@@ -9,52 +9,11 @@ export default function Staking(props) {
   return (
     <div className={`staking ${css(styles.group, styles.group_layout)}`}>
       <div className={css(styles.flex, styles.flex_layout4)}>
-        <div className={css(styles.flex1, styles.flex1_layout)}>
-          <div className={css(styles.flex1_col)}>
-            <div className={css(styles.group1, styles.group1_layout)}>
-              <div
+                      <div
                 style={{ '--src': `url(${require('assets/9c43454c934aa0bc5c11d2277912b307.png')})` }}
                 className={css(styles.background, styles.background_layout)}
               />
-
-              <div
-                style={{ '--src': `url(${require('assets/957827b7d1b9c7063eac3fe4b6ab5a56.png')})` }}
-                className={css(styles.cover_group, styles.cover_group_layout)}>
-                <div className={css(styles.cover_group_spacer)} />
-                <div className={css(styles.cover_group_spacer1)} />
-                <div className={css(styles.rect, styles.rect_layout)} />
-              </div>
-
-              <div
-                style={{ '--src': `url(${require('assets/a3736d806df1599c78a1a26c8d97b9ae.png')})` }}
-                className={css(styles.icon, styles.icon_layout)}
-              />
-              <div
-                style={{ '--src': `url(${require('assets/8e41a73b8b8413543bded8cd8f50a194.png')})` }}
-                className={css(styles.icon, styles.icon_layout1)}
-              />
-            </div>
-          </div>
-          <div className={css(styles.flex1_spacer)} />
-          <div className={css(styles.flex1_col1)}>
-            <h3 className={css(styles.projects, styles.projects_layout)}>{'Projects'}</h3>
-          </div>
-          <div className={css(styles.flex1_spacer1)} />
-          <div className={css(styles.flex1_col2)}>
-            <h3 className={css(styles.staking, styles.staking_layout)}>{'Staking'}</h3>
-          </div>
-          <div className={css(styles.flex1_spacer2)} />
-          <div className={css(styles.flex1_col3)}>
-            <h3 className={css(styles.trade_xs, styles.trade_xs_layout)}>{'Trade XS'}</h3>
-          </div>
-          <div className={css(styles.flex1_spacer3)} />
-          <div className={css(styles.flex1_col4)}>
-            <div className={css(styles.cover_group1, styles.cover_group1_layout)}>
-              <h5 className={css(styles.highlights, styles.highlights_layout)}>{'0xC26e...47da'}</h5>
-            </div>
-          </div>
-        </div>
-
+        
         <h3 className={css(styles.subtitle, styles.subtitle_layout)}>
           {'We are proud to see you as part of XStarter community. Your current tier is:'}
         </h3>
@@ -72,7 +31,7 @@ export default function Staking(props) {
             </div>
 
             <div className={css(styles.cover_group3, styles.cover_group3_layout)}>
-              <div className={css(styles.background1, styles.background1_layout)} />
+              {/* <div className={css(styles.background1, styles.background1_layout)} /> */}
 
               <div className={css(styles.foreground, styles.foreground_layout)}>
                 <div className={css(styles.max, styles.max_layout)}>{'MAX'}</div>
@@ -89,7 +48,7 @@ export default function Staking(props) {
               </div>
               <div className={css(styles.flex5_col)}>
                 <div className={css(styles.cover_group5, styles.cover_group5_layout)}>
-                  <div className={css(styles.background2, styles.background2_layout)} />
+                {/* <div className={css(styles.background2, styles.background2_layout)} /> */}
                   <div className={css(styles.unstake, styles.unstake_layout)}>{'Unstake'}</div>
                 </div>
               </div>
@@ -387,7 +346,8 @@ Staking.inStorybook = true;
 const styles = StyleSheet.create({
   group: {
     display: 'flex',
-    backgroundColor: 'rgb(38,41,52)'
+    backgroundColor: 'rgb(38,41,52)',
+    zIndex: -1
   },
   group_layout: {
     position: 'relative',
@@ -687,6 +647,7 @@ const styles = StyleSheet.create({
   },
   background1_layout: {
     position: 'absolute',
+    zIndex: -1000,
     top: 0,
     height: 40,
     left: 0,

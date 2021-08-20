@@ -3,66 +3,11 @@
  */
 import React from 'react';
 import { StyleSheet, css } from 'aphrodite/no-important';
-
+import { Navbar } from './Navbar';
 export default function Idos(props) {
   return (
     <div className={`idos ${css(styles.group, styles.group_layout)}`}>
       <div className={css(styles.flex, styles.flex_layout4)}>
-        <div className={css(styles.flex1, styles.flex1_layout)}>
-          <div className={css(styles.flex1_col)}>
-            <div className={css(styles.group1, styles.group1_layout)}>
-              <div
-                style={{ '--src': `url(${require('assets/9c43454c934aa0bc5c11d2277912b307.png')})` }}
-                className={css(styles.background, styles.background_layout)}
-              />
-
-              <div className={css(styles.flex2, styles.flex2_layout)}>
-                <div className={css(styles.flex2_col)}>
-                  <div className={css(styles.group2, styles.group2_layout)}>
-                    <div
-                      style={{ '--src': `url(${require('assets/a3736d806df1599c78a1a26c8d97b9ae.png')})` }}
-                      className={css(styles.icon, styles.icon_layout)}
-                    />
-                    <div
-                      style={{ '--src': `url(${require('assets/8e41a73b8b8413543bded8cd8f50a194.png')})` }}
-                      className={css(styles.icon, styles.icon_layout1)}
-                    />
-                  </div>
-                </div>
-                <div className={css(styles.flex2_spacer)} />
-                <div
-                  style={{ '--src': `url(${require('assets/957827b7d1b9c7063eac3fe4b6ab5a56.png')})` }}
-                  className={css(styles.img, styles.img_layout)}
-                />
-              </div>
-
-              <div className={css(styles.flex3, styles.flex3_layout)}>
-                <div className={css(styles.rect, styles.rect_layout)} />
-                <div className={css(styles.rect, styles.rect_layout1)} />
-                <div className={css(styles.rect, styles.rect_layout2)} />
-              </div>
-            </div>
-          </div>
-          <div className={css(styles.flex1_spacer)} />
-          <div className={css(styles.flex1_col1)}>
-            <h3 className={css(styles.projects, styles.projects_layout)}>{'Projects'}</h3>
-          </div>
-          <div className={css(styles.flex1_spacer1)} />
-          <div className={css(styles.flex1_col2)}>
-            <h3 className={css(styles.staking, styles.staking_layout)}>{'Staking'}</h3>
-          </div>
-          <div className={css(styles.flex1_spacer2)} />
-          <div className={css(styles.flex1_col3)}>
-            <h3 className={css(styles.trade_xs, styles.trade_xs_layout)}>{'Trade XS'}</h3>
-          </div>
-          <div className={css(styles.flex1_spacer3)} />
-          <div className={css(styles.flex1_col4)}>
-            <div className={css(styles.cover_group, styles.cover_group_layout)}>
-              <h5 className={css(styles.highlights, styles.highlights_layout)}>{'0xC26e...47da'}</h5>
-            </div>
-          </div>
-        </div>
-
         <div className={css(styles.flex_row)}>
           <div className={css(styles.cover_group1, styles.cover_group1_layout)}>
             <div className={css(styles.txt, styles.txt_layout)}>{'Current IDOs'}</div>
@@ -315,7 +260,8 @@ Idos.inStorybook = true;
 const styles = StyleSheet.create({
   group: {
     display: 'flex',
-    backgroundColor: 'rgb(38,41,52)'
+    backgroundColor: 'rgb(38,41,52)',
+    zIndex:-1
   },
   group_layout: {
     position: 'relative',

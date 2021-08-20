@@ -8,55 +8,6 @@ export default function TradingXS(props) {
   return (
     <div className={`trading-xs ${css(styles.group, styles.group_layout)}`}>
       <div className={css(styles.flex, styles.flex_layout)}>
-        <div className={css(styles.flex1, styles.flex1_layout)}>
-          <div className={css(styles.flex1_col)}>
-            <div className={css(styles.group1, styles.group1_layout)}>
-              <div
-                style={{ '--src': `url(${require('assets/64eeb58d6a27d48f8c10806b12ba0a1a.png')})` }}
-                className={css(styles.background, styles.background_layout)}
-              />
-
-              <div
-                style={{ '--src': `url(${require('assets/957827b7d1b9c7063eac3fe4b6ab5a56.png')})` }}
-                className={css(styles.cover_group, styles.cover_group_layout)}>
-                <div className={css(styles.cover_group_spacer)} />
-                <div className={css(styles.cover_group_spacer1)} />
-                <div className={css(styles.rect, styles.rect_layout)} />
-              </div>
-
-              <div
-                style={{ '--src': `url(${require('assets/a3736d806df1599c78a1a26c8d97b9ae.png')})` }}
-                className={css(styles.icon, styles.icon_layout)}
-              />
-              <div
-                style={{ '--src': `url(${require('assets/8e41a73b8b8413543bded8cd8f50a194.png')})` }}
-                className={css(styles.icon, styles.icon_layout1)}
-              />
-            </div>
-          </div>
-          <div className={css(styles.flex1_spacer)} />
-          <div className={css(styles.flex1_col1)}>
-            <h3 className={css(styles.projects, styles.projects_layout)}>{'Projects'}</h3>
-          </div>
-          <div className={css(styles.flex1_spacer1)} />
-          <div className={css(styles.flex1_col2)}>
-            <h3 className={css(styles.staking, styles.staking_layout)}>{'Staking'}</h3>
-          </div>
-          <div className={css(styles.flex1_spacer2)} />
-          <div className={css(styles.flex1_col3)}>
-            <div className={css(styles.group2, styles.group2_layout)}>
-              <h3 className={css(styles.trade_xs, styles.trade_xs_layout)}>{'Trade XS'}</h3>
-              <hr className={css(styles.line, styles.line_layout)} />
-            </div>
-          </div>
-          <div className={css(styles.flex1_spacer3)} />
-          <div className={css(styles.flex1_col4)}>
-            <div className={css(styles.group3, styles.group3_layout)}>
-              <div className={css(styles.rect1, styles.rect1_layout)} />
-              <h5 className={css(styles.highlights, styles.highlights_layout)}>{'0xC26e...47da'}</h5>
-            </div>
-          </div>
-        </div>
 
         <div className={css(styles.content_box, styles.content_box_layout)}>
           <div className={css(styles.group4, styles.group4_layout)}>
@@ -116,7 +67,8 @@ TradingXS.inStorybook = true;
 const styles = StyleSheet.create({
   group: {
     display: 'flex',
-    backgroundColor: 'rgb(38,41,52)'
+    backgroundColor: 'rgb(38,41,52)',
+    zIndex: -1
   },
   group_layout: {
     position: 'relative',

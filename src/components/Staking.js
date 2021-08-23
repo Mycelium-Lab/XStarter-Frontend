@@ -4,15 +4,12 @@
 import React from 'react';
 import { StyleSheet, css } from 'aphrodite/no-important';
 import { Px, commonStyles } from './posize';
+import { Footer } from './Footer';
 
 export default function Staking(props) {
   return (
     <div className={`staking ${css(styles.group, styles.group_layout)}`}>
       <div className={css(styles.flex, styles.flex_layout4)}>
-                      <div
-                style={{ '--src': `url(${require('assets/9c43454c934aa0bc5c11d2277912b307.png')})` }}
-                className={css(styles.background, styles.background_layout)}
-              />
         
         <h3 className={css(styles.subtitle, styles.subtitle_layout)}>
           {'We are proud to see you as part of XStarter community. Your current tier is:'}
@@ -307,35 +304,7 @@ export default function Staking(props) {
         <div className={css(styles.cover_group8, styles.cover_group8_layout)}>
           <div className={css(styles.text_body4, styles.text_body4_layout)}>{'GO to BUY XS tokens'}</div>
         </div>
-
-        <div className={css(styles.flex_row)}>
-          <Px.div x="1fr 1339.5px 1fr" y="80px minmax(0px, 56fr) 10px" className={css(styles.flex21)}>
-            <div
-              style={{ '--src': `url(${require('assets/f46bd013b1655c9ecc0c37782732c6af.png')})` }}
-              className={css(styles.image, styles.image_layout)}
-            />
-            <div className={css(styles.flex21_spacer)} />
-            <div
-              style={{ '--src': `url(${require('assets/5973fb4bdf2343a0a87d7cd6527bdea1.png')})` }}
-              className={css(styles.icon, styles.icon_layout2)}
-            />
-            <div className={css(styles.flex21_spacer)} />
-            <div className={css(styles.flex21_col)}>
-              <div
-                style={{ '--src': `url(${require('assets/b2fe8991c70f4ecc20f4d6f206f0e193.png')})` }}
-                className={css(styles.cover_group9, styles.cover_group9_layout)}>
-                <div
-                  style={{ '--src': `url(${require('assets/e18ec21f9f22d41337887ae88804acca.png')})` }}
-                  className={css(styles.image1, styles.image1_layout)}
-                />
-              </div>
-            </div>
-            <div className={css(styles.flex21_spacer2)} />
-            <div className={css(styles.flex21_col1)}>
-              <h3 className={css(styles.copyright, styles.copyright_layout)}>{'Copyright'}</h3>
-            </div>
-          </Px.div>
-        </div>
+        <Footer />
       </div>
     </div>
   );
@@ -345,9 +314,7 @@ Staking.inStorybook = true;
 
 const styles = StyleSheet.create({
   group: {
-    display: 'flex',
-    backgroundColor: 'rgb(38,41,52)',
-    zIndex: -1
+    display: 'flex'
   },
   group_layout: {
     position: 'relative',

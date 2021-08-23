@@ -4,6 +4,7 @@ import { StyleSheet, css } from 'aphrodite/no-important';
 import { useState } from 'react';
 export const ConnectToWallet = () => {
     const [address, setAddress] = useState()
+    let formattedAddress = address ?  (address.substring(0,6) + '..'+ address.substring(address.length - 4)) : null
     const connectToMetamask = async () => {
         if (window.ethereum && ((window ).ethereum.isMetaMask == true) && !address) {
             let web3 = new Web3(window.ethereum)
@@ -21,7 +22,7 @@ export const ConnectToWallet = () => {
     return (
     <div className={css(styles.flex1_col4)}>
         <div style= {{cursor:'pointer'}} className={css(styles.cover_group, styles.cover_group_layout)} onClick = {connectToMetamask}>
-          <h5 className={css(styles.highlights, styles.highlights_layout)}>{address || 'Connect'}</h5>
+          <h5 className={css(styles.highlights, styles.highlights_layout)}>{formattedAddress || 'Connect'}</h5>
         </div>
      </div>
     )

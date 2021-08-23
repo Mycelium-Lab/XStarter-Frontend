@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import { StyleSheet, css } from 'aphrodite/no-important';
+import { Footer } from './Footer';
 
 export default function TradingXS(props) {
   return (
@@ -57,7 +58,9 @@ export default function TradingXS(props) {
             <div className={css(styles.buy, styles.buy_layout)}>{'BUY'}</div>
           </div>
         </div>
+        <Footer />
       </div>
+      
     </div>
   );
 }
@@ -66,9 +69,7 @@ TradingXS.inStorybook = true;
 
 const styles = StyleSheet.create({
   group: {
-    display: 'flex',
-    backgroundColor: 'rgb(38,41,52)',
-    zIndex: -1
+    display: 'flex'
   },
   group_layout: {
     position: 'relative',

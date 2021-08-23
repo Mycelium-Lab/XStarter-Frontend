@@ -4,6 +4,7 @@
 import React from 'react';
 import { StyleSheet, css } from 'aphrodite/no-important';
 import { Navbar } from './Navbar';
+import { Footer } from './Footer';
 export default function Idos(props) {
   return (
     <div className={`idos ${css(styles.group, styles.group_layout)}`}>
@@ -14,53 +15,61 @@ export default function Idos(props) {
           </div>
         </div>
 
-        <div className={css(styles.content_box, styles.content_box_layout)}>
-          <div className={css(styles.cover_group2, styles.cover_group2_layout)}>
-            <div className={css(styles.flex4, styles.flex4_layout)}>
-              <div
-                style={{ '--src': `url(${require('assets/7aed560d17841ee587f0a5178d160625.png')})` }}
-                className={css(styles.icon, styles.icon_layout2)}
-              />
-              <div className={css(styles.flex4_spacer)} />
-              <div className={css(styles.flex4_col)}>
-                <div className={css(styles.flex, styles.flex_layout)}>
-                  <h2 className={css(styles.medium_title, styles.medium_title_layout)}>{'shuffle!'}</h2>
-                  <div className={css(styles.small_text_body, styles.small_text_body_layout)}>
-                    {'Website | Medium | Twitter | Telegram'}
+        <div className={css(styles.flex7, styles.flex7_layout)}>
+          <div className={css(styles.flex7_col)}>
+            <div className={css(styles.content_box, styles.content_box_layout3)}>
+              <div className={css(styles.cover_group7, styles.cover_group7_layout)}>
+                <div className={css(styles.flex14, styles.flex14_layout)}>
+                  <div
+                    style={{ '--src': `url(${require('assets/7aed560d17841ee587f0a5178d160625.png')})` }}
+                    className={css(styles.icon, styles.icon_layout5)}
+                  />
+                  <div className={css(styles.flex14_spacer)} />
+                  <div className={css(styles.flex14_col)}>
+                    <div className={css(styles.flex, styles.flex_layout)}>
+                      <h2 className={css(styles.medium_title, styles.medium_title_layout)}>{'shuffle!'}</h2>
+                      <div className={css(styles.small_text_body, styles.small_text_body_layout)}>
+                        {'Website | Medium | Twitter | Telegram'}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className={css(styles.flex6, styles.flex6_layout)}>
-            <div className={css(styles.group3, styles.group3_layout)}>
-              <div className={css(styles.text_body, styles.text_body_layout)}>{'IDO Status:'}</div>
-              <div className={css(styles.text_body1, styles.text_body1_layout)}>{'Pair:'}</div>
-              <div className={css(styles.completed, styles.completed_layout)}>{'Completed'}</div>
-              <div className={css(styles.eth, styles.eth_layout)}>{'ETH'}</div>
-            </div>
+              <div className={css(styles.flex16, styles.flex16_layout)}>
+                <div className={css(styles.group10, styles.group10_layout)}>
+                  <div className={css(styles.text_body, styles.text_body_layout)}>{'IDO Status:'}</div>
+                  <div className={css(styles.text_body10, styles.text_body10_layout)}>{'Pair:'}</div>
+                  <div className={css(styles.completed, styles.completed_layout)}>{'Completed'}</div>
+                  <div className={css(styles.eth, styles.eth_layout)}>{'ETH'}</div>
+                </div>
 
-            <div className={css(styles.small_paragraph_body, styles.small_paragraph_body_layout)}>
-              {
-                'SHUFFLE! is a deflationary odds based slot machine that runs on SHUFFLE! native token. Prizes consist of $SHFL, $CARDS, $C3, $GERO and others.'
-              }
-            </div>
+                <div className={css(styles.small_paragraph_body, styles.small_paragraph_body_layout)}>
+                  {
+                    'SHUFFLE! is a deflationary odds based slot machine that runs on SHUFFLE! native token. Prizes consist of $SHFL, $CARDS, $C3, $GERO and others.'
+                  }
+                </div>
 
-            <div className={css(styles.group4, styles.group4_layout)}>
-              <div className={css(styles.text_body, styles.text_body_layout)}>{'IDO Progress:'}</div>
-              <div className={css(styles.small_text_body1, styles.small_text_body1_layout)}>{'100.00%'}</div>
-            </div>
+                <div className={css(styles.group11, styles.group11_layout)}>
+                  <div className={css(styles.text_body, styles.text_body_layout)}>{'IDO Progress:'}</div>
+                  <div className={css(styles.small_text_body19, styles.small_text_body19_layout)}>{'100.00%'}</div>
+                </div>
 
-            <div className={css(styles.rect3, styles.rect3_layout)} />
-            <div className={css(styles.small_text_body2, styles.small_text_body2_layout)}>
-              {'Swap Rate - 1 ETH: 285000.00 SHFL'}
+                <div className={css(styles.rect6, styles.rect6_layout)} />
+                <div className={css(styles.small_text_body20, styles.small_text_body20_layout)}>
+                  {'Swap Rate - 1 ETH: 285000.00 SHFL'}
+                </div>
+                <div className={css(styles.small_text_body21, styles.small_text_body21_layout)}>
+                  {'Pool Cap - 349772.7272727 SHFL'}
+                </div>
+                <div className={css(styles.small_text_body22, styles.small_text_body22_layout)}>
+                  {'Access - PRIVATE'}
+                </div>
+                <div className={css(styles.small_text_body23, styles.small_text_body23_layout)}>
+                  {'Participants - 856'}
+                </div>
+              </div>
             </div>
-            <div className={css(styles.small_text_body3, styles.small_text_body3_layout)}>
-              {'Pool Cap - 349772.7272727 SHFL'}
-            </div>
-            <div className={css(styles.small_text_body4, styles.small_text_body4_layout)}>{'Access - PRIVATE'}</div>
-            <div className={css(styles.small_text_body5, styles.small_text_body5_layout)}>{'Participants - 856'}</div>
           </div>
         </div>
 
@@ -250,6 +259,7 @@ export default function Idos(props) {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     </div>
   );
@@ -259,9 +269,7 @@ Idos.inStorybook = true;
 
 const styles = StyleSheet.create({
   group: {
-    display: 'flex',
-    backgroundColor: 'rgb(38,41,52)',
-    zIndex:-1
+    display: 'flex'
   },
   group_layout: {
     position: 'relative',
@@ -307,13 +315,7 @@ const styles = StyleSheet.create({
   background: {
     background: 'var(--src) center center / contain no-repeat'
   },
-  background_layout: {
-    position: 'absolute',
-    height: 2048,
-    bottom: -1696,
-    left: -1378,
-    right: -2562
-  },
+
   flex2: {
     display: 'flex'
   },
@@ -538,7 +540,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(38,41,52,0.803921568627451)',
     boxShadow: '1px -1px 4px 0px rgba(243,243,243,0.25098039215686274)',
     border: '1px solid rgba(74,74,74,0.803921568627451)',
-    borderRadius: '8px 8px 8px 8px'
+    borderRadius: '8px 8px 8px 8px',
+
   },
   content_box_layout: {
     position: 'relative',
@@ -854,6 +857,7 @@ const styles = StyleSheet.create({
   },
   flex7_col: {
     display: 'flex',
+    maxWidth: '364px',
     flex: '1 1 300px'
   },
   content_box_layout1: {

@@ -12,7 +12,7 @@ class App extends Component {
     return (
       <Router hashType="noslash" basename={process.env.BASE_PATH}>
         <div style={{ '--src': `url(${require('assets/9c43454c934aa0bc5c11d2277912b307.png')})` }}
-                className={css(styles.background, styles.background_layout)}>
+                className={css(styles.background)}>
         <Navbar />
 
         <Switch>
@@ -37,9 +37,8 @@ class App extends Component {
 }
 const styles = StyleSheet.create({
 background: {
-  background: 'var(--src)',
-  width: '100vw',
-  height: '100vh',
+  background: 'var(--src) rgb(38, 41, 52)',
+  minHeight: '100vh',
   backgroundPosition: 'center',
   backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',

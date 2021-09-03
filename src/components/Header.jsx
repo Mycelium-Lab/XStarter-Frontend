@@ -1,8 +1,10 @@
 import React from 'react';
 import logo from '../img/logo.png';
+import { useSelector } from 'react-redux';
 
 function Header(props) {
   const { handleChange } = props;
+  const address = useSelector(state => state.wallet.address);
   return (
     <div className="xs-head-wrapper">
         <div className="xs-head">
@@ -22,7 +24,7 @@ function Header(props) {
               </div>
             </nav>
             <div className="xs-user">
-              <span className="xs-username">0xC26e88888888888888999999999847da</span>
+              <span className="xs-username">{`${address.slice(0,6)}...${address.slice(-4)}`}</span>
             </div>
           </div>
         </div>

@@ -6,17 +6,22 @@ import StakingPage from './components/StakingPage.jsx';
 import TradePage from './components/TradePage.jsx';
 import './App.css';
 import './style.css';
+import { sendBuyTransaction } from './swap.js';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { selectWallet } from './wallets/actions';
+
+
 
 function App() {
   const [page, setPage] = useState('projects');
 
   const dispatch = useDispatch()
 
+
   useEffect(() => {
     selectWallet('metaMask', dispatch);
+    sendBuyTransaction();
   }, [])
 
 

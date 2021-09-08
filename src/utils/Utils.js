@@ -6,7 +6,7 @@ export { findGetParameter,commissionToStaked };
 //адреса контрактов токенов
 const tokenCase = '0x5cafe85d8983f61C059df359c504F1Bab8009e9e';
 const stakeCase = '0x5a179BD986f1DCCbADd940A8c5DC6aa5Ce5dFF3C';
-const rankCase = '0x91Ac0cc63eA781fBe31CD925Ae7B94FA254E6ffA';
+
 
 
 export class contractMethods {
@@ -18,7 +18,6 @@ export class contractMethods {
         this.ZERO_ADDR = "0x0000000000000000000000000000000000000000";
         this.contractCase = new this.web3.eth.Contract(abiProxy, tokenCase);
         this.contractStake = new this.web3.eth.Contract(abiStake, stakeCase);
-        this.contractRank = new this.web3.eth.Contract(abiRank, rankCase);
         this.walletAddress = walletAddress;
     }
 
@@ -63,19 +62,8 @@ export class contractMethods {
         });
     }
 
-    //метод для поднятия ранга
-    async instanceRankUp() {
-      await this.contractRank.methods.rankUp(this.walletAddress).send({from: this.walletAddress});
-    }
-
-    //метод для получения информации о том, может ли юзер поднять ранг
-    async canRankUp() {
-        console.log(this.walletAddress);
-        return new Promise((resolve, reject) => {
-            return this.contractRank.methods.canRankUp(this.walletAddress.toLowerCase()).call({from: this.walletAddress.toLowerCase()}, function(error, result) {
-                resolve(result);
-            });
-        });
+    async swap(amount) {
+      
     }
     
     //метод для получения баланса

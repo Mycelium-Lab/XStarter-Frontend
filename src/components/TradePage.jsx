@@ -22,7 +22,7 @@ function TradePage(props) {
   }
   const changeOutputPrice = async (price) => {
     if (parseFloat(price.target.value) && swapProvider) {
-      const [buyPrice, sellPrice] = await swapProvider.getWETHToXSPrice(price.target.value);
+      const sellPrice = await swapProvider.getWETHToXSPrice(price.target.value);
       setInTokenAmount(price.target.value)
       setOutTokenAmount(sellPrice);
     }

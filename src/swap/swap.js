@@ -99,7 +99,7 @@ export class SwapProvider {
   async buyXSForWETH(inTokens) {
     const weiInTokensAmount = Web3.utils.toWei(inTokens).toString();
     if (await this.isEnoughAllowance(weiInTokensAmount, WETH9[process.env.REACT_APP_CHAIN_ID].address)) {
-      const [buyPrice, sellPrice] = await this.getWETHToXSPrice(inTokens);
+      const sellPrice = await this.getWETHToXSPrice(inTokens);
       const amountOutMin = new Web3.utils.BN(parseFloat(sellPrice) * Math.pow(10, 8))
       const params = {
         tokenIn: WETH9[process.env.REACT_APP_CHAIN_ID].address,
@@ -122,7 +122,7 @@ export class SwapProvider {
   async buyWETHForXS(inTokens) {
     const inTokenAmount = new Web3.utils.BN(parseFloat(inTokens.toString()) * Math.pow(10, 8));
     if (await this.isEnoughAllowance(inTokenAmount, this.immutables.token0)) {
-      const [buyPrice, sellPrice] = await this.getXSToWETHPrice(inTokens);
+      const sellPrice = await this.getXSToWETHPrice(inTokens);
       const amountOutMin = Web3.utils.toWei(sellPrice.toString()).toString()
       const params = {
         tokenIn: this.immutables.token0,
@@ -144,17 +144,15 @@ export class SwapProvider {
   // Цена WETH -> XS
   async getWETHToXSPrice(amount){
     const outputAmount = CurrencyAmount.fromRawAmount(WETH9[process.env.REACT_APP_CHAIN_ID], Web3.utils.toWei(amount).toString());
-    const [inputAmount] = await this.pool.getInputAmount(outputAmount);
     const [newOutputAmount]= await this.pool.getOutputAmount(outputAmount);
-    return [parseFloat(inputAmount.toSignificant(8) * (1 + slippageRate)), parseFloat(newOutputAmount.toSignificant(8) * (1 - slippageRate))];
+    return parseFloat(newOutputAmount.toSignificant(8) * (1 - slippageRate));
   }
   // Цена XS -> WETH
   async getXSToWETHPrice(amount){
     const myToken = new Token(4, this.immutables.token0, 8, "XS", "XStarter");
     const tokenAmount = new Web3.utils.BN(parseFloat(amount) * Math.pow(10, 8))
     const outputAmount = CurrencyAmount.fromRawAmount(myToken, tokenAmount.toString());
-    const [inputAmount] = await this.pool.getInputAmount(outputAmount);
     const [newOutputAmount]= await this.pool.getOutputAmount(outputAmount);
-    return [parseFloat(inputAmount.toSignificant(18) * (1 + slippageRate)), parseFloat(newOutputAmount.toSignificant(18) * (1 - slippageRate))];
+    return parseFloat(newOutputAmount.toSignificant(18) * (1 - slippageRate));
   }
 }

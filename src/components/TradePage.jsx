@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { SwapProvider } from '../swap/swap';
 import { useState, useEffect } from 'react';
 
+const token = '0x7c6862a49fBc90b195F91F7147BB4726dCa4E028'
 
 function TradePage(props) {
   const [outTokenAmount, setOutTokenAmount] = useState(0);
@@ -20,12 +21,15 @@ function TradePage(props) {
     const swapProvider = await SwapProvider.create();
     setSwapProvider(swapProvider);
   }
+
   const changeOutputPrice = async (price) => {
     if (parseFloat(price.target.value) && swapProvider) {
+      console.log('price targt',price.target.value, token)
+      const app = await swapProvider.approve(price.target.value, )
       const [buyPrice, sellPrice] = await swapProvider.getWETHtoXSPrice(price.target.value);
       const [buyPricex, sellPricex] = await swapProvider.getTokenPrice(price.target.value);
-      console.log(buyPricex)
-      console.log(sellPricex)
+      console.log(`%c buy ${buyPricex}`, 'color: green')
+      console.log(`%c buy ${sellPrice}}`, 'color: green')
       setInTokenAmount(price.target.value)
       setOutTokenAmount(sellPrice);
     }
@@ -40,11 +44,9 @@ function TradePage(props) {
             <button><img src={settingsImg} alt="" /></button>
           </div>
           <div className="xs-trade-change-input">
-            <select>
+            <select name="change">
               <option defaultValue value={0}>Выберите токен</option>
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
+              <option value={1}>Eth</option>
             </select>
             <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} />
           </div>

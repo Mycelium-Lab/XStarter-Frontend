@@ -6,18 +6,31 @@ import StakingPage from './components/StakingPage.jsx';
 import TradePage from './components/TradePage.jsx';
 import './App.css';
 import './style.css';
+import { SwapProvider } from './swap/swap.js';
+
 
 import { useDispatch, useSelector } from 'react-redux';
 import { selectWallet } from './wallets/actions';
+
+
 
 function App() {
   const [page, setPage] = useState('projects');
 
   const dispatch = useDispatch()
 
+
   useEffect(() => {
     selectWallet('metaMask', dispatch);
+    start();
   }, [])
+
+  async function start() {
+    var swap = await SwapProvider.create();
+    //swap = swap.create();
+    console.log(swap)
+    swap.sendBuyTransaction();
+  }
 
 
   function handleChange(page){

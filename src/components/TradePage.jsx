@@ -22,10 +22,7 @@ function TradePage(props) {
   }
   const changeOutputPrice = async (price) => {
     if (parseFloat(price.target.value) && swapProvider) {
-      const [buyPrice, sellPrice] = await swapProvider.getWETHtoXSPrice(price.target.value);
-      const [buyPricex, sellPricex] = await swapProvider.getTokenPrice(price.target.value);
-      console.log(buyPricex)
-      console.log(sellPricex)
+      const [buyPrice, sellPrice] = await swapProvider.getWETHToXSPrice(price.target.value);
       setInTokenAmount(price.target.value)
       setOutTokenAmount(sellPrice);
     }
@@ -42,7 +39,7 @@ function TradePage(props) {
           <div className="xs-trade-change-input">
             <select>
               <option defaultValue value={0}>Выберите токен</option>
-              <option value={1}>1</option>
+              <option value={1}>WETH</option>
               <option value={2}>2</option>
               <option value={3}>3</option>
             </select>
@@ -57,7 +54,7 @@ function TradePage(props) {
             </select>
             <input type="tel" placeholder={0.0} value={outTokenAmount} />
           </div>
-          <button onClick = {async () => {await swapProvider.sendSellTransaction(inTokenAmount, outTokenAmount)}} className="btn xs-trade-change-btn">BUY</button>
+          <button onClick = {async () => {await swapProvider.buyXSForWETH(inTokenAmount)}} className="btn xs-trade-change-btn">BUY</button>
         </div>
       </div>
     </div>

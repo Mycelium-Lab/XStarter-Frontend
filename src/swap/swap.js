@@ -5,6 +5,8 @@ import { abi as poolAbi } from '@uniswap/v3-core/artifacts/contracts/UniswapV3Po
 import { abi as swapRouterAbi } from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json'
 import { abi as erco20Abi} from '@uniswap/v3-core/artifacts/contracts/interfaces/IERC20Minimal.sol/IERC20Minimal.json'
 import { CurrencyAmount } from '@uniswap/sdk-core';
+import { Interface } from '@ethersproject/abi'
+
 import JSBI from 'jsbi';
 const slippageRate = 0.001
 const feeAmount = FeeAmount.MEDIUM
@@ -19,6 +21,7 @@ export class SwapProvider {
       this.immutables = await this.getPoolImmutables();
       [this.liquidity, this.slot] = await this.getPoolState();
       this.pool = await this.setupPool();
+      this.INTERFACE = new Interface(swapRouterAbi)
     }
   }
   static async create() {
@@ -111,8 +114,12 @@ export class SwapProvider {
         amountOutMinimum: amountOutMin.toString(),
         sqrtPriceLimitX96: 0
       }
+      const multicall = []
+      multicall.push(this.INTERFACE.encodeFunctionData('exactInputSingle',[params]))
+      multicall.push(this.INTERFACE.encodeFunctionData('unwrapWETH9', [0, this.account]))
+
       const swapRouterContract = new this.web3.eth.Contract(swapRouterAbi, process.env.REACT_APP_SWAPROUTER_ADDRESS);
-      const transactionResult = await swapRouterContract.methods.exactInputSingle(params).send({ from: this.account });
+      const transactionResult = await swapRouterContract.methods.exactInputSingle(params).send({ from: this.account, value: weiInTokensAmount });
       return transactionResult;
     } else {
       await this.approve(weiInTokensAmount, WETH9[process.env.REACT_APP_CHAIN_ID].address);

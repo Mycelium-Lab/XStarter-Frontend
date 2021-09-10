@@ -22,7 +22,7 @@ function TradePage(props) {
   }
   const changeOutputPrice = async (price) => {
     if (parseFloat(price.target.value) && swapProvider) {
-      const sellPrice = await swapProvider.getWETHToXSPrice(price.target.value);
+      const sellPrice = await swapProvider.getXSToWETHPrice(price.target.value);
       setInTokenAmount(price.target.value)
       setOutTokenAmount(sellPrice);
     }
@@ -54,7 +54,10 @@ function TradePage(props) {
             </select>
             <input type="tel" placeholder={0.0} value={outTokenAmount} />
           </div>
-          <button onClick = {async () => {await swapProvider.buyXSForWETH(inTokenAmount)}} className="btn xs-trade-change-btn">BUY</button>
+          <button onClick = {async () => {
+            await swapProvider.approve('XST', inTokenAmount)
+            await swapProvider.buyWETHForXS(inTokenAmount)
+            }} className="btn xs-trade-change-btn">BUY</button>
         </div>
       </div>
     </div>

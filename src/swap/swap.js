@@ -91,9 +91,22 @@ export class SwapProvider {
     const allowance = await tokenContract.methods.allowance(this.account, process.env.REACT_APP_SWAPROUTER_ADDRESS).call();
     return allowance >= amount;
   }
-  async approve(amount, tokenAddress){
-    const tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
-    return tokenContract.methods.approve(process.env.REACT_APP_SWAPROUTER_ADDRESS, amount).send({from:this.account});
+  async approve(type,amount){
+    let tokenAmount;
+    let tokenContract;
+    let tokenAddress;
+    if(type == 'WETH'){
+      tokenAmount = Web3.utils.toWei(amount).toString()
+      tokenAddress = WETH9[process.env.REACT_APP_CHAIN_ID].address
+      tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
+    }else if (type == 'XST') {
+      tokenAmount = new Web3.utils.BN(parseFloat(amount) * Math.pow(10, 8)).toString()
+      tokenAddress = this.immutables.token0
+      tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
+    }
+    if (!(await this.isEnoughAllowance(tokenAmount, tokenAddress))) {
+      return tokenContract.methods.approve(process.env.REACT_APP_SWAPROUTER_ADDRESS, tokenAmount).send({from:this.account});
+    }
   }
   // Купить XS за WETH
   async buyXSForWETH(inTokens) {
@@ -114,9 +127,7 @@ export class SwapProvider {
       const swapRouterContract = new this.web3.eth.Contract(swapRouterAbi, process.env.REACT_APP_SWAPROUTER_ADDRESS);
       const transactionResult = await swapRouterContract.methods.exactInputSingle(params).send({ from: this.account });
       return transactionResult;
-    } else {
-      await this.approve(weiInTokensAmount, WETH9[process.env.REACT_APP_CHAIN_ID].address);
-    }
+    } 
   }
   // Купить WETH за XS
   async buyWETHForXS(inTokens) {
@@ -137,8 +148,6 @@ export class SwapProvider {
       const swapRouterContract = new this.web3.eth.Contract(swapRouterAbi, process.env.REACT_APP_SWAPROUTER_ADDRESS);
       const transactionResult = await swapRouterContract.methods.exactInputSingle(params).send({ from: this.account });
       return transactionResult;
-    } else {
-      await this.approve(inTokenAmount, this.immutables.token0);
     }
   }
   // Цена WETH -> XS

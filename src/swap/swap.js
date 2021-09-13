@@ -132,8 +132,9 @@ export class SwapProvider {
         amountOutMinimum: amountOutMin.toString(),
         sqrtPriceLimitX96: 0
       }
+      console.log('AGRH')
       const swapRouterContract = new this.web3.eth.Contract(swapRouterAbi, process.env.REACT_APP_SWAPROUTER_ADDRESS);
-      const transactionResult = await swapRouterContract.methods.exactInputSingle(params).send({ from: this.account });
+      const transactionResult = await swapRouterContract.methods.exactInputSingle(params).send({ from: this.account, value: weiInTokensAmount });
       return transactionResult;
     } 
   }

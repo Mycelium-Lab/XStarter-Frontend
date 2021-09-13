@@ -11,6 +11,9 @@ export const SET_GLOBAL = "SET_GLOBAL"
 export const SET_BALANCE = "SET_BALANCE"
 export const SET_PATH = "SET_PATH"
 
+// TRANSACTION INFO
+export const SET_TRANSACTION_INFO = "SET_TRANSACTION_INFO"
+
 /* UI */
 export const OPEN_MODAL = "OPEN_MODAL"
 export const CLOSE_MODAL = "CLOSE_MODAL"

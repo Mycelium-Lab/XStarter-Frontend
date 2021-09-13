@@ -19,6 +19,7 @@ function toXS(val){
 }
 
 export class SwapProvider {
+  
   async initialize() {
     if (window.ethereum && ((window).ethereum.isMetaMask === true)) {
       this.web3 = new Web3(window.ethereum)
@@ -97,32 +98,41 @@ export class SwapProvider {
     }
   }
   async isEnoughAllowance(amount, tokenAddress){
+    const weiInTokensAmount = Web3.utils.toWei(amount).toString();
     const tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
     const allowance = await tokenContract.methods.allowance(this.account, process.env.REACT_APP_SWAPROUTER_ADDRESS).call();
-    return allowance >= amount;
+    const num1 = this.web3.utils.toBN(allowance);
+    const num2 = this.web3.utils.toBN(weiInTokensAmount);
+    return num1.gte(num2);
   }
-  async approve(type,amount){
-    let tokenAmount;
-    let tokenContract;
-    let tokenAddress;
-    if(type === 'WETH'){
-      tokenAmount = Web3.utils.toWei(amount).toString()
-      tokenAddress = WETH9[process.env.REACT_APP_CHAIN_ID].address
-      tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
-    }else if (type === 'XST') {
-      tokenAmount = toXS(amount);
-      tokenAddress = this.immutables.token0
-      tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
-    }
-    console.log(tokenAmount, tokenAddress);
-    if (!(await this.isEnoughAllowance(tokenAmount, tokenAddress))) {
-      return tokenContract.methods.approve(process.env.REACT_APP_SWAPROUTER_ADDRESS, tokenAmount).send({from:this.account});
-    }
+  async approve(type, amount){ 
+      let tokenAmount;
+      let tokenContract;
+      let tokenAddress;
+      if(type === 'WETH'){
+        tokenAmount = Web3.utils.toWei(amount).toString()
+        tokenAddress = WETH9[process.env.REACT_APP_CHAIN_ID].address
+        tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
+      }else if (type === 'XST') {
+        tokenAmount = toXS(amount);
+        tokenAddress = this.immutables.token0
+        tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
+      }
+      if (!(await this.isEnoughAllowance(amount, tokenAddress))) 
+      {
+        return new Promise((resolve, reject) => {
+          tokenContract.methods.approve(process.env.REACT_APP_SWAPROUTER_ADDRESS, tokenAmount).send({from:this.account})
+          .on('transactionHash', function(hash) {
+          resolve(hash);
+          });
+        })
+      } 
   }
   // Купить XS за WETH
   async buyXSForWETH(inTokens) {
-    const weiInTokensAmount = Web3.utils.toWei(inTokens).toString();
-    if (await this.isEnoughAllowance(weiInTokensAmount, WETH9[process.env.REACT_APP_CHAIN_ID].address)) {
+    const weiInTokensAmount = this.web3.utils.toWei(inTokens).toString();
+    if (await this.isEnoughAllowance(inTokens, WETH9[process.env.REACT_APP_CHAIN_ID].address)) 
+    {
       const sellPrice = await this.getWETHToXSPrice(inTokens);
       const amountOutMin = new Web3.utils.BN(parseFloat(sellPrice) * Math.pow(10, 8))
       const params = {
@@ -136,14 +146,18 @@ export class SwapProvider {
         sqrtPriceLimitX96: 0
       }
       const swapRouterContract = new this.web3.eth.Contract(swapRouterAbi, process.env.REACT_APP_SWAPROUTER_ADDRESS);
-      const transactionResult = await swapRouterContract.methods.exactInputSingle(params).send({ from: this.account, value: weiInTokensAmount });
-      return transactionResult;
+      return new Promise((resolve, reject) => {
+        swapRouterContract.methods.exactInputSingle(params).send({ from: this.account, value: weiInTokensAmount })
+        .on('transactionHash', function(hash){
+          resolve(hash)
+        });
+      });
     } 
   }
   // Купить WETH за XS
   async buyWETHForXS(inTokens) {
     const inTokenAmount = new Web3.utils.BN(parseFloat(inTokens.toString()) * Math.pow(10, 8));
-    if (await this.isEnoughAllowance(inTokenAmount, this.immutables.token0)) {
+    if (await this.isEnoughAllowance(inTokens, this.immutables.token0)) {
       const sellPrice = await this.getXSToWETHPrice(inTokens);
       const amountOutMin = Web3.utils.toWei(sellPrice.toString()).toString()
       const params = {
@@ -157,9 +171,28 @@ export class SwapProvider {
         sqrtPriceLimitX96: 0
       }
       const swapRouterContract = new this.web3.eth.Contract(swapRouterAbi, process.env.REACT_APP_SWAPROUTER_ADDRESS);
-      const transactionResult = await swapRouterContract.methods.exactInputSingle(params).send({ from: this.account });
-      return transactionResult;
+      return new Promise((resolve, reject) => {
+        swapRouterContract.methods.exactInputSingle(params).send({ from: this.account })
+        .on('transactionHash', function(hash){
+          resolve(hash)
+        });
+      });
     }
+  }
+  async sleep (milliseconds)
+  {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+  } 
+  async waitTransaction (txnHash)
+  {
+    const expectedBlockTime = 1000; 
+    let transactionReceipt = null
+      while (transactionReceipt == null)
+      {
+        transactionReceipt = await this.web3.eth.getTransactionReceipt(txnHash);
+        await this.sleep(expectedBlockTime)
+      }
+      return transactionReceipt
   }
   // Цена WETH -> XS
   async getWETHToXSPrice(amount){

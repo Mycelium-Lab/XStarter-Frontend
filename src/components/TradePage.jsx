@@ -45,7 +45,7 @@ function TradePage(props) {
   }
   const swapTokens = async ()=>{
     let amountToApprove = web3.utils.toWei(inTokenAmount)
-    // let tx = token0 === WETH ? await swapProvider.approve(MAXUINT, WETH) : await swapProvider.approve(MAXUINT, XSTOKEN)
+    let rx = token0 === WETH ? await swapProvider.approve('WETH', inTokenAmount) : await swapProvider.approve('XST', inTokenAmount.toString());
     let tx = token0 === WETH ? await swapProvider.buyXSForWETH(inTokenAmount.toString()) : await swapProvider.buyWETHForXS(inTokenAmount.toString())
 
   }

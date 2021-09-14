@@ -14,7 +14,6 @@ const feeAmount = FeeAmount.MEDIUM
 function toXS(val){
   var str = val.split('.')
   let result = str[0] + (str[1]!==undefined ? str[1]: "") + "0".repeat(8-(str[1]!==undefined ? str[1].length : 0))
-  console.log('xs result',result)
   return result;
 }
 
@@ -97,8 +96,9 @@ export class SwapProvider {
       return pool
     }
   }
-  async isEnoughAllowance(amount, tokenAddress){
-    const weiInTokensAmount = Web3.utils.toWei(amount).toString();
+  async isEnoughAllowance(amount, tokenAddress, type){
+    const weiInTokensAmount = type === 'WETH' ? Web3.utils.toWei(amount).toString() : toXS(amount);
+
     const tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
     const allowance = await tokenContract.methods.allowance(this.account, process.env.REACT_APP_SWAPROUTER_ADDRESS).call();
     const num1 = this.web3.utils.toBN(allowance);
@@ -129,12 +129,12 @@ export class SwapProvider {
       } 
   }
   // Купить XS за WETH
-  async buyXSForWETH(inTokens) {
+    async buyXSForWETH(inTokens) {
     const weiInTokensAmount = this.web3.utils.toWei(inTokens).toString();
-    if (await this.isEnoughAllowance(inTokens, WETH9[process.env.REACT_APP_CHAIN_ID].address)) 
+    if (await this.isEnoughAllowance(inTokens, WETH9[process.env.REACT_APP_CHAIN_ID].address, 'WETH')) 
     {
       const sellPrice = await this.getWETHToXSPrice(inTokens);
-      const amountOutMin = new Web3.utils.BN(parseFloat(sellPrice) * Math.pow(10, 8))
+      const amountOutMin = new Web3.utils.BN(toXS(sellPrice))
       const params = {
         tokenIn: WETH9[process.env.REACT_APP_CHAIN_ID].address,
         tokenOut: this.immutables.token0,
@@ -154,10 +154,65 @@ export class SwapProvider {
       });
     } 
   }
+  // Купить желаемое количество XST за WETH
+  async buyXSforWETHoutput(outTokens)
+  {
+    const xsTokenAmount = toXS(outTokens);
+    const inTokensAmount = await this.getXSfromWETHPrice(outTokens)
+    if(await this.isEnoughAllowance(inTokensAmount, WETH9[process.env.REACT_APP_CHAIN_ID].address, 'WETH'))
+    {
+      const amountInMax = Web3.utils.toWei(inTokensAmount);
+      const params = {
+        tokenIn: WETH9[process.env.REACT_APP_CHAIN_ID].address,
+        tokenOut: this.immutables.token0, 
+        fee: feeAmount,
+        recipient: this.account,
+        deadline: Math.floor(Date.now() / 1000) + 60 * 30,
+        amountOut: xsTokenAmount,
+        amountInMaximum: amountInMax,
+        sqrtPriceLimitX96: 0
+      }
+      const swapRouterContract = new this.web3.eth.Contract(swapRouterAbi, process.env.REACT_APP_SWAPROUTER_ADDRESS);
+      return new Promise((resolve, reject) => {
+        swapRouterContract.methods.exactOutputSingle(params).send({ from: this.account, value: amountInMax})
+        .on('transactionHash', function(hash){
+          resolve(hash)
+        });
+      });
+    }
+  }
+
+  // Купить желаемое количество WETH за XS
+  async buyWETHforXSoutput(outputWeth)
+  {
+    const wethAmount = Web3.utils.toWei(outputWeth);
+    const inTokensAmount = await this.getWETHfromXSPrice(outputWeth)
+    if(await this.isEnoughAllowance(inTokensAmount, this.immutables.token0, 'XST'))
+    {
+      const amountInMax = toXS(inTokensAmount);
+      const params = {
+        tokenIn: this.immutables.token0,
+        tokenOut: WETH9[process.env.REACT_APP_CHAIN_ID].address, 
+        fee: feeAmount,
+        recipient: this.account,
+        deadline: Math.floor(Date.now() / 1000) + 60 * 30,
+        amountOut: wethAmount,
+        amountInMaximum: amountInMax,
+        sqrtPriceLimitX96: 0
+      }
+      const swapRouterContract = new this.web3.eth.Contract(swapRouterAbi, process.env.REACT_APP_SWAPROUTER_ADDRESS);
+      return new Promise((resolve, reject) => {
+        swapRouterContract.methods.exactOutputSingle(params).send({from: this.account})
+        .on('transactionHash', function(hash){
+          resolve(hash)
+        });
+      });
+    }
+  }
   // Купить WETH за XS
   async buyWETHForXS(inTokens) {
-    const inTokenAmount = new Web3.utils.BN(parseFloat(inTokens.toString()) * Math.pow(10, 8));
-    if (await this.isEnoughAllowance(inTokens, this.immutables.token0)) {
+    const inTokenAmount = new Web3.utils.BN(toXS(inTokens));
+    if (await this.isEnoughAllowance(inTokens, this.immutables.token0, 'XST')) {
       const sellPrice = await this.getXSToWETHPrice(inTokens);
       const amountOutMin = Web3.utils.toWei(sellPrice.toString()).toString()
       const params = {
@@ -196,16 +251,33 @@ export class SwapProvider {
   }
   // Цена WETH -> XS
   async getWETHToXSPrice(amount){
-    const outputAmount = CurrencyAmount.fromRawAmount(WETH9[process.env.REACT_APP_CHAIN_ID], Web3.utils.toWei(amount).toString());
-    const [newOutputAmount]= await this.pool.getOutputAmount(outputAmount);
-    return parseFloat(newOutputAmount.toSignificant(8) * (1 - slippageRate));
+    const inputAmount = CurrencyAmount.fromRawAmount(WETH9[process.env.REACT_APP_CHAIN_ID], Web3.utils.toWei(amount).toString());
+    const [newOutputAmount]= await this.pool.getOutputAmount(inputAmount);
+    return parseFloat(newOutputAmount.toSignificant(8) * (1 - slippageRate)).toFixed(8);
+  }
+  // Цена WETH <- XS
+  async getWETHfromXSPrice(desiredWethAmount)
+  {
+    const outputAmount = CurrencyAmount.fromRawAmount(WETH9[process.env.REACT_APP_CHAIN_ID], Web3.utils.toWei(desiredWethAmount).toString());
+    const [inputXSAmount] = await this.pool.getInputAmount(outputAmount);
+    return parseFloat(inputXSAmount.toSignificant(8) * (1 + slippageRate)).toFixed(8);
   }
   // Цена XS -> WETH
   async getXSToWETHPrice(amount){
     const myToken = new Token(4, this.immutables.token0, 8, "XS", "XStarter");
-    const tokenAmount = new Web3.utils.BN(parseFloat(amount) * Math.pow(10, 8))
-    const outputAmount = CurrencyAmount.fromRawAmount(myToken, tokenAmount.toString());
-    const [newOutputAmount]= await this.pool.getOutputAmount(outputAmount);
-    return parseFloat(newOutputAmount.toSignificant(18) * (1 - slippageRate));
+    const tokenAmount = new Web3.utils.BN(toXS(amount))
+    const inTokenAmount = CurrencyAmount.fromRawAmount(myToken, tokenAmount.toString());
+    const [newOutputAmount]= await this.pool.getOutputAmount(inTokenAmount);
+    return parseFloat(newOutputAmount.toSignificant(18) * (1 - slippageRate)).toFixed(18);
+  }
+
+  // Цена XS <- WETH
+  async getXSfromWETHPrice(desiredXsAmount)
+  {
+    const myToken = new Token(4, this.immutables.token0, 8, "XS", "XStarter");
+    const tokenAmount = new Web3.utils.BN(toXS(desiredXsAmount))
+    const outTokenAmount = CurrencyAmount.fromRawAmount(myToken, tokenAmount.toString());
+    const [InputAmount]= await this.pool.getInputAmount(outTokenAmount);
+    return parseFloat(InputAmount.toSignificant(18) * (1 + slippageRate)).toFixed(18);
   }
 }

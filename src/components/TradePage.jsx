@@ -34,10 +34,14 @@ function TradePage(props) {
     setWeb3(web3);
   }
   const changeOutputPrice = async (price) => {
-    setIsExactInput(true);
-    token0 === WETH ? setBaseToken('WETH') : setBaseToken('XST')
-    setInTokenAmount(price.target.value)
-    if (parseFloat(price.target.value) && swapProvider) {
+    if((!/^[0-9.]*$/.test(price.target.value.toString())))
+    {
+      // Do nothing
+    }
+    else if (parseFloat(price.target.value) && swapProvider) {
+      setIsExactInput(true);
+      token0 === WETH ? setBaseToken('WETH') : setBaseToken('XST')
+      setInTokenAmount(price.target.value)  
       const sellPrice = token0 === WETH ? await swapProvider.getWETHToXSPrice(price.target.value.toString()) : await swapProvider.getXSToWETHPrice(price.target.value.toString());
       setOutTokenAmount(sellPrice);
       if(swapProvider && token0 != '')
@@ -48,15 +52,20 @@ function TradePage(props) {
     }
     else
     {
+      setInTokenAmount(price.target.value)
       setOutTokenAmount('0');
     }
   }
 
   const changeInputPrice = async (price) =>{
-    setIsExactInput(false);
-    token1 === WETH ? setBaseToken('WETH') : setBaseToken('XST')
-    setOutTokenAmount(price.target.value)
-    if (parseFloat(price.target.value) && swapProvider) {
+    if((!/^[0-9.]*$/.test(price.target.value.toString())))
+    {
+      // Do nothing
+    }
+    else if (parseFloat(price.target.value) && swapProvider) {
+      setIsExactInput(false);
+      token1 === WETH ? setBaseToken('WETH') : setBaseToken('XST')
+      setOutTokenAmount(price.target.value)  
       const buyPrice = token1 === WETH ? await swapProvider.getWETHfromXSPrice(price.target.value.toString()) : await swapProvider.getXSfromWETHPrice(price.target.value.toString());
       setInTokenAmount(buyPrice);
       if(swapProvider && token0 != '')
@@ -67,6 +76,7 @@ function TradePage(props) {
     }
     else{
       setInTokenAmount('0');
+      setOutTokenAmount(price.target.value);
     }
   };
   
@@ -238,11 +248,11 @@ function TradePage(props) {
     }
     else if(isApproved)
     {
-      button = <button onClick = {swapTokens} className="btn xs-trade-change-btn">BUY</button>
+      button = <button onClick = {swapTokens} className="btn xs-trade-change-btn">Buy</button>
     }
     else
     {
-      button = <button onClick = {swapTokens} className="btn xs-trade-change-btn">APPROVE</button>
+      button = <button onClick = {swapTokens} className="btn xs-trade-change-btn">Approve</button>
     }
     return (
       button

@@ -28,6 +28,14 @@ function Header(props) {
       {
         var button = <span className="xs-username" onClick={goToTransaction}>Selling XST...</span>
       }
+      else if(transactionType === 'stakeXS')
+      {
+        var button = <span className="xs-username" onClick={goToTransaction}>Staking XST...</span>
+      }
+      else if(transactionType === 'withdrawXS')
+      {
+        var button = <span className="xs-username" onClick={goToTransaction}>Withdrawing XST...</span>
+      }
     }
     else
     {

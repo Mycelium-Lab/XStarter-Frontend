@@ -4,9 +4,8 @@ export { findGetParameter,commissionToStaked };
 
 
 //адреса контрактов токенов
-const tokenCase = '0x5cafe85d8983f61C059df359c504F1Bab8009e9e';
-const stakeCase = '0x5a179BD986f1DCCbADd940A8c5DC6aa5Ce5dFF3C';
-const rankCase = '0x91Ac0cc63eA781fBe31CD925Ae7B94FA254E6ffA';
+const xsToken = '0x7c6862a49fBc90b195F91F7147BB4726dCa4E028';
+const stakeCase = '0xEBC3f93FCE7b4b4DC8882a92b4aa0Fe606dE17c4';
 
 
 export class contractMethods {
@@ -16,81 +15,150 @@ export class contractMethods {
         this.web3 = web;
         this.CASE_PRECISION = 10 ** 8;
         this.ZERO_ADDR = "0x0000000000000000000000000000000000000000";
-        this.contractCase = new this.web3.eth.Contract(abiProxy, tokenCase);
+        this.tokenContract = new this.web3.eth.Contract(abiProxy, xsToken);
         this.contractStake = new this.web3.eth.Contract(abiStake, stakeCase);
-        this.contractRank = new this.web3.eth.Contract(abiRank, rankCase);
         this.walletAddress = walletAddress;
     }
+    toXS(val){
+        var str = val.split('.')
+        let result = str[0] + (str[1]!==undefined ? str[1]: "") + "0".repeat(8-(str[1]!==undefined ? str[1].length : 0))
+        return result;
+    }
+    async sleep (milliseconds)
+    {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+    } 
+    async waitTransaction (txnHash)
+    {
+        const expectedBlockTime = 1000; 
+        let transactionReceipt = null
+        while (transactionReceipt == null)
+        {
+            transactionReceipt = await this.web3.eth.getTransactionReceipt(txnHash);
+            await this.sleep(expectedBlockTime)
+        }
+        return transactionReceipt
+    }
+    getUserBalance()
+    {
+        return new Promise((resolve, reject) =>{
+            this.tokenContract.methods.balanceOf(this.walletAddress).call({from: this.walletAddress.toLowerCase()}, function(error, result) {
+                const balance = parseInt(result) / 10**8;
+                resolve(balance);
+            })
+        })
+    }
+    getUserStakedAmount()
+    {
+        return new Promise((resolve, reject) => {
+            this.contractStake.methods.userStakeAmount(this.walletAddress).call({from: this.walletAddress.toLowerCase()}, function(error, result){
+                const amount = parseInt(result) / 10**8;
+                resolve(amount);
+            })
 
+        })
+    }
+    getUserTier()
+    {
+        return new Promise((resolve, reject) => {
+            this.contractStake.methods.userTiers(this.walletAddress).call({from:this.walletAddress}, function(error, result) {
+                resolve(result);
+            })
+        })
+    }
     //метод стейкинга
-    instanceStake(amount, days, ref) {
-        if (ref===null) {
-            return new Promise((resolve, reject) => {
-                return this.contractStake.methods.stake((amount*this.CASE_PRECISION).toString(), days.toString(), this.ZERO_ADDR).send({from: this.walletAddress})
-                .on('receipt', function(receipt) {
-                    resolve(receipt.transactionHash);
+    stakeXS(amount) {
+        return new Promise((resolve, reject) => {
+            this.contractStake.methods.stake((this.toXS(amount)).toString()).send({from: this.walletAddress})
+            .on('transactionHash', function(hash) {
+                resolve(hash);
+            })
+            .on('error', function(error){console.log('error',error)});
+        });   
+    }
+    //метод аппрува стейкинга
+    approveStake(amount)
+    {
+        return new Promise((resolve, reject) => {
+            this.tokenContract.methods.approve(stakeCase,(this.toXS(amount)).toString()).send({from: this.walletAddress})
+            .on('transactionHash', function(hash) {
+                resolve(hash);
+            })
+            .on('error', function(error){console.log('error',error)});
+        });
+    }
+    async isEnoughAllowance(amount)
+    {
+        const newAmount = this.toXS(amount)
+        const allowance = await this.tokenContract.methods.allowance(this.walletAddress, stakeCase).call();
+        const num1 = this.web3.utils.toBN(allowance);
+        const num2 = this.web3.utils.toBN(newAmount);
+        return num1.gte(num2);
+      }
+    // метод для вывода вознаграждений
+    instanceWithdraw(idx) {
+        return new Promise((resolve, reject) => {
+            this.contractStake.methods.withdraw(idx).send({from: this.walletAddress})
+            .on('transactionHash', function(hash) {
+                resolve(hash);
+            })
+            .on('error', function(error){console.log('error',error)});
+        });
+    }
+    //метод для поднятия ранга
+    updateTierValues(tierValues) {
+        if(this.walletAddress !== process.env.REACT_APP_ADMIN_ADDRESS)
+        {
+            return false;
+        }
+        else
+        {
+            return new Promise((resolve, reject) =>{
+                return this.contractStake.methods.updateTierValues(tierValues).send({from: this.walletAddress})
+                .on('transactionHash', function(hash) {
+                    resolve(hash);
                 })
                 .on('error', function(error){console.log('error',error)});
-            });
+    
+            })
+        }  
+    }
+
+    updateSpecificTierValue(tierValue, tierIndex)
+    {
+        if(this.walletAddress !== process.env.REACT_APP_ADMIN_ADDRESS)
+        {
+            return false;
         }
-        else {
-            return new Promise((resolve, reject) => {
-                return this.contractStake.methods.stake((amount*this.CASE_PRECISION).toString(), days.toString(), ref.toLowerCase()).send({from: this.walletAddress})
-                .on('receipt', function(receipt) {
-                    resolve(receipt.transactionHash);
-                });
-            });
-        }
+        else
+        {
+            return new Promise((resolve, reject) =>{
+                return this.contractStake.methods.updateSpecificTierValue(tierValue, tierIndex).send({from: this.walletAddress})
+                .on('transactionHash', function(hash) {
+                    resolve(hash);
+                })
+                .on('error', function(error){console.log('error',error)});
+            })
+        }  
     }
 
-    //метод аппрува стейкинга
-    instanceApprove(amount) {
+    calculateInterestAmount(stakeIdx)
+    {
         return new Promise((resolve, reject) => {
-            return this.contractCase.methods.approve(stakeCase,(amount*this.CASE_PRECISION).toString()).send({from: this.walletAddress})
-            .on('receipt', function(receipt) {
-                resolve(receipt);
-            });
-        });
-    }
-
-    // метод для вывода вознаграждений
-    async instanceWithdraw(idx) {
-        return new Promise((resolve, reject) => {
-            return this.contractStake.methods.withdraw(idx).send({from: this.walletAddress})
-                .on('receipt', function(receipt) {
-                    resolve(receipt);
-            });
-        });
-    }
-
-    //метод для поднятия ранга
-    async instanceRankUp() {
-      await this.contractRank.methods.rankUp(this.walletAddress).send({from: this.walletAddress});
-    }
-
-    //метод для получения информации о том, может ли юзер поднять ранг
-    async canRankUp() {
-        console.log(this.walletAddress);
-        return new Promise((resolve, reject) => {
-            return this.contractRank.methods.canRankUp(this.walletAddress.toLowerCase()).call({from: this.walletAddress.toLowerCase()}, function(error, result) {
+            this.contractStake.methods.calculateInterestAmount(stakeIdx).call({from: this.walletAddress.toLowerCase()}, function(error, result) {
                 resolve(result);
             });
         });
     }
-    
-    //метод для получения баланса
-    async getBalance() {
+    getStakeList(idx)
+    {
         return new Promise((resolve, reject) => {
-            return this.contractCase.methods.balanceOf(this.walletAddress.toLowerCase()).call({from: this.walletAddress.toLowerCase()}, function(error, result) {
-                console.log(result);
-                console.log(error);
-                let balanceCase = parseInt(result) / 10**8;
-                resolve(balanceCase);
+            this.contractStake.methods.stakeList(idx).call({from: this.walletAddress.toLowerCase()}, function(error, result) {
+                resolve(result);
             });
-        })
-    }         
+        });
+    }
 }
-
 
 //функция для поиска get-параметра
 function findGetParameter(parameterName) {
@@ -109,6 +177,6 @@ function findGetParameter(parameterName) {
 
 //высчитывает комиссию, полученную с реферала определенного уровня
 function commissionToStaked(commission, level) {
-  const percents = [8, 5, 2.5, 1.5, 1.0, 1.0, 0.5, 0.5 ];
-  return parseFloat(commission * (100/percents[level-1])).toFixed(2);
+    const percents = [8, 5, 2.5, 1.5, 1.0, 1.0, 0.5, 0.5 ];
+    return parseFloat(commission * (100/percents[level-1])).toFixed(2);
 }

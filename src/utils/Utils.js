@@ -96,7 +96,7 @@ export class contractMethods {
         return num1.gte(num2);
       }
     // метод для вывода вознаграждений
-    instanceWithdraw(idx) {
+    withdrawXS(idx) {
         return new Promise((resolve, reject) => {
             this.contractStake.methods.withdraw(idx).send({from: this.walletAddress})
             .on('transactionHash', function(hash) {
@@ -157,6 +157,42 @@ export class contractMethods {
                 resolve(result);
             });
         });
+    }
+    async getCurrentStakes()
+    {      
+        const allStakes = await this.contractStake.getPastEvents('CreateStake', {
+            filter: {user: this.walletAddress},
+            fromBlock: 0,
+            toBlock: 'latest'
+        })
+        const withdrawals = await this.contractStake.getPastEvents('WithdrawReward', {
+            filter: {user: this.walletAddress},
+            fromBlock: 0,
+            toBlock: 'latest'
+        })
+        let currentStakes = [];
+        for(let i = 0; i < allStakes.length; ++i)
+        {
+            let isStaked = true;
+            for(let j = 0; j < withdrawals.length; ++j)
+            {
+                if(allStakes[i].returnValues.idx === withdrawals[j].returnValues.idx)
+                {
+                    isStaked = false;
+                }
+            }
+            if(isStaked)
+            {
+                let reward = await this.calculateInterestAmount(allStakes[i].returnValues.idx);
+                let info = {
+                    idx: allStakes[i].returnValues.idx,
+                    stakeAmount: parseInt(allStakes[i].returnValues.stakeAmount) / 10**8 ,
+                    reward: reward / 10**8
+                }
+                currentStakes.push(info);
+            }
+        }
+        return currentStakes;
     }
 }
 

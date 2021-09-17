@@ -914,6 +914,27 @@ select::-ms-expand {
     display: flex;
     margin: 40px auto 0;
 }
+.xs-table-btn {
+    width: 130px;
+    max-height: 40px;
+}
+.xs-withdraw-table{
+    color: white;
+    margin-left: 60px;
+}
+.modal
+{
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
 @media screen and (max-width: 1380px) {
     .xs-head {
         padding: 12px 30px;

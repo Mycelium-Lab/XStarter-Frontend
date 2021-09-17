@@ -181,7 +181,7 @@ export class contractMethods {
                     isStaked = false;
                 }
             }
-            if(isStaked)
+            if(isStaked && allStakes[i].returnValues.user.toLowerCase() === this.walletAddress.toLowerCase())
             {
                 let reward = await this.calculateInterestAmount(allStakes[i].returnValues.idx);
                 let info = {

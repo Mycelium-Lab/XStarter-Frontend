@@ -1,14 +1,16 @@
 import Web3 from 'web3'
-import { Pool, FeeAmount, TickMath, TICK_SPACINGS, nearestUsableTick } from "@uniswap/v3-sdk";
+import { Pool, FeeAmount, TickMath, TICK_SPACINGS, nearestUsableTick , Trade, Route} from "@uniswap/v3-sdk";
 import { Token, WETH9 } from "@uniswap/sdk-core";
 import { abi as poolAbi } from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json'
 import { abi as swapRouterAbi } from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json'
 import { abi as erco20Abi} from '@uniswap/v3-core/artifacts/contracts/interfaces/IERC20Minimal.sol/IERC20Minimal.json'
-import { CurrencyAmount } from '@uniswap/sdk-core';
+import { CurrencyAmount, TradeType, Percent} from '@uniswap/sdk-core';
 import { Interface } from '@ethersproject/abi'
 
 import JSBI from 'jsbi';
 const slippageRate = 0.001
+const slippageTolerance = new Percent(JSBI.BigInt(1), JSBI.BigInt(1000))
+
 const feeAmount = FeeAmount.MEDIUM
 
 function toXS(val){
@@ -98,7 +100,6 @@ export class SwapProvider {
   }
   async isEnoughAllowance(amount, tokenAddress, type){
     const weiInTokensAmount = type === 'WETH' ? Web3.utils.toWei(amount).toString() : toXS(amount);
-
     const tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
     const allowance = await tokenContract.methods.allowance(this.account, process.env.REACT_APP_SWAPROUTER_ADDRESS).call();
     const num1 = this.web3.utils.toBN(allowance);
@@ -115,7 +116,7 @@ export class SwapProvider {
         tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
       }else if (type === 'XST') {
         tokenAmount = toXS(amount);
-        tokenAddress = this.immutables.token0
+        tokenAddress = this.immutables.token0;
         tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
       }
       if (!(await this.isEnoughAllowance(amount, tokenAddress))) 
@@ -128,8 +129,23 @@ export class SwapProvider {
         })
       } 
   }
+  async getTokenBalance(token, type)
+  {
+    if(type === 'WETH')
+    {
+      var balance = await this.web3.eth.getBalance(this.account);
+      balance = this.web3.utils.fromWei(balance);
+    }
+    else
+    {
+      const tokenContract = new this.web3.eth.Contract(erco20Abi, token);
+      var balance = await tokenContract.methods.balanceOf(this.account).call({from: this.account});
+      balance = parseFloat(balance) / 10**8;
+    }
+    return balance;
+  }
   // Купить XS за WETH
-    async buyXSForWETH(inTokens) {
+  async buyXSForWETH(inTokens) {
     const weiInTokensAmount = this.web3.utils.toWei(inTokens).toString();
     if (await this.isEnoughAllowance(inTokens, WETH9[process.env.REACT_APP_CHAIN_ID].address, 'WETH')) 
     {
@@ -251,33 +267,51 @@ export class SwapProvider {
   }
   // Цена WETH -> XS
   async getWETHToXSPrice(amount){
-    const inputAmount = CurrencyAmount.fromRawAmount(WETH9[process.env.REACT_APP_CHAIN_ID], Web3.utils.toWei(amount).toString());
-    const [newOutputAmount]= await this.pool.getOutputAmount(inputAmount);
-    return parseFloat(newOutputAmount.toSignificant(8) * (1 - slippageRate)).toFixed(8);
+    const myToken = new Token(4, this.immutables.token0, 8, "XS", "XStarter");
+    const route = new Route([this.pool], WETH9[process.env.REACT_APP_CHAIN_ID], myToken);
+    const trade = await Trade.fromRoute(
+      route,
+      CurrencyAmount.fromRawAmount(WETH9[process.env.REACT_APP_CHAIN_ID], Web3.utils.toWei(amount)),
+      TradeType.EXACT_INPUT
+    )
+    return (trade.minimumAmountOut(slippageTolerance).toSignificant(8));
+    // const inputAmount = CurrencyAmount.fromRawAmount(WETH9[process.env.REACT_APP_CHAIN_ID], Web3.utils.toWei(amount).toString());
+    // const [newOutputAmount]= await this.pool.getOutputAmount(inputAmount);
+    // return parseFloat(newOutputAmount.toSignificant(8) * (1 - slippageRate)).toFixed(8);
   }
   // Цена WETH <- XS
   async getWETHfromXSPrice(desiredWethAmount)
   {
-    const outputAmount = CurrencyAmount.fromRawAmount(WETH9[process.env.REACT_APP_CHAIN_ID], Web3.utils.toWei(desiredWethAmount).toString());
-    const [inputXSAmount] = await this.pool.getInputAmount(outputAmount);
-    return parseFloat(inputXSAmount.toSignificant(8) * (1 + slippageRate)).toFixed(8);
+    const myToken = new Token(4, this.immutables.token0, 8, "XS", "XStarter");
+    const route = new Route([this.pool], myToken, WETH9[process.env.REACT_APP_CHAIN_ID]);
+    const trade = await Trade.fromRoute(
+      route,
+      CurrencyAmount.fromRawAmount(WETH9[process.env.REACT_APP_CHAIN_ID], Web3.utils.toWei(desiredWethAmount)),
+      TradeType.EXACT_OUTPUT
+    )
+    return (trade.maximumAmountIn(slippageTolerance).toSignificant(8));
   }
   // Цена XS -> WETH
   async getXSToWETHPrice(amount){
     const myToken = new Token(4, this.immutables.token0, 8, "XS", "XStarter");
-    const tokenAmount = new Web3.utils.BN(toXS(amount))
-    const inTokenAmount = CurrencyAmount.fromRawAmount(myToken, tokenAmount.toString());
-    const [newOutputAmount]= await this.pool.getOutputAmount(inTokenAmount);
-    return parseFloat(newOutputAmount.toSignificant(18) * (1 - slippageRate)).toFixed(18);
+    const route = new Route([this.pool], myToken, WETH9[process.env.REACT_APP_CHAIN_ID]);
+    const trade = await Trade.fromRoute(
+      route,
+      CurrencyAmount.fromRawAmount(myToken, toXS(amount)),
+      TradeType.EXACT_INPUT
+    )
+    return (trade.minimumAmountOut(slippageTolerance).toSignificant(18));
   }
-
   // Цена XS <- WETH
   async getXSfromWETHPrice(desiredXsAmount)
   {
     const myToken = new Token(4, this.immutables.token0, 8, "XS", "XStarter");
-    const tokenAmount = new Web3.utils.BN(toXS(desiredXsAmount))
-    const outTokenAmount = CurrencyAmount.fromRawAmount(myToken, tokenAmount.toString());
-    const [InputAmount]= await this.pool.getInputAmount(outTokenAmount);
-    return parseFloat(InputAmount.toSignificant(18) * (1 + slippageRate)).toFixed(18);
+    const route = new Route([this.pool], WETH9[process.env.REACT_APP_CHAIN_ID], myToken);
+    const trade = await Trade.fromRoute(
+      route,
+      CurrencyAmount.fromRawAmount(myToken, toXS(desiredXsAmount)),
+      TradeType.EXACT_OUTPUT
+    )
+    return (trade.maximumAmountIn(slippageTolerance).toSignificant(18));
   }
 }

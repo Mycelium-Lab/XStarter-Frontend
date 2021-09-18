@@ -12,6 +12,7 @@ function SPStake(props) {
   const [currentStakes, setCurrentStakes] = useState([]);
   const [isApproved, setIsApproved] = useState(false);
   const [isModal, setIsModal] = useState(false);
+  const [isInsufficientBalance, setIsInsufficientBalance] = useState(true);
   const methods = useSelector(state => state.wallet.methods);
   const dispatch = useDispatch();
   const { handleChange } = props;
@@ -23,17 +24,12 @@ function SPStake(props) {
     const balance = await methods.getUserBalance();
     const stakedAmount = await methods.getUserStakedAmount();
     const tier = await methods.getUserTier();
-    if(stakedAmount !== 0)
-    {
-      const currentStakes = await methods.getCurrentStakes();
-      console.log(currentStakes)
-      setCurrentStakes(currentStakes)
-    } 
+    const currentStakes = await methods.getCurrentStakes();
+    setCurrentStakes(currentStakes)
     setUserBalance(balance);
     setUserStakedAmount(stakedAmount);
     setUserTier(tier);
   }
-
   const openModal = () =>
   {
     setIsModal(true);
@@ -52,7 +48,11 @@ function SPStake(props) {
           hash: tx,
           type: 'stakeXS'
         }));
-      const receipt = await methods.waitTransaction(tx)
+      const receipt = await methods.waitTransaction(tx);
+      if(!!receipt)
+      {
+        setUserInfo();
+      }
     }
     dispatch(setTransactionInfo(
       {
@@ -76,6 +76,7 @@ function SPStake(props) {
           return element.idx !== evt.target.value.toString()
         });
         setCurrentStakes(newStakes);
+        setUserInfo();
       }
     }
     dispatch(setTransactionInfo(
@@ -94,6 +95,10 @@ function SPStake(props) {
           type: 'approve'
         }));
         const receipt = await methods.waitTransaction(rx)
+        if(!!receipt)
+        {
+          setIsApproved(true);
+        }
     }
     dispatch(setTransactionInfo(
       {
@@ -110,6 +115,13 @@ function SPStake(props) {
       setAmount(price.target.value.toString());
       const isApproved = await methods.isEnoughAllowance(price.target.value.toString());
       setIsApproved(isApproved);  
+      if(parseFloat(price.target.value) > parseFloat(userBalance))
+      {
+        setIsInsufficientBalance(true);
+      }
+      else{
+        setIsInsufficientBalance(false);
+      }
     }
     else{
       setAmount(price.target.value);
@@ -120,6 +132,10 @@ function SPStake(props) {
     if (amount == 0)
     {
       button = <button className="btn">Enter an amount</button>
+    }
+    else if(isInsufficientBalance)
+    {
+      button = <button className="btn xs-stake-btn">Insufficient balance</button>
     }
     else if(isApproved)
     {
@@ -134,9 +150,6 @@ function SPStake(props) {
     );
   }
   function StakesTable({ data }) {
-    const withdraw = async (evt) =>{
-      console.log(evt.target.value)
-    }
     if(!!data && isModal)
     {
       return(

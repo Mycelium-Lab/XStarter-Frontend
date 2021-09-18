@@ -909,7 +909,7 @@ select::-ms-expand {
     -o-transform: translateY(3px);
 }
 .xs-trade-change-btn {
-    width: 130px;
+    width: 150px;
     margin-top: 40px;
     display: flex;
     margin: 40px auto 0;
@@ -921,6 +921,9 @@ select::-ms-expand {
 .xs-withdraw-table{
     color: white;
     margin-left: 60px;
+}
+.xs-stake-btn{
+    font-size: 12px;
 }
 .modal
 {

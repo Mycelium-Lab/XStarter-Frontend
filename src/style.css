@@ -932,6 +932,11 @@ select::-ms-expand {
 
     font-size: 12px;
 }
+.xs-stake-btn-loading
+{
+    margin: 0 auto;
+    width: 300px;
+}
 .modal
 {
     position: fixed;

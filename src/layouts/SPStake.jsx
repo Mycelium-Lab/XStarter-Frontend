@@ -175,7 +175,7 @@ function SPStake(props) {
     let button
     if(!isLoaded)
     {
-      button = <div></div>
+      button = <button className="btn xs-stake-btn-loading">Loading....</button>
     }
     else if (amount == 0)
     {

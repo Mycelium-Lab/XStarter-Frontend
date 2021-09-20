@@ -24,6 +24,7 @@ function TradePage(props) {
   const [web3, setWeb3] = useState(null);
   const [isApproved, setIsApproved] = useState(false);
   const [isExactInput, setIsExactInput] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
   const dispatch = useDispatch();
   useEffect(() => {
     if (!swapProvider) {
@@ -39,6 +40,7 @@ function TradePage(props) {
     setToken0Balance(token0Balance);
     setToken1Balance(token1Balance);
     setWeb3(web3);
+    setIsLoaded(true);
   }
   const setUserBalance = async (token0, token0Symbol, token1, token1Symbol) =>{ 
     const token0Balance = await swapProvider.getTokenBalance(token0, token0Symbol);
@@ -65,6 +67,7 @@ function TradePage(props) {
   }
 
   const changeOutputPrice = async (price) => {
+    setIsLoaded(false);
     if((!/^[0-9.]*$/.test(price.target.value.toString())))
     {
       // Do nothing
@@ -88,9 +91,11 @@ function TradePage(props) {
       setInTokenAmount(price.target.value)
       setOutTokenAmount('0');
     }
+    setIsLoaded(true);
   }
 
   const changeInputPrice = async (price) =>{
+    setIsLoaded(false);
     if((!/^[0-9.]*$/.test(price.target.value.toString())))
     {
       // Do nothing
@@ -113,6 +118,7 @@ function TradePage(props) {
       setInTokenAmount('0');
       setOutTokenAmount(price.target.value);
     }
+    setIsLoaded(true);
   };
   
   const swapTokens = async ()=>{
@@ -199,6 +205,7 @@ function TradePage(props) {
     }));    
   }
   const changeUpperDropdown = async (token) =>{
+    setIsLoaded(false);
     if(token.target.value === WETH)
     {
       await setUserBalance(WETH, 'WETH', XSTOKEN, 'XS');
@@ -246,8 +253,10 @@ function TradePage(props) {
       setInTokenAmount(newInTokenAmount);
       setOutTokenAmount(newOutTokenAmount);
     }
+    setIsLoaded(true);
   }
   const changeLowerDropdown = async (token) =>{
+    setIsLoaded(false);
     if(token.target.value === WETH)
     {
       await setUserBalance(XSTOKEN, 'XS', WETH, 'WETH');
@@ -295,12 +304,17 @@ function TradePage(props) {
       setInTokenAmount(newInTokenAmount);
       setOutTokenAmount(newOutTokenAmount);
     }
+    setIsLoaded(true);
   }
 
   const { handleChange } = props;
   function BuyButton(props) {
     let button
-    if (!inTokenAmount)
+    if(!isLoaded)
+    {
+      button = <button className="btn xs-trade-change-btn ">Loading...</button>
+    }
+    else if (!inTokenAmount)
     {
       button = <button className="btn xs-trade-change-btn">Enter an amount</button>
     }

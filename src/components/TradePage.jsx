@@ -53,6 +53,7 @@ function TradePage(props) {
     const price = {target: {
       value: token0Balance
     }}
+    setIsInsufficientBalance(false);
     changeOutputPrice(price);
     token0 === WETH ? setBaseToken('WETH') : setBaseToken('XST');
   }
@@ -78,7 +79,7 @@ function TradePage(props) {
       setInTokenAmount(price.target.value)  
       const sellPrice = token0 === WETH ? await swapProvider.getWETHToXSPrice(price.target.value.toString()) : await swapProvider.getXSToWETHPrice(price.target.value.toString());
       setOutTokenAmount(sellPrice);
-      const isInsufficientBalance = parseFloat(token0Balance) > parseFloat(price.target.value) ? false : true;
+      const isInsufficientBalance = parseFloat(token0Balance) >= parseFloat(price.target.value) ? false : true;
       setIsInsufficientBalance(isInsufficientBalance);
       if(token0 !== '')
       {
@@ -106,7 +107,7 @@ function TradePage(props) {
       setOutTokenAmount(price.target.value)  
       const buyPrice = token1 === WETH ? await swapProvider.getWETHfromXSPrice(price.target.value.toString()) : await swapProvider.getXSfromWETHPrice(price.target.value.toString());
       setInTokenAmount(buyPrice);
-      const isInsufficientBalance = parseFloat(token0Balance) > parseFloat(buyPrice) ? false : true;
+      const isInsufficientBalance = parseFloat(token0Balance) >= parseFloat(buyPrice) ? false : true;
       setIsInsufficientBalance(isInsufficientBalance);
       if(swapProvider && token0 != '')
       {

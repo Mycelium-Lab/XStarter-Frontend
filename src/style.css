@@ -600,7 +600,7 @@ footer {
     align-items: center;
 }
 .staking-tier-text {
-    width: 387px;
+    width: 420px;
     font-size: 20px;
     line-height: 130%;
     text-align: center;
@@ -686,6 +686,7 @@ footer {
     
 }
 .btn-wo-bg {
+    margin: 0 auto;
     background: transparent;
 }
 
@@ -878,7 +879,7 @@ select::-ms-expand {
     display: none;
 }
 .xs-trade-change-input-xs select {
-    width: 62px;
+    width: 90px;
     background-position: 80%;
 }
 
@@ -922,7 +923,13 @@ select::-ms-expand {
     color: white;
     margin-left: 60px;
 }
-.xs-stake-btn{
+.xs-stake-btn
+{
+    margin: 0 auto;
+}
+.xs-stake-btn-insufficient-balance{
+    margin: 0 auto;
+
     font-size: 12px;
 }
 .modal
@@ -937,6 +944,22 @@ select::-ms-expand {
     align-items: center;
     justify-content: center;
     z-index: 999;
+}
+.btn-max
+{
+    position: absolute;
+    top: -5px;
+    left: 200px;
+    color:#FF824B;
+    cursor: pointer;
+}
+.btn-max-trade
+{
+    top: -1px;
+    left: 110px;
+}
+.btn-max:hover{
+
 }
 @media screen and (max-width: 1380px) {
     .xs-head {

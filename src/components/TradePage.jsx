@@ -17,6 +17,7 @@ function TradePage(props) {
   const [isInsufficientBalance, setIsInsufficientBalance] = useState(true);
   const [token0Symbol, setToken0Symbol] = useState('WETH');
   const [token1, setToken1] = useState(XSTOKEN);
+  const [token1Balance, setToken1Balance] = useState(0);
   const [token1Symbol, setToken1Symbol] = useState('XS');
   const [baseToken, setBaseToken] = useState('WETH');
   const [swapProvider, setSwapProvider] = useState(null);
@@ -33,14 +34,36 @@ function TradePage(props) {
     const swapProvider = await SwapProvider.create();
     setSwapProvider(swapProvider);
     const web3 = new Web3(window.ethereum);
-    const balance = await swapProvider.getTokenBalance(token0, token0Symbol);
-    setToken0Balance(balance);
+    const token0Balance = await swapProvider.getTokenBalance(token0, token0Symbol);
+    const token1Balance = await swapProvider.getTokenBalance(token1, token1Symbol);
+    setToken0Balance(token0Balance);
+    setToken1Balance(token1Balance);
     setWeb3(web3);
   }
-  const setUserBalance = async (token, tokenSymbol) =>{
-    const balance = await swapProvider.getTokenBalance(token, tokenSymbol);
-    setToken0Balance(balance);
+  const setUserBalance = async (token0, token0Symbol, token1, token1Symbol) =>{ 
+    const token0Balance = await swapProvider.getTokenBalance(token0, token0Symbol);
+    const token1Balance = await swapProvider.getTokenBalance(token1, token1Symbol);
+    setToken0Balance(token0Balance);
+    setToken1Balance(token1Balance);
   }
+  const setMaxAmountUpper = () =>{
+    setInTokenAmount(token0Balance);
+    const price = {target: {
+      value: token0Balance
+    }}
+    changeOutputPrice(price);
+    token0 === WETH ? setBaseToken('WETH') : setBaseToken('XST');
+  }
+
+  const setMaxAmountLower = () =>{
+    setOutTokenAmount(token1Balance);
+    const price = {target:{
+      value: token1Balance
+    }}
+    changeInputPrice(price);
+    token1 === WETH ? setBaseToken('WETH') : setBaseToken('XST');
+  }
+
   const changeOutputPrice = async (price) => {
     if((!/^[0-9.]*$/.test(price.target.value.toString())))
     {
@@ -140,16 +163,15 @@ function TradePage(props) {
         const receipt = await swapProvider.waitTransaction(tx)
         if(!!receipt)
         {
-          token0 === WETH ? await setUserBalance(WETH, 'WETH') : await setUserBalance(XSTOKEN, 'XS') ;
           if(token0 === WETH)
           {
-            await setUserBalance(WETH, 'WETH');
+            await setUserBalance(WETH, 'WETH', XSTOKEN, 'XS');
             const isApproved = !!inTokenAmount ? await swapProvider.isEnoughAllowance(inTokenAmount.toString(), WETH, 'WETH') : false;
             setIsApproved(isApproved);
           }
           else
           {
-            await setUserBalance(XSTOKEN, 'XS');
+            await setUserBalance(XSTOKEN, 'XS', WETH, 'WETH');
             const isApproved = !!inTokenAmount ? await swapProvider.isEnoughAllowance(inTokenAmount.toString(), WETH, 'WETH') : false;
             setIsApproved(isApproved);
           }
@@ -179,8 +201,8 @@ function TradePage(props) {
   const changeUpperDropdown = async (token) =>{
     if(token.target.value === WETH)
     {
+      await setUserBalance(WETH, 'WETH', XSTOKEN, 'XS');
       setToken0(WETH);
-      await setUserBalance(WETH, 'WETH');
       setToken1(XSTOKEN)
       setToken0Symbol('WETH')
       setToken1Symbol('XS')
@@ -202,8 +224,8 @@ function TradePage(props) {
       setOutTokenAmount(newOutTokenAmount);
     }
     else if(token.target.value == XSTOKEN){
+      await setUserBalance(XSTOKEN, 'XS', WETH, 'WETH');
       setToken0(XSTOKEN)
-      await setUserBalance(XSTOKEN, 'XS');
       setToken1(WETH)
       setToken0Symbol('XS')
       setToken1Symbol('WETH')
@@ -228,8 +250,8 @@ function TradePage(props) {
   const changeLowerDropdown = async (token) =>{
     if(token.target.value === WETH)
     {
+      await setUserBalance(XSTOKEN, 'XS', WETH, 'WETH');
       setToken1(WETH);
-      await setUserBalance(XSTOKEN, 'XS');
       setToken0(XSTOKEN)
       setToken1Symbol('WETH')
       setToken0Symbol('XS')
@@ -251,8 +273,8 @@ function TradePage(props) {
       setOutTokenAmount(newOutTokenAmount);
     }
     else if(token.target.value == XSTOKEN){
+      await setUserBalance(WETH, 'WETH', XSTOKEN, 'XS');
       setToken1(XSTOKEN)
-      await setUserBalance(WETH, 'WETH');
       setToken0(WETH)
       setToken1Symbol('XS')
       setToken0Symbol('WETH')
@@ -307,19 +329,23 @@ function TradePage(props) {
             <span>Обменять</span>
             <button><img src={settingsImg} alt="" /></button>
           </div>
-          <div className="xs-trade-change-input">
+          <p>Balance: {parseFloat(token0Balance).toFixed(5)} {token0Symbol}</p>
+          <div className="xs-trade-change-input xs-trade-change-input-xs">
             <select value={token0} onChange={changeUpperDropdown}>
               <option defaultValue value={WETH}>WETH</option>
               <option value={XSTOKEN}>XS</option>
             </select>
             <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inTokenAmount}/>
+            <p className="btn-max btn-max-trade" onClick={setMaxAmountUpper}>MAX</p>
           </div>
+          <p>Balance: {parseFloat(token1Balance).toFixed(5)} {token1Symbol}</p>
           <div className="xs-trade-change-input xs-trade-change-input-xs">
             <select value={token1} onChange={changeLowerDropdown}>
               <option defaultValue value={XSTOKEN}>XS</option>
               <option value={WETH}>WETH</option>
             </select>
             <input onChange={async(e) => {await changeInputPrice(e); }} type="tel" placeholder={0.0} value={outTokenAmount}/>
+            <p className="btn-max btn-max-trade" onClick={setMaxAmountLower}>MAX</p>
           </div>
           <BuyButton></BuyButton>
         </div>

@@ -11,6 +11,8 @@ function TradePage(props) {
   const WETH = '0xc778417E063141139Fce010982780140Aa0cD5Ab';
   const [outTokenAmount, setOutTokenAmount] = useState('');
   const [inTokenAmount, setInTokenAmount] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [outputValue, setOutputValue] = useState('');
   const [allowance, setAllowance] = useState(0);
   const [token0, setToken0] = useState(WETH);
   const [token0Balance, setToken0Balance] = useState(0);
@@ -25,48 +27,45 @@ function TradePage(props) {
   const [isApproved, setIsApproved] = useState(false);
   const [isExactInput, setIsExactInput] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
+  const wallet = useSelector(state => state.wallet.address);
   const dispatch = useDispatch();
   useEffect(() => {
     if (!swapProvider) {
       setParams()
     }
-  }, [])
+    else
+    {
+      swapProvider.setWallet(wallet);
+      setUserBalance(token0, token0Symbol, token1, token1Symbol);
+    }
+  })
   const setParams = async () => {
     const swapProvider = await SwapProvider.create();
     setSwapProvider(swapProvider);
-    const web3 = new Web3(window.ethereum);
     const token0Balance = await swapProvider.getTokenBalance(token0, token0Symbol);
     const token1Balance = await swapProvider.getTokenBalance(token1, token1Symbol);
     setToken0Balance(token0Balance);
     setToken1Balance(token1Balance);
-    setWeb3(web3);
     setIsLoaded(true);
   }
   const setUserBalance = async (token0, token0Symbol, token1, token1Symbol) =>{ 
     const token0Balance = await swapProvider.getTokenBalance(token0, token0Symbol);
     const token1Balance = await swapProvider.getTokenBalance(token1, token1Symbol);
+    const isInsufficientBalance = parseFloat(token0Balance) >= parseFloat(inTokenAmount) ? false : true;
+    setIsInsufficientBalance(isInsufficientBalance);
     setToken0Balance(token0Balance);
     setToken1Balance(token1Balance);
   }
   const setMaxAmountUpper = () =>{
     setInTokenAmount(token0Balance);
+    const balance = Number(token0Balance) % 1 === 0 ? (parseInt(token0Balance).toString()): (parseFloat(Number(token0Balance).toFixed(8)).toString())
     const price = {target: {
-      value: token0Balance
+      value: balance
     }}
     setIsInsufficientBalance(false);
     changeOutputPrice(price);
     token0 === WETH ? setBaseToken('WETH') : setBaseToken('XST');
   }
-
-  const setMaxAmountLower = () =>{
-    setOutTokenAmount(token1Balance);
-    const price = {target:{
-      value: token1Balance
-    }}
-    changeInputPrice(price);
-    token1 === WETH ? setBaseToken('WETH') : setBaseToken('XST');
-  }
-
   const changeOutputPrice = async (price) => {
     setIsLoaded(false);
     if((!/^[0-9.]*$/.test(price.target.value.toString())))
@@ -77,8 +76,11 @@ function TradePage(props) {
       setIsExactInput(true);
       token0 === WETH ? setBaseToken('WETH') : setBaseToken('XST')
       setInTokenAmount(price.target.value)  
+      setInputValue(price.target.value)
+      // Number(price.target.value) % 1 === 0 ? setInputValue(parseInt(price.target.value)): setInputValue(parseFloat(price.target.value).toFixed(8))
       const sellPrice = token0 === WETH ? await swapProvider.getWETHToXSPrice(price.target.value.toString()) : await swapProvider.getXSToWETHPrice(price.target.value.toString());
       setOutTokenAmount(sellPrice);
+      Number(sellPrice) % 1 === 0 ? setOutputValue((sellPrice).toString()): setOutputValue(parseFloat(Number(sellPrice).toFixed(8)).toString())  
       const isInsufficientBalance = parseFloat(token0Balance) >= parseFloat(price.target.value) ? false : true;
       setIsInsufficientBalance(isInsufficientBalance);
       if(token0 !== '')
@@ -90,7 +92,9 @@ function TradePage(props) {
     else
     {
       setInTokenAmount(price.target.value)
+      setInputValue('0');
       setOutTokenAmount('0');
+      setOutputValue('0');
     }
     setIsLoaded(true);
   }
@@ -104,9 +108,12 @@ function TradePage(props) {
     else if (parseFloat(price.target.value) && swapProvider) {
       setIsExactInput(false);
       token1 === WETH ? setBaseToken('WETH') : setBaseToken('XST')
-      setOutTokenAmount(price.target.value)  
+      setOutTokenAmount(price.target.value) 
+      setOutputValue(price.target.value);
+      // Number(price.target.value) % 1 === 0 ? setOutputValue(parseInt(price.target.value).toString()): setOutputValue(parseFloat(price.target.value).toFixed(8).toString())
       const buyPrice = token1 === WETH ? await swapProvider.getWETHfromXSPrice(price.target.value.toString()) : await swapProvider.getXSfromWETHPrice(price.target.value.toString());
       setInTokenAmount(buyPrice);
+      Number(buyPrice) % 1 === 0 ? setInputValue(parseInt(buyPrice).toString()): setInputValue(parseFloat(Number(buyPrice).toFixed(8)).toString())
       const isInsufficientBalance = parseFloat(token0Balance) >= parseFloat(buyPrice) ? false : true;
       setIsInsufficientBalance(isInsufficientBalance);
       if(swapProvider && token0 != '')
@@ -117,7 +124,9 @@ function TradePage(props) {
     }
     else{
       setInTokenAmount('0');
+      setInputValue('0');
       setOutTokenAmount(price.target.value);
+      setOutputValue('0');
     }
     setIsLoaded(true);
   };
@@ -228,8 +237,17 @@ function TradePage(props) {
       }
       const isApproved = !!newInTokenAmount ? await swapProvider.isEnoughAllowance(newInTokenAmount.toString(), WETH, 'WETH') : false;
       setIsApproved(isApproved);
-      setInTokenAmount(newInTokenAmount);
+      setInTokenAmount(newInTokenAmount);      
       setOutTokenAmount(newOutTokenAmount);
+      if(!newInTokenAmount || !newOutTokenAmount)
+      {
+        setInputValue('0');
+        setOutputValue('0');
+      }
+      else{
+        Number(newInTokenAmount) % 1 === 0 ? setInputValue(parseInt(newInTokenAmount).toString()): setInputValue(parseFloat(Number(newInTokenAmount).toFixed(8)).toString())
+        Number(newOutTokenAmount) % 1 === 0 ? setOutputValue((newOutTokenAmount).toString()): setOutputValue(parseFloat(Number(newOutTokenAmount).toFixed(8)).toString())  
+      }
     }
     else if(token.target.value == XSTOKEN){
       await setUserBalance(XSTOKEN, 'XS', WETH, 'WETH');
@@ -253,6 +271,16 @@ function TradePage(props) {
       setIsApproved(isApproved);
       setInTokenAmount(newInTokenAmount);
       setOutTokenAmount(newOutTokenAmount);
+      if(!newInTokenAmount || !newOutTokenAmount)
+      {
+        setInputValue('0');
+        setOutputValue('0');
+      }
+      else{
+        Number(newInTokenAmount) % 1 === 0 ? setInputValue(parseInt(newInTokenAmount).toString()): setInputValue(parseFloat(Number(newInTokenAmount).toFixed(8)).toString())
+        Number(newOutTokenAmount) % 1 === 0 ? setOutputValue((newOutTokenAmount).toString()): setOutputValue(parseFloat(Number(newOutTokenAmount).toFixed(8)).toString())  
+      }
+
     }
     setIsLoaded(true);
   }
@@ -281,6 +309,15 @@ function TradePage(props) {
       setIsApproved(isApproved);
       setInTokenAmount(newInTokenAmount);
       setOutTokenAmount(newOutTokenAmount);
+      if(!newInTokenAmount || !newOutTokenAmount)
+      {
+        setInputValue('0');
+        setOutputValue('0');
+      }
+      else{
+        Number(newInTokenAmount) % 1 === 0 ? setInputValue(parseInt(newInTokenAmount).toString()): setInputValue(parseFloat(Number(newInTokenAmount).toFixed(8)).toString())
+        Number(newOutTokenAmount) % 1 === 0 ? setOutputValue((newOutTokenAmount).toString()): setOutputValue(parseFloat(Number(newOutTokenAmount).toFixed(8)).toString())  
+      }
     }
     else if(token.target.value == XSTOKEN){
       await setUserBalance(WETH, 'WETH', XSTOKEN, 'XS');
@@ -304,6 +341,15 @@ function TradePage(props) {
       setIsApproved(isApproved);
       setInTokenAmount(newInTokenAmount);
       setOutTokenAmount(newOutTokenAmount);
+      if(!newInTokenAmount || !newOutTokenAmount)
+      {
+        setInputValue('0');
+        setOutputValue('0');
+      }
+      else{
+        Number(newInTokenAmount) % 1 === 0 ? setInputValue(parseInt(newInTokenAmount).toString()): setInputValue(parseFloat(Number(newInTokenAmount).toFixed(8)).toString())
+        Number(newOutTokenAmount) % 1 === 0 ? setOutputValue((newOutTokenAmount).toString()): setOutputValue(parseFloat(Number(newOutTokenAmount).toFixed(8)).toString())  
+      }
     }
     setIsLoaded(true);
   }
@@ -350,8 +396,8 @@ function TradePage(props) {
               <option defaultValue value={WETH}>WETH</option>
               <option value={XSTOKEN}>XS</option>
             </select>
-            <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inTokenAmount}/>
-            <p className="btn-max btn-max-trade" onClick={setMaxAmountUpper}>MAX</p>
+            <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inputValue}/>
+            <button className="btn btn-max btn-max-trade" onClick={setMaxAmountUpper}>MAX</button>
           </div>
           <p>Balance: {parseFloat(token1Balance).toFixed(5)} {token1Symbol}</p>
           <div className="xs-trade-change-input xs-trade-change-input-xs">
@@ -359,7 +405,7 @@ function TradePage(props) {
               <option defaultValue value={XSTOKEN}>XS</option>
               <option value={WETH}>WETH</option>
             </select>
-            <input onChange={async(e) => {await changeInputPrice(e); }} type="tel" placeholder={0.0} value={outTokenAmount}/>
+            <input onChange={async(e) => {await changeInputPrice(e); }} type="tel" placeholder={0.0} value={outputValue}/>
           </div>
           <BuyButton></BuyButton>
         </div>

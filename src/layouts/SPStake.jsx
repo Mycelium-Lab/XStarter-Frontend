@@ -15,17 +15,23 @@ function SPStake(props) {
   const [isInsufficientBalance, setIsInsufficientBalance] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const methods = useSelector(state => state.wallet.methods);
+  const wallet = useSelector(state => state.wallet.address);
   const dispatch = useDispatch();
   const { handleChange } = props;
 
   useEffect(() => {
     setUserInfo()
-  }, [])
+  }, [wallet])
   const setUserInfo = async () =>{
+    setIsLoaded(false);
+    methods.setWallet(wallet);
     const balance = await methods.getUserBalance();
     const stakedAmount = await methods.getUserStakedAmount();
     const tier = await methods.getUserTier();
     const currentStakes = await methods.getCurrentStakes();
+    const isInsufficientBalance = parseFloat(balance) >= parseFloat(amount) ? false : true;
+
+    setIsInsufficientBalance(isInsufficientBalance);
     setCurrentStakes(currentStakes)
     setUserBalance(balance);
     setUserStakedAmount(stakedAmount);
@@ -223,7 +229,7 @@ function SPStake(props) {
         </div>
         <div className="staking-tier-stats-input">
           <input onChange={async (e) => {changeInput(e)}} type="tel" placeholder={0.0} value={amount}/>
-          <p className="btn-max" onClick={setMaxAmount}>MAX</p>
+          <button className="btn btn-max" onClick={setMaxAmount}>MAX</button>
         </div>
         <div className="staking-tier-stats-btns">
           <StakeButton></StakeButton>

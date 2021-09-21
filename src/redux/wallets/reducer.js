@@ -3,6 +3,7 @@ import {
     SET_CHAINID,
     SET_PROVIDER,
     SET_METHODS,
+    SET_IS_LOADED
 } from '../types'
 
 const initialState = {
@@ -10,7 +11,8 @@ const initialState = {
     address: '',
     method: '',
     provider: null,
-    correntChainId: process.env.NODE_ENV === 'development' ? '42' : '56'
+    isLoaded: false,
+    correntChainId: process.env.NODE_ENV === 'development' ? '4' : '1'
 }
 
 export default function (state = initialState, action) {
@@ -35,6 +37,11 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 methods: action.payload.methods
+            }
+        case SET_IS_LOADED:
+            return {
+                ...state,
+                isLoaded: action.payload.isLoaded
             }
         default:
             return {

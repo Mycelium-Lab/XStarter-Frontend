@@ -360,7 +360,6 @@ function TradePage(props) {
               <option value={WETH}>WETH</option>
             </select>
             <input onChange={async(e) => {await changeInputPrice(e); }} type="tel" placeholder={0.0} value={outTokenAmount}/>
-            <p className="btn-max btn-max-trade" onClick={setMaxAmountLower}>MAX</p>
           </div>
           <BuyButton></BuyButton>
         </div>

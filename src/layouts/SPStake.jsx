@@ -13,6 +13,7 @@ function SPStake(props) {
   const [isApproved, setIsApproved] = useState(false);
   const [isModal, setIsModal] = useState(false);
   const [isInsufficientBalance, setIsInsufficientBalance] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
   const methods = useSelector(state => state.wallet.methods);
   const dispatch = useDispatch();
   const { handleChange } = props;
@@ -29,6 +30,11 @@ function SPStake(props) {
     setUserBalance(balance);
     setUserStakedAmount(stakedAmount);
     setUserTier(tier);
+    setIsLoaded(true);
+  }
+  const setMaxAmount = () =>{
+    setIsInsufficientBalance(false);
+    setAmount(userBalance);
   }
   const openModal = () =>
   {
@@ -69,6 +75,7 @@ function SPStake(props) {
           hash: tx,
           type: 'withdrawXS'
         }));
+      setIsModal(false);
       const receipt = await methods.waitTransaction(tx)
       if(!!receipt)
       {
@@ -114,7 +121,7 @@ function SPStake(props) {
     else if (parseFloat(price.target.value) && methods && (/^[0-9.]*$/.test(price.target.value.toString()))) {
       setAmount(price.target.value.toString());
       const isApproved = await methods.isEnoughAllowance(price.target.value.toString());
-      setIsApproved(isApproved);  
+      setIsApproved(isApproved);
       if(parseFloat(price.target.value) > parseFloat(userBalance))
       {
         setIsInsufficientBalance(true);
@@ -127,28 +134,6 @@ function SPStake(props) {
       setAmount(price.target.value);
     }
   };
-  function StakeButton(props) {
-    let button
-    if (amount == 0)
-    {
-      button = <button className="btn">Enter an amount</button>
-    }
-    else if(isInsufficientBalance)
-    {
-      button = <button className="btn xs-stake-btn">Insufficient balance</button>
-    }
-    else if(isApproved)
-    {
-      button = <button onClick = {stakeXST} className="btn">Stake</button>
-    }
-    else
-    {
-      button = <button onClick = {approve} className="btn">Approve</button>
-    }
-    return (
-      button
-    );
-  }
   function StakesTable({ data }) {
     if(!!data && isModal)
     {
@@ -186,27 +171,67 @@ function SPStake(props) {
       )
     } 
   }
+  function StakeButton(props) {
+    let button
+    if(!isLoaded)
+    {
+      button = <button className="btn xs-stake-btn-loading">Loading....</button>
+    }
+    else if (amount == 0)
+    {
+      button = <button className="btn xs-stake-btn">Enter an amount</button>
+    }
+    else if(isInsufficientBalance)
+    {
+      button = <button className="btn xs-stake-btn-insufficient-balance">Insufficient balance</button>
+    }
+    else if(isApproved)
+    {
+      button = <button onClick = {stakeXST} className="btn xs-stake-btn">Stake</button>
+    }
+    else
+    {
+      button = <button onClick = {approve} className="btn xs-stake-btn">Approve</button>
+    }
     return (
-      <div className="staking-tier mb80">
-        <StakesTable data={currentStakes}></StakesTable>
-        <span className="staking-tier-text mb40">
-          We are proud to see you as part of XStarter community. Your current tier is: {userTier}
-        </span>
-        <div className="xs-block">
-          <div className="staking-tier-stats">
-            <div><span>Balance:</span> <span>{userBalance} XS</span></div>
-            <div><span>Staked:</span> <span>{userStakedAmount} XS</span></div>
-          </div>
-          <div className="staking-tier-stats-input">
-            <input onChange={async (e) => {changeInput(e)}} type="tel" placeholder={0.0} value={amount}/>
-          </div>
-          <div className="staking-tier-stats-btns">
-            <StakeButton></StakeButton>
-            <button onClick= {openModal} className="btn btn-wo-bg">Unstake</button>
-          </div>
+      button
+    );
+  }
+  function UnstakeButton(props)
+  {
+    let stakeButton
+    if(userStakedAmount == 0 || !isLoaded)
+    {
+      stakeButton = <div></div>
+    }
+    else
+    {
+      stakeButton = <button onClick={openModal} className="btn btn-wo-bg">Unstake</button>
+    }
+    return stakeButton
+  }
+  return (
+    <div className="staking-tier mb80">
+      <StakesTable data={currentStakes}></StakesTable>
+      <span className="staking-tier-text mb40">
+        We are proud to see you as part of XStarter community. Your current tier is: {userTier}
+      </span>
+      <div className="xs-block">
+        <div className="staking-tier-stats">
+          <div><span>Balance:</span> <span>{userBalance} XS</span></div>
+          <div><span>Staked:</span> <span>{userStakedAmount} XS</span></div>
+        </div>
+        <div className="staking-tier-stats-input">
+          <input onChange={async (e) => {changeInput(e)}} type="tel" placeholder={0.0} value={amount}/>
+          <p className="btn-max" onClick={setMaxAmount}>MAX</p>
+        </div>
+        <div className="staking-tier-stats-btns">
+          <StakeButton></StakeButton>
+          <UnstakeButton></UnstakeButton>
         </div>
       </div>
-    );
+    </div>
+  );
     
     
 }

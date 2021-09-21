@@ -300,7 +300,7 @@ export class SwapProvider {
       CurrencyAmount.fromRawAmount(myToken, toXS(amount)),
       TradeType.EXACT_INPUT
     )
-    return (trade.minimumAmountOut(slippageTolerance).toSignificant(18));
+    return (trade.minimumAmountOut(slippageTolerance).toSignificant(8));
   }
   // Цена XS <- WETH
   async getXSfromWETHPrice(desiredXsAmount)
@@ -312,6 +312,6 @@ export class SwapProvider {
       CurrencyAmount.fromRawAmount(myToken, toXS(desiredXsAmount)),
       TradeType.EXACT_OUTPUT
     )
-    return (trade.maximumAmountIn(slippageTolerance).toSignificant(18));
+    return (trade.maximumAmountIn(slippageTolerance).toSignificant(8));
   }
 }

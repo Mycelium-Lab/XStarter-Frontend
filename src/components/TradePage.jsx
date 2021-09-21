@@ -92,9 +92,9 @@ function TradePage(props) {
     else
     {
       setInTokenAmount(price.target.value)
-      setInputValue('0');
-      setOutTokenAmount('0');
-      setOutputValue('0');
+      setInputValue('');
+      setOutTokenAmount('');
+      setOutputValue('');
     }
     setIsLoaded(true);
   }
@@ -123,10 +123,10 @@ function TradePage(props) {
       }
     }
     else{
-      setInTokenAmount('0');
-      setInputValue('0');
+      setInTokenAmount('');
+      setInputValue('');
       setOutTokenAmount(price.target.value);
-      setOutputValue('0');
+      setOutputValue('');
     }
     setIsLoaded(true);
   };
@@ -241,8 +241,8 @@ function TradePage(props) {
       setOutTokenAmount(newOutTokenAmount);
       if(!newInTokenAmount || !newOutTokenAmount)
       {
-        setInputValue('0');
-        setOutputValue('0');
+        setInputValue('');
+        setOutputValue('');
       }
       else{
         Number(newInTokenAmount) % 1 === 0 ? setInputValue(parseInt(newInTokenAmount).toString()): setInputValue(parseFloat(Number(newInTokenAmount).toFixed(8)).toString())
@@ -273,8 +273,8 @@ function TradePage(props) {
       setOutTokenAmount(newOutTokenAmount);
       if(!newInTokenAmount || !newOutTokenAmount)
       {
-        setInputValue('0');
-        setOutputValue('0');
+        setInputValue('');
+        setOutputValue('');
       }
       else{
         Number(newInTokenAmount) % 1 === 0 ? setInputValue(parseInt(newInTokenAmount).toString()): setInputValue(parseFloat(Number(newInTokenAmount).toFixed(8)).toString())
@@ -311,8 +311,8 @@ function TradePage(props) {
       setOutTokenAmount(newOutTokenAmount);
       if(!newInTokenAmount || !newOutTokenAmount)
       {
-        setInputValue('0');
-        setOutputValue('0');
+        setInputValue('');
+        setOutputValue('');
       }
       else{
         Number(newInTokenAmount) % 1 === 0 ? setInputValue(parseInt(newInTokenAmount).toString()): setInputValue(parseFloat(Number(newInTokenAmount).toFixed(8)).toString())
@@ -343,8 +343,8 @@ function TradePage(props) {
       setOutTokenAmount(newOutTokenAmount);
       if(!newInTokenAmount || !newOutTokenAmount)
       {
-        setInputValue('0');
-        setOutputValue('0');
+        setInputValue('');
+        setOutputValue('');
       }
       else{
         Number(newInTokenAmount) % 1 === 0 ? setInputValue(parseInt(newInTokenAmount).toString()): setInputValue(parseFloat(Number(newInTokenAmount).toFixed(8)).toString())

@@ -39,6 +39,7 @@ export class Sale {
         ])
         const erc20Contract = new this.web3.eth.Contract(erc20Abi, tokenAddress)
         const tokenSymbol = await erc20Contract.methods.symbol().call()
+        const decimals = await erc20Contract.methods.decimals().call()
         return {
             tokenName,
             tokenSymbol,
@@ -46,7 +47,8 @@ export class Sale {
             softcap,
             startTimestamp,
             endTimestamp,
-            description
+            description,
+            decimals
         }
     }
 
@@ -55,7 +57,21 @@ export class Sale {
     }
 
     async getHardcap() {
-        return this.saleContract.methods.hardcap().call()
+        const hardcap = await this.saleContract.methods.hardcap().call()
+        const hardcapBN = new Web3.utils.BN(hardcap.toString())
+        const ten = new Web3.utils.BN('10')
+        const decimals = new Web3.utils.BN(this.immutables.decimals.toString())
+        const tenPowDecimals = ten.pow(decimals)
+        return hardcapBN.div(tenPowDecimals).toString()
+    }
+
+    addDecimals(value) {
+        const ten = new Web3.utils.BN('10')
+        const decimals = new Web3.utils.BN(this.immutables.decimals.toString())
+        const tenPowDecimals = ten.pow(decimals)
+        const valueBN = new Web3.utils.BN(value)
+        const result = valueBN.mul(tenPowDecimals)
+        return result.toString()
     }
 
     async getTotalTokensSold() {
@@ -73,7 +89,7 @@ export class Sale {
 
     async buyTokens(tokenAmount) {
         const ethValue = await this.calculatePriceTokenToETH(tokenAmount)
-        return this.saleContract.methods.buyTokens().send({value: ethValue})
+        return this.saleContract.methods.buyTokens().send({value: ethValue, from: this.account})
     }
 
     async getNumberOfParticipants() {
@@ -96,14 +112,16 @@ export class Sale {
 
     async calculatePriceTokenToETH(tokenAmount) {
         const price = await this.getPriceWithDecimals()
-        let ethPrice = price.mul(new Web3.utils.BN(parseInt(tokenAmount)))
+        const priceBN = new Web3.utils.BN(price)
+        let ethPrice = priceBN.mul(new Web3.utils.BN(tokenAmount))
         return ethPrice.toString()
     }
 
     async addTokensForSale(amount) {
-        const erc20Contract = new this.web3.Contract(erc20Abi, this.immutables.tokenAddress)
-        await erc20Contract.methods.approve(this.saleContract.options.address, amount).send()
-        await this.saleContract.methods.addTokensForSale(amount).send()
+        const erc20Contract = new this.web3.eth.Contract(erc20Abi, this.immutables.tokenAddress)
+        const amountWithDecimals = this.addDecimals(amount);
+        await erc20Contract.methods.approve(this.saleContract.options.address, amountWithDecimals).send({from: this.account})
+        await this.saleContract.methods.addTokensForSale(amountWithDecimals).send({from: this.account})
     }
 
     async changePrice(newPrice) {
@@ -111,11 +129,11 @@ export class Sale {
     }
 
     async withdrawFunds() {
-        return this.saleContract.methods.withdrawFunds().send()
+        return this.saleContract.methods.withdrawFunds().send({from: this.account})
     }
 
     async withdrawBoughtTokens() {
-        return this.saleContract.methods.withdrawBoughtTokens().send()
+        return this.saleContract.methods.withdrawBoughtTokens().send({from: this.account})
     }
 
     async getCurrentTimestamp() {
@@ -130,20 +148,23 @@ export class Sale {
             numberOfParticipants,
             totalTokensSold,
             hardcap,
-            price
+            price,
+            hardcapCompletionPercent
         ] = await Promise.all([
             this.getStatus(),
             this.getNumberOfParticipants(),
             this.getTotalTokensSold(),
             this.getHardcap(),
-            this.getPriceWithoutDecimals()
+            this.getPriceWithoutDecimals(),
+            this.getHardcapCompletionPercent()
         ])
         return {
             status,
             numberOfParticipants,
             totalTokensSold,
             hardcap,
-            price
+            price,
+            hardcapCompletionPercent
         }
     }
 
@@ -152,20 +173,22 @@ export class Sale {
         if (currentTimestamp < this.immutables.startTimestamp) {
             return "Upcoming"
         } else if (currentTimestamp >= this.immutables.startTimestamp && currentTimestamp <= this.immutables.endTimestamp) {
-            return "Active"
+            return "Current"
         } else {
-            return "Completed"
+            return "Finished"
         }
     }
 
     async getHardcapCompletionPercent() {
         const hardcap = await this.saleContract.methods.hardcap().call()
         const totalTokensSold = await this.saleContract.methods.totalTokensSold().call()
-        if (hardcap == 0 || totalTokensSold == 0) {
+        const hardcapBN = new Web3.utils.BN(hardcap)
+        const totalTokensSoldBN = new Web3.utils.BN(totalTokensSold)
+        if (hardcap == "0" || totalTokensSold == "0") {
             return "0"
         }
         const hundred = new Web3.utils.BN(100)
-        const percent = totalTokensSold.mul(hundred).div(hardcap)
+        const percent = totalTokensSoldBN.mul(hundred).div(hardcapBN)
         return Math.floor(percent.toNumber()).toString()
     }
 }

@@ -30,9 +30,9 @@ export class SaleProvider {
     }
 
     static splitByStatus(sales) {
-        const current = sales.filter(sale => sale.status === "Active")
+        const current = sales.filter(sale => sale.status === "Current")
         const upcoming = sales.filter(sale => sale.status === "Upcoming")
-        const finished = sales.filter(sale => sale.status === "Completed")
+        const finished = sales.filter(sale => sale.status === "Finished")
         return [current, upcoming, finished]
     }
 }

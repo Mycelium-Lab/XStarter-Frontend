@@ -64,7 +64,14 @@ export class Sale {
         const tenPowDecimals = ten.pow(decimals)
         return hardcapBN.div(tenPowDecimals).toString()
     }
-
+    noDecimals(value){
+        const ten = new Web3.utils.BN('10')
+        const decimalsBN = new Web3.utils.BN(this.immutables.decimals)
+        const tenPowDecimals = ten.pow(decimalsBN)
+        const valueBN = new Web3.utils.BN(value)
+        const result = valueBN.div(tenPowDecimals)
+        return result.toString()
+    }
     addDecimals(value) {
         const ten = new Web3.utils.BN('10')
         const decimals = new Web3.utils.BN(this.immutables.decimals.toString())

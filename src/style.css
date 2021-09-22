@@ -841,7 +841,7 @@ tbody tr td {
     padding: 15.5px 19px;
     outline: none;
     text-align: left;
-    padding-left: 110px;
+    padding-left: 20px;
 }
 select {
     -webkit-appearance: none;
@@ -864,7 +864,7 @@ select {
     border-radius: 8px;
     position: absolute;
     top: 10px;
-    left: 10px;
+    left: 200px;
 }
 
 select option {
@@ -964,7 +964,7 @@ select::-ms-expand {
 .btn-max-trade
 {
     top: 8px;
-    margin-left: 35px;
+    left: 140px;
 }
 .btn-modal
 {

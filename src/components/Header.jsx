@@ -5,9 +5,21 @@ import { useState, useEffect } from 'react';
 
 function Header(props) {
   const { handleChange } = props;
+  const [isWalletConnectionError, setIsWalletConnectionError] = useState(false);
+  const [isLoadingState, setIsLoadinState] = useState(false);
+  const [isNetworkConnectionError, setIsNetworkConnectionError] = useState(false);
   const address = useSelector(state => state.wallet.address);
   const transactionHash = useSelector(state => state.transactionInfo.transactionInfo.hash);
   const transactionType = useSelector(state => state.transactionInfo.transactionInfo.type);
+  const currentChainId = useSelector(state => state.wallet.chainId);
+  const rightChainId = useSelector(state => state.wallet.correntChainId);
+  const provider = useSelector(state => state.wallet.provider)
+  const isLoaded = useSelector(state => state.wallet.isLoaded)
+
+
+  useEffect(() => {
+
+  }, [address, currentChainId, isLoaded])
 
   const goToTransaction = () =>{
     const url = "https://rinkeby.etherscan.io/tx/" + transactionHash

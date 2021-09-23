@@ -18,13 +18,12 @@ function ProjectPage(props) {
     setSales({current, upcoming, finished})
   }
   if(sales){
-    console.log(sales.finished[0]);
     return (
       <div className="xs-body-projects">
           <ProjectPageIDOs sales={sales.current} title="Current"/>
           <ProjectPageIDOs sales={sales.upcoming} title="Upcoming"/>
           <ProjectPageIDOs sales={sales.finished} title="Finished"/>
-          <SalePage sale={sales.finished[0]} />
+          {/* <SalePage sale={sales.finished[1]} /> */}
       </div>
       );
   }else{

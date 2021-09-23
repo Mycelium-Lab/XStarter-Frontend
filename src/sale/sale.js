@@ -23,6 +23,7 @@ export class Sale {
 
     async initializeImmutables() {
         const [
+            tokenCreator,
             tokenName,
             tokenAddress,
             softcap,
@@ -30,6 +31,7 @@ export class Sale {
             endTimestamp,
             description
         ] = await Promise.all([
+            this.saleContract.methods.tokenCreator().call(),
             this.saleContract.methods.tokenName().call(),
             this.saleContract.methods.tokenAddress().call(),
             this.saleContract.methods.softcap().call(),
@@ -41,10 +43,11 @@ export class Sale {
         const tokenSymbol = await erc20Contract.methods.symbol().call()
         const decimals = await erc20Contract.methods.decimals().call()
         return {
+            tokenCreator,
             tokenName,
             tokenSymbol,
             tokenAddress,
-            softcap,
+            softcap: this.noDecimals(softcap, decimals),
             startTimestamp,
             endTimestamp,
             description,
@@ -64,9 +67,9 @@ export class Sale {
         const tenPowDecimals = ten.pow(decimals)
         return hardcapBN.div(tenPowDecimals).toString()
     }
-    noDecimals(value){
+    noDecimals(value, decimals){
         const ten = new Web3.utils.BN('10')
-        const decimalsBN = new Web3.utils.BN(this.immutables.decimals)
+        const decimalsBN = new Web3.utils.BN(decimals)
         const tenPowDecimals = ten.pow(decimalsBN)
         const valueBN = new Web3.utils.BN(value)
         const result = valueBN.div(tenPowDecimals)
@@ -82,7 +85,8 @@ export class Sale {
     }
 
     async getTotalTokensSold() {
-        return this.saleContract.methods.totalTokensSold().call()
+        const totalTokensSold = await this.saleContract.methods.totalTokensSold().call()
+        return this.noDecimals(totalTokensSold, this.immutables.decimals)
     }
 
     async getPriceWithDecimals() {
@@ -137,6 +141,10 @@ export class Sale {
 
     async withdrawFunds() {
         return this.saleContract.methods.withdrawFunds().send({from: this.account})
+    }
+
+    async withdrawSaleResult() {
+        return this.saleContract.methods.withdrawSaleResult().send({from:this.account})
     }
 
     async withdrawBoughtTokens() {

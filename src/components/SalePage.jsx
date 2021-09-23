@@ -33,10 +33,35 @@ function SalePage(props) {
         const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
         return time;
       }
+      // Добавить токены до начала сейла. Кнопка показывается, если сейл еще не начался, адрес соответствует адресу держателя токенов (продавцу).
     const addTokensButton = () => {
-            return <button onClick={async () => { await sale.addTokensForSale("100000") }}>
-            Add tokens for sale
-            </button>
+        if(sale && saleMutables && saleMutables.status === "Upcoming" && sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()){
+            return <button onClick={async () => { await sale.addTokensForSale("125000") }}>Add tokens for sale</button>
+        }
+    }
+    // Забрать результат продажи (лишние токены + эфир). Кнопка показывается, если сейл закончился, адрес соответствует адресу держателя токенов (продавцу).
+    const withdrawSaleResultButton = () => {
+        if(sale && saleMutables && saleMutables.status === "Finished" && sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()){
+            return <button onClick={async () => { await sale.withdrawSaleResult() }}>Withdraw sale result</button>
+        }
+    }
+    // Забрать эфир, если не был достигнут софткап и время кончилось. 
+    const withdrawFundsButton = () => {
+        if(sale && saleMutables && saleMutables.status === "Finished" && parseInt(saleMutables.totalTokensSold) < parseInt(sale.immutables.softcap)){
+            return <button onClick={async () => { await sale.withdrawFunds() }}>Withdraw funds</button>
+        }
+    }
+    // Забрать купленные токены, если был достигнут софткап и время кончилось.
+    const withdrawBoughtTokensButton = () => {
+        if(sale && saleMutables && saleMutables.status === "Finished" && parseInt(saleMutables.totalTokensSold) >= parseInt(sale.immutables.softcap)){
+            return <button onClick={async () => { await sale.withdrawBoughtTokens() }}>Withdraw tokens</button>
+        }
+    }
+    // Купить токены во время сейла.
+    const buyTokensButton = () => {
+        if(sale && saleMutables && saleMutables.status === "Current" && parseInt(saleMutables.totalTokensSold) < parseInt(saleMutables.hardcap)){
+            return <button onClick={async () => { await sale.buyTokens("125000") }}>Buy tokens</button>
+        }
     }
     if(saleMutables && sale){
     return (
@@ -46,7 +71,7 @@ function SalePage(props) {
                 <img src={topblockimg} alt="" />
             </div>
             <div className="xs-block-top-content">
-                <span className="xs-top-block-name">QWE</span>
+                <span className="xs-top-block-name">{sale.immutables.tokenName}</span>
                 <span className="xs-top-block-name-links">
                     <a href="#">Website</a>
                     <a href="#">Medium</a>
@@ -58,7 +83,7 @@ function SalePage(props) {
         <div className="xs-block-content">
             <div className="xs-block-ido-status">
                 <div className="ido-status-top mb30">
-                    <div>IDO Status: <span>{sale.status}</span></div>
+                    <div>IDO Status: <span>{saleMutables.status}</span></div>
                     <div>Pair: <span>ETC</span></div>
                 </div>
                 <div className="ido-status-desc mb30">
@@ -76,19 +101,14 @@ function SalePage(props) {
                     <div>Swap Rate - 1 {sale.immutables.tokenSymbol} : {saleMutables.price} ETH</div>
                     <div>Pool Cap - {saleMutables.hardcap} {sale.immutables.tokenSymbol}</div>
                     <div>Participants - {saleMutables.numberOfParticipants}</div>
-                    <div>Softcap - {sale.immutables.softcap}</div>
-                    <div>Sale will start at {timeConverter(sale.immutables.startTimestamp)}</div>
-                    <div>Sale will end at {timeConverter(sale.immutables.endTimestamp)}</div>
+                    <div>Softcap - {sale.immutables.softcap} {sale.immutables.tokenSymbol}</div>
+                    <div>Sale starts at {timeConverter(sale.immutables.startTimestamp)}</div>
+                    <div>Sale ends at {timeConverter(sale.immutables.endTimestamp)}</div>
                     {addTokensButton()}
-                    <button onClick={async () => { await sale.withdrawFunds() }}>
-                        Withdraw funds
-                    </button>
-                    <button onClick={async () => { await sale.withdrawBoughtTokens() }}>
-                        Withdraw tokens
-                    </button>
-                    <button onClick={async () => { await sale.buyTokens("125000") }}>
-                        Buy tokens
-                    </button>
+                    {withdrawSaleResultButton()}
+                    {withdrawFundsButton()}
+                    {withdrawBoughtTokensButton()}
+                    {buyTokensButton()}
                 </div>
             </div>
         </div>

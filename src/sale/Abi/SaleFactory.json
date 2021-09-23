@@ -39,7 +39,7 @@
          {
             "indexed":false,
             "internalType":"uint256",
-            "name":"minAmount",
+            "name":"softcap",
             "type":"uint256"
          },
          {
@@ -101,7 +101,7 @@
          },
          {
             "internalType":"uint256",
-            "name":"_minAmount",
+            "name":"_softcap",
             "type":"uint256"
          },
          {

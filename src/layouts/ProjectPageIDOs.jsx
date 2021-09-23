@@ -43,7 +43,7 @@ function ProjectPageIDOs(props) {
                     <div className="xs-block-content">
                         <div className="xs-block-ido-status">
                             <div className="ido-status-top mb30">
-                                <div>IDO Status: <span>{sales[i].status}</span></div>
+                                <div>IDO Status: <span>{saleMutables[i].status}</span></div>
                                 <div>Pair: <span>ETC</span></div>
                             </div>
                             <div className="ido-status-desc mb30">

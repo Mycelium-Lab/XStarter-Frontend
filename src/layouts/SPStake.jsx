@@ -14,34 +14,59 @@ function SPStake(props) {
   const [isModal, setIsModal] = useState(false);
   const [isInsufficientBalance, setIsInsufficientBalance] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [chainName, setChainName] = useState('');
   const methods = useSelector(state => state.wallet.methods);
   const wallet = useSelector(state => state.wallet.address);
+  const currentChainId = useSelector(state => state.wallet.chainId);
+  const rightChainId = useSelector(state => state.wallet.correntChainId);
+  const provider = useSelector(state => state.wallet.provider)
+  const isInitialized = useSelector(state => state.wallet.isLoaded)
+
   const dispatch = useDispatch();
   const { handleChange } = props;
 
   useEffect(() => {
+    rightChainId === '1' ? setChainName('Mainnet') : setChainName('Rinkeby');
     setUserInfo()
-  }, [wallet])
+  }, [wallet, currentChainId])
   const setUserInfo = async () =>{
     setIsLoaded(false);
-    methods.setWallet(wallet);
-    const balance = await methods.getUserBalance();
-    const stakedAmount = await methods.getUserStakedAmount();
-    const tier = await methods.getUserTier();
-    const currentStakes = await methods.getCurrentStakes();
-    const isInsufficientBalance = parseFloat(balance) >= parseFloat(amount) ? false : true;
-
-    setIsInsufficientBalance(isInsufficientBalance);
-    setCurrentStakes(currentStakes)
-    setUserBalance(balance);
-    setUserStakedAmount(stakedAmount);
-    setUserTier(tier);
-    setIsLoaded(true);
+    if(!!wallet && !!methods && currentChainId === rightChainId)
+    {
+      methods.setWallet(wallet);
+      const balance = await methods.getUserBalance();
+      const stakedAmount = await methods.getUserStakedAmount();
+      const tier = await methods.getUserTier();
+      const currentStakes = await methods.getCurrentStakes();
+      const isInsufficientBalance = parseFloat(balance) >= parseFloat(amount) ? false : true;
+  
+      setIsInsufficientBalance(isInsufficientBalance);
+      setCurrentStakes(currentStakes)
+      setUserBalance(balance);
+      setUserStakedAmount(stakedAmount);
+      setUserTier(tier);
+      setIsLoaded(true);  
+    }
   }
   const setMaxAmount = () =>{
     setIsInsufficientBalance(false);
     setAmount(userBalance);
   }
+  const switchNetwork = async() =>
+  {
+    try{
+      const res = await window.ethereum.request({ 
+          method: 'wallet_switchEthereumChain',
+          params: [
+              {chainId: '0x' + rightChainId}
+            ]
+      });
+      // setIsNetworkConnectionError(false);
+    }catch(err){
+      // setIsNetworkConnectionError(true);
+    }
+  }
+
   const openModal = () =>
   {
     setIsModal(true);
@@ -179,7 +204,15 @@ function SPStake(props) {
   }
   function StakeButton(props) {
     let button
-    if(!isLoaded)
+    if((!wallet || !provider) && isInitialized)
+    {
+      button = <button className="btn xs-stake-btn-loading">Connect wallet</button>
+    }
+    else if(currentChainId !== rightChainId && !!wallet && isInitialized)
+    {
+      button = <button className="btn xs-stake-btn-loading" onClick={switchNetwork}>Switch to {chainName}</button>
+    }
+    else if(!isLoaded)
     {
       button = <button className="btn xs-stake-btn-loading">Loading....</button>
     }
@@ -206,7 +239,8 @@ function SPStake(props) {
   function UnstakeButton(props)
   {
     let stakeButton
-    if(userStakedAmount == 0 || !isLoaded)
+    
+    if(userStakedAmount == 0 || !isLoaded ||currentChainId !== rightChainId && !!wallet && isInitialized)
     {
       stakeButton = <div></div>
     }

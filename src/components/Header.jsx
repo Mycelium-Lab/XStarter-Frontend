@@ -8,6 +8,7 @@ function Header(props) {
   const [isWalletConnectionError, setIsWalletConnectionError] = useState(false);
   const [isLoadingState, setIsLoadinState] = useState(false);
   const [isNetworkConnectionError, setIsNetworkConnectionError] = useState(false);
+  const [chainName, setChainName] = useState('');
   const address = useSelector(state => state.wallet.address);
   const transactionHash = useSelector(state => state.transactionInfo.transactionInfo.hash);
   const transactionType = useSelector(state => state.transactionInfo.transactionInfo.type);
@@ -18,8 +19,24 @@ function Header(props) {
 
 
   useEffect(() => {
+    rightChainId === '1' ? setChainName('Mainnet') : setChainName('Rinkeby');
 
   }, [address, currentChainId, isLoaded])
+
+  const switchNetwork = async() =>
+  {
+    try{
+      const res = await window.ethereum.request({ 
+          method: 'wallet_switchEthereumChain',
+          params: [
+              {chainId: '0x' + rightChainId}
+            ]
+      });
+      // setIsNetworkConnectionError(false);
+    }catch(err){
+      // setIsNetworkConnectionError(true);
+    }
+  }
 
   const goToTransaction = () =>{
     const url = "https://rinkeby.etherscan.io/tx/" + transactionHash
@@ -48,6 +65,14 @@ function Header(props) {
       {
         var button = <span className="xs-username" onClick={goToTransaction}>Withdrawing XST...</span>
       }
+    }
+    else if((!address || !provider) && isLoaded)
+    {
+      var button = <span className="xs-username">Connect wallet</span>
+    }
+    else if(currentChainId !== rightChainId && !!address && isLoaded)
+    {
+      var button =<span className="xs-username" onClick={switchNetwork}>Switch to {chainName}</span>
     }
     else
     {

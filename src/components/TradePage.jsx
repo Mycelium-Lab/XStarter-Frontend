@@ -27,18 +27,42 @@ function TradePage(props) {
   const [isApproved, setIsApproved] = useState(false);
   const [isExactInput, setIsExactInput] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [chainName, setChainName] = useState('');
+  const [userHasSpecifiedInputOutput, setUserHasSpecifiedInputOutput] = useState(false);
   const wallet = useSelector(state => state.wallet.address);
+  const currentChainId = useSelector(state => state.wallet.chainId);
+  const rightChainId = useSelector(state => state.wallet.correntChainId);
+  const provider = useSelector(state => state.wallet.provider)
+  const isInitialized = useSelector(state => state.wallet.isLoaded)
+
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!swapProvider) {
+    if (!swapProvider && !!wallet && currentChainId === rightChainId) {
       setParams()
     }
-    else
+    else if(!!wallet && currentChainId === rightChainId)
     {
       swapProvider.setWallet(wallet);
       setUserBalance(token0, token0Symbol, token1, token1Symbol);
     }
+    rightChainId === '1' ? setChainName('Mainnet') : setChainName('Rinkeby');
   })
+
+  const switchNetwork = async() =>
+  {
+    try{
+      const res = await window.ethereum.request({ 
+          method: 'wallet_switchEthereumChain',
+          params: [
+              {chainId: '0x' + rightChainId}
+            ]
+      });
+      // setIsNetworkConnectionError(false);
+    }catch(err){
+      // setIsNetworkConnectionError(true);
+    }
+  }
+
   const setParams = async () => {
     const swapProvider = await SwapProvider.create();
     setSwapProvider(swapProvider);
@@ -357,7 +381,15 @@ function TradePage(props) {
   const { handleChange } = props;
   function BuyButton(props) {
     let button
-    if(!isLoaded)
+    if((!wallet || !provider) && isInitialized)
+    {
+      button = <button className="btn xs-trade-change-btn">Connect wallet</button>
+    }
+    else if(currentChainId !== rightChainId && !!wallet && isInitialized)
+    {
+      button = <button className="btn xs-trade-change-btn" onClick={switchNetwork}>Switch to {chainName}</button>
+    }
+    else if(!isLoaded)
     {
       button = <button className="btn xs-trade-change-btn ">Loading...</button>
     }

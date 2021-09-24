@@ -4,9 +4,12 @@ import SPStake from '../layouts/SPStake';
 import SPTableCoins from '../layouts/SPTableCoins';
 import SPTableProfits from '../layouts/SPTableProfits';
 import { useState, useEffect } from 'react';
+import settingsImg from '../img/settings.svg';
 function SalePage(props) {
     const { handleChange } = props;
     const [sale, setSale] = useState(null);
+    const [inTokenAmount, setInTokenAmount] = useState(null)
+    const [outTokenAmount, setOutTokenAmount] = useState(null)
     const [saleMutables, setSaleMutables] = useState(null);
     const setParams = async () => {
         if (props.sale) {
@@ -23,101 +26,120 @@ function SalePage(props) {
     }, [])
     const timeConverter = (UNIX_timestamp) => {
         const a = new Date(UNIX_timestamp * 1000);
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const year = a.getFullYear();
         const month = months[a.getMonth()];
         const date = a.getDate();
         const hour = a.getHours();
         const min = a.getMinutes() < 10 ? '0' + a.getMinutes() : a.getMinutes()
         const sec = a.getSeconds() < 10 ? '0' + a.getSeconds() : a.getSeconds();
-        const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+        const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
         return time;
-      }
-      // Добавить токены до начала сейла. Кнопка показывается, если сейл еще не начался, адрес соответствует адресу держателя токенов (продавцу).
-    const addTokensButton = () => {
-        if(sale && saleMutables && saleMutables.status === "Upcoming" && sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()){
-            return <button onClick={async () => { await sale.addTokensForSale("125000") }}>Add tokens for sale</button>
-        }
     }
-    // Забрать результат продажи (лишние токены + эфир). Кнопка показывается, если сейл закончился, адрес соответствует адресу держателя токенов (продавцу).
-    const withdrawSaleResultButton = () => {
-        if(sale && saleMutables && saleMutables.status === "Finished" && sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()){
-            return <button onClick={async () => { await sale.withdrawSaleResult() }}>Withdraw sale result</button>
-        }
-    }
-    // Забрать эфир, если не был достигнут софткап и время кончилось. 
-    const withdrawFundsButton = () => {
-        if(sale && saleMutables && saleMutables.status === "Finished" && parseInt(saleMutables.totalTokensSold) < parseInt(sale.immutables.softcap)){
-            return <button onClick={async () => { await sale.withdrawFunds() }}>Withdraw funds</button>
-        }
-    }
-    // Забрать купленные токены, если был достигнут софткап и время кончилось.
-    const withdrawBoughtTokensButton = () => {
-        if(sale && saleMutables && saleMutables.status === "Finished" && parseInt(saleMutables.totalTokensSold) >= parseInt(sale.immutables.softcap)){
-            return <button onClick={async () => { await sale.withdrawBoughtTokens() }}>Withdraw tokens</button>
-        }
-    }
-    // Купить токены во время сейла.
-    const buyTokensButton = () => {
-        if(sale && saleMutables && saleMutables.status === "Current" && parseInt(saleMutables.totalTokensSold) < parseInt(saleMutables.hardcap)){
-            return <button onClick={async () => { await sale.buyTokens("125000") }}>Buy tokens</button>
-        }
-    }
-    if(saleMutables && sale){
-    return (
-    <div className="xs-block">
-        <div className="xs-block-top">
-            <div className="xs-block-top-img">
-                <img src={topblockimg} alt="" />
-            </div>
-            <div className="xs-block-top-content">
-                <span className="xs-top-block-name">{sale.immutables.tokenName}</span>
-                <span className="xs-top-block-name-links">
-                    <a href="#">Website</a>
-                    <a href="#">Medium</a>
-                    <a href="#">Twitter</a>
-                    <a href="#">Telegram</a>
-                </span>
-            </div>
-        </div>
-        <div className="xs-block-content">
-            <div className="xs-block-ido-status">
-                <div className="ido-status-top mb30">
-                    <div>IDO Status: <span>{saleMutables.status}</span></div>
-                    <div>Pair: <span>ETC</span></div>
-                </div>
-                <div className="ido-status-desc mb30">
-                    {sale.immutables.description}
-                </div>
-                <div className="ido-status-progress mb30">
-                    <div>IDO Progress: <span>{saleMutables.hardcapCompletionPercent}%</span></div>
-                    <div className="progress-wrap progress">
-                        <div className="progress-bar progress"
-                            style={{ width: saleMutables.hardcapCompletionPercent + '%' }}>
+    const saleAction = () => {
+        if(saleMutables.status === "Current"){
+            return <div className="xs-trade-change xs-sale-trade">
+                        <div className="xs-trade-change-top">
+                            <span>Buy tokens</span>
+                            <button><img src={settingsImg} alt="" /></button>
                         </div>
+                        <div className="xs-trade-change-input  xs-trade-change-input-xs">
+                            <select defaultValue="ETH" >
+                                <option defaultValue value={"ETH"}>ETH</option>
+                            </select>
+                            <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inTokenAmount} />
+                        </div>
+                        <div className="xs-trade-change-input xs-trade-change-input-xs">
+                            <select defaultValue={sale.immutables.tokenSymbol}>
+                                <option defaultValue value={sale.immutables.tokenSymbol}>{sale.immutables.tokenSymbol}</option>
+                            </select>
+                            <input onChange={async (e) => { await changeInputPrice(e); }} type="tel" placeholder={0.0} value={outTokenAmount} />
+                        </div>
+                        <button className="btn xs-trade-change-btn" onClick={async () => { if(parseFloat(inTokenAmount) > 0) await sale.buyTokens(inTokenAmount) }}>Buy</button>
+                    </div>
+        }else if(saleMutables.status === "Finished"){
+            if(parseInt(saleMutables.totalTokensSold) >= parseInt(sale.immutables.softcap)){
+                return <div className="xs-trade-change xs-sale-trade">
+                            <div>Sale ended!</div>
+                            <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawBoughtTokens() }}>Withdraw tokens</button>
+                            {(() => {
+                                if(sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()) {
+                                    return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawSaleResult() }}>Withdraw sale result</button>
+                                }
+                            })()}
+                        </div>
+            }else{
+                return <div className="xs-trade-change xs-sale-trade">
+                            <div>Sale failed!</div>
+                            <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawFunds() }}>Withdraw funds</button>
+                            {(() => {
+                                if(sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()) {
+                                    return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawSaleResult() }}>Withdraw sale result</button>
+                                }
+                            })()}
+                        </div>
+            }
+        }else if(saleMutables.status === "Upcoming"){
+            if(sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()){
+                return <div className="xs-trade-change xs-sale-trade">
+                            <div>Sale will start soon...</div>
+                            {/* <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inTokenAmount} /> */}
+                            <button onClick={async () => { await sale.addTokensForSale("125000") }}>Add tokens for sale</button>
+                        </div>
+            }
+        }
+    }
+    const changeOutputPrice = (price) => {
+        if((!/^[0-9.]*$/.test(price.target.value.toString()))){
+            
+        }else if(parseFloat(price.target.value)){
+            const token = sale.calculatePriceETHToToken(price.target.value, saleMutables.price);
+            setOutTokenAmount(token.tokenAmount)
+            setInTokenAmount(price.target.value)
+        }else{
+            setInTokenAmount('0')
+            setOutTokenAmount('0')
+        }
+    }
+    const changeInputPrice = (price) => {
+        if((!/^[0-9.]*$/.test(price.target.value.toString()))){
+            
+        }else if(parseInt(price.target.value)){
+                const eth = sale.calculatePriceTokenToETH(price.target.value, saleMutables.price);
+                setOutTokenAmount(price.target.value)
+                setInTokenAmount(eth)
+        }else{
+            setInTokenAmount('0')
+            setOutTokenAmount('0')
+        }
+        
+    }
+    if (saleMutables && sale) {
+        return (
+            <div className="xs-body-trade">
+                
+                <div className="xs-sale">
+                <div className="xs-sale-info">
+                    <div className="ido-status-stats">
+                                <div>Token name - {sale.immutables.tokenName}</div>
+                                <div>Swap Rate - 1 {sale.immutables.tokenSymbol} : {saleMutables.price} ETH</div>
+                                <div>Pool Cap - {saleMutables.hardcap} {sale.immutables.tokenSymbol}</div>
+                                <div>Participants - {saleMutables.numberOfParticipants}</div>
+                                <div>Softcap - {sale.immutables.softcap} {sale.immutables.tokenSymbol}</div>
+                                <div>Start date - {timeConverter(sale.immutables.startTimestamp)}</div>
+                                <div>End date - {timeConverter(sale.immutables.endTimestamp)}</div>
                     </div>
                 </div>
-                <div className="ido-status-stats">
-                    <div>Swap Rate - 1 {sale.immutables.tokenSymbol} : {saleMutables.price} ETH</div>
-                    <div>Pool Cap - {saleMutables.hardcap} {sale.immutables.tokenSymbol}</div>
-                    <div>Participants - {saleMutables.numberOfParticipants}</div>
-                    <div>Softcap - {sale.immutables.softcap} {sale.immutables.tokenSymbol}</div>
-                    <div>Sale starts at {timeConverter(sale.immutables.startTimestamp)}</div>
-                    <div>Sale ends at {timeConverter(sale.immutables.endTimestamp)}</div>
-                    {addTokensButton()}
-                    {withdrawSaleResultButton()}
-                    {withdrawFundsButton()}
-                    {withdrawBoughtTokensButton()}
-                    {buyTokensButton()}
+                <div className="xs-sale-separator"></div>
+                    {saleAction()}
                 </div>
             </div>
-        </div>
-    </div>
-    )
-    }else{
-        return(<div>Loading
+        )
+    } else {
+        return (<div>Loading
 
         </div>)
     }
 }
+
 export default SalePage;

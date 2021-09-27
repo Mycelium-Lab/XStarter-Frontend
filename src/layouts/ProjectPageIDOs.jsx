@@ -31,7 +31,7 @@ function ProjectPageIDOs(props) {
                             <img src={topblockimg} alt=""/>
                         </div>
                         <div className="xs-block-top-content">
-                            <span className="xs-top-block-name">{sales[i].immutables.tokenName}</span>
+                            <span onClick={()=>handleChange('sale', sales[i])} className="xs-top-block-name">{sales[i].immutables.tokenName}</span>
                             <span className="xs-top-block-name-links">
                                 <a href="#">Website</a>
                                 <a href="#">Medium</a>

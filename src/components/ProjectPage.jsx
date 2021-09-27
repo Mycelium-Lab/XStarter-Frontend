@@ -20,10 +20,9 @@ function ProjectPage(props) {
   if(sales){
     return (
       <div className="xs-body-projects">
-          <ProjectPageIDOs sales={sales.current} title="Current"/>
-          <ProjectPageIDOs sales={sales.upcoming} title="Upcoming"/>
-          <ProjectPageIDOs sales={sales.finished} title="Finished"/>
-          {/* <SalePage sale={sales.finished[1]} /> */}
+          <ProjectPageIDOs handleChange={handleChange} sales={sales.current} title="Current"/>
+          <ProjectPageIDOs handleChange={handleChange} sales={sales.upcoming} title="Upcoming"/>
+          <ProjectPageIDOs handleChange={handleChange} sales={sales.finished} title="Finished"/>
       </div>
       );
   }else{

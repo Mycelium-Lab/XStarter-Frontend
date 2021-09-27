@@ -136,9 +136,7 @@ function SalePage(props) {
             </div>
         )
     } else {
-        return (<div>Loading
-
-        </div>)
+        return (<div className="xs-loading-text">Loading...</div>)
     }
 }
 

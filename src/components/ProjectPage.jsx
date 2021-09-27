@@ -2,6 +2,7 @@ import React from 'react';
 import ProjectPageIDOs from '../layouts/ProjectPageIDOs';
 import { SaleProvider } from '../sale/saleprovider';
 import { useState, useEffect } from 'react';
+import SalePage from './SalePage';
 function ProjectPage(props) {
   const { handleChange } = props;
   const [sales, setSales] = useState(null);
@@ -22,6 +23,7 @@ function ProjectPage(props) {
           <ProjectPageIDOs sales={sales.current} title="Current"/>
           <ProjectPageIDOs sales={sales.upcoming} title="Upcoming"/>
           <ProjectPageIDOs sales={sales.finished} title="Finished"/>
+          {/* <SalePage sale={sales.finished[1]} /> */}
       </div>
       );
   }else{

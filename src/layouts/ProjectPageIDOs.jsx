@@ -43,7 +43,7 @@ function ProjectPageIDOs(props) {
                     <div className="xs-block-content">
                         <div className="xs-block-ido-status">
                             <div className="ido-status-top mb30">
-                                <div>IDO Status: <span>{sales[i].status}</span></div>
+                                <div>IDO Status: <span>{saleMutables[i].status}</span></div>
                                 <div>Pair: <span>ETC</span></div>
                             </div>
                             <div className="ido-status-desc mb30">
@@ -61,18 +61,6 @@ function ProjectPageIDOs(props) {
                                 <div>Swap Rate - 1 {sales[i].immutables.tokenSymbol} : {saleMutables[i].price} ETH</div>
                                 <div>Pool Cap - {saleMutables[i].hardcap} {sales[i].immutables.tokenSymbol}</div>
                                 <div>Participants - {saleMutables[i].numberOfParticipants}</div>
-                                <button onClick={async () => {await sales[i].addTokensForSale("100000")}}>
-                                  Add tokens for sale
-                                </button>
-                                <button onClick={async () => {await sales[i].withdrawFunds()}}>
-                                  Withdraw funds
-                                </button>
-                                <button onClick={async () => {await sales[i].withdrawBoughtTokens()}}>
-                                  Withdraw tokens
-                                </button>
-                                <button onClick={async () => {await sales[i].buyTokens("125000")}}>
-                                  Buy tokens
-                                </button>
                             </div>
                         </div>
                     </div>

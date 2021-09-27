@@ -23,6 +23,7 @@ export class Sale {
 
     async initializeImmutables() {
         const [
+            tokenCreator,
             tokenName,
             tokenAddress,
             softcap,
@@ -30,6 +31,7 @@ export class Sale {
             endTimestamp,
             description
         ] = await Promise.all([
+            this.saleContract.methods.tokenCreator().call(),
             this.saleContract.methods.tokenName().call(),
             this.saleContract.methods.tokenAddress().call(),
             this.saleContract.methods.softcap().call(),
@@ -41,10 +43,11 @@ export class Sale {
         const tokenSymbol = await erc20Contract.methods.symbol().call()
         const decimals = await erc20Contract.methods.decimals().call()
         return {
+            tokenCreator,
             tokenName,
             tokenSymbol,
             tokenAddress,
-            softcap,
+            softcap: this.noDecimals(softcap, decimals),
             startTimestamp,
             endTimestamp,
             description,
@@ -64,18 +67,36 @@ export class Sale {
         const tenPowDecimals = ten.pow(decimals)
         return hardcapBN.div(tenPowDecimals).toString()
     }
-
-    addDecimals(value) {
+    noDecimals(value, decimals){
         const ten = new Web3.utils.BN('10')
-        const decimals = new Web3.utils.BN(this.immutables.decimals.toString())
-        const tenPowDecimals = ten.pow(decimals)
+        const decimalsBN = new Web3.utils.BN(decimals)
+        const tenPowDecimals = ten.pow(decimalsBN)
         const valueBN = new Web3.utils.BN(value)
-        const result = valueBN.mul(tenPowDecimals)
+        const result = valueBN.div(tenPowDecimals)
         return result.toString()
+    }
+    addDecimals(value) {
+        if(!(typeof(value) === 'string')){
+            value = value.toString()
+        }
+        const floatRegex =  /^-?\d+(?:[.,]\d*?)?$/
+        if(floatRegex.test(value)){
+            const splitValue = value.split('.')
+            const result = splitValue[0] + (splitValue[1]!==undefined ? splitValue[1]: "") + "0".repeat(8-(splitValue[1]!==undefined ? splitValue[1].length : 0))
+            return result;
+        }else{
+            const ten = new Web3.utils.BN('10')
+            const decimals = new Web3.utils.BN(this.immutables.decimals.toString())
+            const tenPowDecimals = ten.pow(decimals)
+            const valueBN = new Web3.utils.BN(value)
+            const result = valueBN.mul(tenPowDecimals)
+            return result.toString()
+        }
     }
 
     async getTotalTokensSold() {
-        return this.saleContract.methods.totalTokensSold().call()
+        const totalTokensSold = await this.saleContract.methods.totalTokensSold().call()
+        return this.noDecimals(totalTokensSold, this.immutables.decimals)
     }
 
     async getPriceWithDecimals() {
@@ -87,19 +108,19 @@ export class Sale {
         return Web3.utils.fromWei(priceWithDecimals).toString()
     }
 
-    async buyTokens(tokenAmount) {
-        const ethValue = await this.calculatePriceTokenToETH(tokenAmount)
-        return this.saleContract.methods.buyTokens().send({value: ethValue, from: this.account})
+    async buyTokens(eth) {
+        //const ethValue = await this.calculatePriceTokenToETH(tokenAmount)
+        return this.saleContract.methods.buyTokens().send({value: Web3.utils.toWei(eth.toString()), from: this.account})
     }
 
     async getNumberOfParticipants() {
         return this.saleContract.methods.numberOfParticipants().call()
     }
 
-    async calculatePriceETHToToken(ethAmount) {
-        const price = await this.getPriceWithDecimals()
-        const priceBN = new Web3.utils.BN(price)
-        const ethAmountToWei = Web3.utils.toWei(ethAmount)
+    calculatePriceETHToToken(ethAmount, price) {   
+        //const price = await this.getPriceWithDecimals()
+        const priceBN = new Web3.utils.BN(Web3.utils.toWei(price.toString()))
+        const ethAmountToWei = Web3.utils.toWei(ethAmount.toString())
         const ethAmountBN = new Web3.utils.BN(ethAmountToWei)
         const excessAmount = ethAmountBN.mod(priceBN)
         const withoutExcessAmount = ethAmountBN.sub(excessAmount)
@@ -109,12 +130,14 @@ export class Sale {
             excessAmount
         }
     }
+    
+    precisionRound(number, precision) {
+        const factor = Math.pow(10, precision);
+        return Math.round(number * factor) / factor;
+    }
 
-    async calculatePriceTokenToETH(tokenAmount) {
-        const price = await this.getPriceWithDecimals()
-        const priceBN = new Web3.utils.BN(price)
-        let ethPrice = priceBN.mul(new Web3.utils.BN(tokenAmount))
-        return ethPrice.toString()
+    calculatePriceTokenToETH(tokenAmount, price) {
+        return this.precisionRound(parseInt(tokenAmount)*parseFloat(price), 12);
     }
 
     async addTokensForSale(amount) {
@@ -130,6 +153,10 @@ export class Sale {
 
     async withdrawFunds() {
         return this.saleContract.methods.withdrawFunds().send({from: this.account})
+    }
+
+    async withdrawSaleResult() {
+        return this.saleContract.methods.withdrawSaleResult().send({from:this.account})
     }
 
     async withdrawBoughtTokens() {

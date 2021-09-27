@@ -3,6 +3,7 @@ import {
     SET_ADDRESS,
     SET_PROVIDER,
     SET_METHODS,
+    SET_IS_LOADED
 } from '../types'
 
 export const setChainId = (chainId) => ({
@@ -23,4 +24,9 @@ export const setProvider = (provider) => ({
 export const setMethods = (methods) => ({
     type: SET_METHODS,
     payload: { methods }
+})
+
+export const setIsLoaded = (isLoaded) => ({
+    type: SET_IS_LOADED,
+    payload: { isLoaded }
 })

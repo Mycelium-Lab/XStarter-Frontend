@@ -19,6 +19,10 @@ export class contractMethods {
         this.contractStake = new this.web3.eth.Contract(abiStake, stakeCase);
         this.walletAddress = walletAddress;
     }
+    setWallet(wallet)
+    {
+        this.walletAddress = wallet;
+    }
     toXS(val){
         var str = val.split('.')
         let result = str[0] + (str[1]!==undefined ? str[1]: "") + "0".repeat(8-(str[1]!==undefined ? str[1].length : 0))

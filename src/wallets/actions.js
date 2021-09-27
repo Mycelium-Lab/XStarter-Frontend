@@ -1,4 +1,4 @@
-import { setChainId, setProvider, setAddress, setMethods } from '../redux/wallets/actions'
+import { setChainId, setProvider, setAddress, setMethods, setIsLoaded } from '../redux/wallets/actions'
 //import { closeModal } from '../redux/modal/actions'
 import Web3 from 'web3'
 import { contractMethods} from '../utils/Utils.js';
@@ -16,6 +16,7 @@ const addProvider = (provider, provider_name, dispatch, address) => {
 
 const addProviderListeners = (provider, dispatch) => {
     provider.on("accountsChanged", (accounts) => {
+        dispatch(setIsLoaded(true));
         dispatch(setAddress(accounts[0]))
     })
 
@@ -27,9 +28,9 @@ const addProviderListeners = (provider, dispatch) => {
         else {
             convertedChainId = parseInt(chainId, 16).toString()
         }
+        dispatch(setIsLoaded(true));
         dispatch(setChainId(convertedChainId))
     })
-
     provider.on("disconnect", (code, reason) => {})
 }
 
@@ -51,12 +52,11 @@ export const selectWallet = async (wallet, dispatch) => {
                     dispatch(setAddress(response[0]))
                     addProvider(window.ethereum, 'metaMask', dispatch, response[0])
                   })
-    
-                
                 addProviderListeners(window.ethereum, dispatch)
-
+                dispatch(setIsLoaded(true));
               } catch (err) {
-                  dispatch(setProvider(null))
+                dispatch(setIsLoaded(true));
+                dispatch(setProvider(null))
               }
               break
         /*case 'walletConnect':

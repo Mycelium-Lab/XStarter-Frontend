@@ -12,22 +12,23 @@ import { selectWallet } from './wallets/actions';
 
 function App() {
   const [page, setPage] = useState('projects');
-
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const currentChainId = useSelector(state => state.wallet.chainId);
+  const wallet = useSelector(state => state.wallet.address);
+  const isLoaded = useSelector(state => state.wallet.isLoaded)
 
   useEffect(() => {
     selectWallet('metaMask', dispatch);
-  }, [])
-
+  }, [wallet, currentChainId, isLoaded])
 
   function handleChange(page){
     setPage(page);
   }
+  
   return (
     <div className="App">
-      <Header handleChange={handleChange} />
+      <Header handleChange={handleChange}/>
       <div className="mtop135"></div>
-
       { page == 'projects' &&
         <ProjectPage handleChange={handleChange} />
       }

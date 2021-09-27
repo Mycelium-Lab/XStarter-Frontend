@@ -61,6 +61,10 @@ export class SwapProvider {
       return immutables;
     }
   }
+  setWallet(wallet)
+  {
+    this.account = wallet;
+  }
   async getPoolState() {
     if (this.web3) {
       let poolContract = new this.web3.eth.Contract(poolAbi, process.env.REACT_APP_POOL_ADDRESS);
@@ -119,7 +123,7 @@ export class SwapProvider {
         tokenAddress = this.immutables.token0;
         tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
       }
-      if (!(await this.isEnoughAllowance(amount, tokenAddress))) 
+      if (!(await this.isEnoughAllowance(amount, tokenAddress, type))) 
       {
         return new Promise((resolve, reject) => {
           tokenContract.methods.approve(process.env.REACT_APP_SWAPROUTER_ADDRESS, tokenAmount).send({from:this.account})
@@ -300,7 +304,7 @@ export class SwapProvider {
       CurrencyAmount.fromRawAmount(myToken, toXS(amount)),
       TradeType.EXACT_INPUT
     )
-    return (trade.minimumAmountOut(slippageTolerance).toSignificant(8));
+    return (trade.minimumAmountOut(slippageTolerance).toSignificant(18));
   }
   // Цена XS <- WETH
   async getXSfromWETHPrice(desiredXsAmount)
@@ -312,6 +316,6 @@ export class SwapProvider {
       CurrencyAmount.fromRawAmount(myToken, toXS(desiredXsAmount)),
       TradeType.EXACT_OUTPUT
     )
-    return (trade.maximumAmountIn(slippageTolerance).toSignificant(8));
+    return (trade.maximumAmountIn(slippageTolerance).toSignificant(18));
   }
 }

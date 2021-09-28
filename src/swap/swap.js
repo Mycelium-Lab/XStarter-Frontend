@@ -8,16 +8,11 @@ import { CurrencyAmount, TradeType, Percent} from '@uniswap/sdk-core';
 import { Interface } from '@ethersproject/abi'
 
 import JSBI from 'jsbi';
+import { toBaseUnit } from '../utils/toBaseUnit';
 const slippageRate = 0.001
 const slippageTolerance = new Percent(JSBI.BigInt(1), JSBI.BigInt(1000))
 
 const feeAmount = FeeAmount.MEDIUM
-
-function toXS(val){
-  var str = val.split('.')
-  let result = str[0] + (str[1]!==undefined ? str[1]: "") + "0".repeat(8-(str[1]!==undefined ? str[1].length : 0))
-  return result;
-}
 
 export class SwapProvider {
   
@@ -103,7 +98,7 @@ export class SwapProvider {
     }
   }
   async isEnoughAllowance(amount, tokenAddress, type){
-    const weiInTokensAmount = type === 'WETH' ? Web3.utils.toWei(amount).toString() : toXS(amount);
+    const weiInTokensAmount = type === 'WETH' ? Web3.utils.toWei(amount).toString() : toBaseUnit(amount, 8, Web3.utils.BN).toString();
     const tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
     const allowance = await tokenContract.methods.allowance(this.account, process.env.REACT_APP_SWAPROUTER_ADDRESS).call();
     const num1 = this.web3.utils.toBN(allowance);
@@ -119,7 +114,7 @@ export class SwapProvider {
         tokenAddress = WETH9[process.env.REACT_APP_CHAIN_ID].address
         tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
       }else if (type === 'XST') {
-        tokenAmount = toXS(amount);
+        tokenAmount = toBaseUnit(amount, 8, Web3.utils.BN).toString()
         tokenAddress = this.immutables.token0;
         tokenContract = new this.web3.eth.Contract(erco20Abi, tokenAddress);
       }
@@ -154,7 +149,7 @@ export class SwapProvider {
     if (await this.isEnoughAllowance(inTokens, WETH9[process.env.REACT_APP_CHAIN_ID].address, 'WETH')) 
     {
       const sellPrice = await this.getWETHToXSPrice(inTokens);
-      const amountOutMin = new Web3.utils.BN(toXS(sellPrice))
+      const amountOutMin = toBaseUnit(sellPrice, 8, Web3.utils.BN).toString()
       const params = {
         tokenIn: WETH9[process.env.REACT_APP_CHAIN_ID].address,
         tokenOut: this.immutables.token0,
@@ -162,7 +157,7 @@ export class SwapProvider {
         recipient: this.account,
         deadline: Math.floor(Date.now() / 1000) + 60 * 30,
         amountIn: weiInTokensAmount,
-        amountOutMinimum: amountOutMin.toString(),
+        amountOutMinimum: amountOutMin,
         sqrtPriceLimitX96: 0
       }
       const swapRouterContract = new this.web3.eth.Contract(swapRouterAbi, process.env.REACT_APP_SWAPROUTER_ADDRESS);
@@ -177,7 +172,7 @@ export class SwapProvider {
   // Купить желаемое количество XST за WETH
   async buyXSforWETHoutput(outTokens)
   {
-    const xsTokenAmount = toXS(outTokens);
+    const xsTokenAmount = toBaseUnit(outTokens, 8, Web3.utils.BN).toString()//toXS(outTokens);
     const inTokensAmount = await this.getXSfromWETHPrice(outTokens)
     if(await this.isEnoughAllowance(inTokensAmount, WETH9[process.env.REACT_APP_CHAIN_ID].address, 'WETH'))
     {
@@ -209,7 +204,7 @@ export class SwapProvider {
     const inTokensAmount = await this.getWETHfromXSPrice(outputWeth)
     if(await this.isEnoughAllowance(inTokensAmount, this.immutables.token0, 'XST'))
     {
-      const amountInMax = toXS(inTokensAmount);
+      const amountInMax = toBaseUnit(inTokensAmount, 8, Web3.utils.BN)//toXS(inTokensAmount);
       const params = {
         tokenIn: this.immutables.token0,
         tokenOut: WETH9[process.env.REACT_APP_CHAIN_ID].address, 
@@ -231,7 +226,7 @@ export class SwapProvider {
   }
   // Купить WETH за XS
   async buyWETHForXS(inTokens) {
-    const inTokenAmount = new Web3.utils.BN(toXS(inTokens));
+    const inTokenAmount = toBaseUnit(inTokens, 8, Web3.utils.BN)//new Web3.utils.BN(toXS(inTokens));
     if (await this.isEnoughAllowance(inTokens, this.immutables.token0, 'XST')) {
       const sellPrice = await this.getXSToWETHPrice(inTokens);
       const amountOutMin = Web3.utils.toWei(sellPrice.toString()).toString()
@@ -301,7 +296,7 @@ export class SwapProvider {
     const route = new Route([this.pool], myToken, WETH9[process.env.REACT_APP_CHAIN_ID]);
     const trade = await Trade.fromRoute(
       route,
-      CurrencyAmount.fromRawAmount(myToken, toXS(amount)),
+      CurrencyAmount.fromRawAmount(myToken,toBaseUnit(amount, 8, Web3.utils.BN).toString()),// toXS(amount)),
       TradeType.EXACT_INPUT
     )
     return (trade.minimumAmountOut(slippageTolerance).toSignificant(18));
@@ -313,7 +308,7 @@ export class SwapProvider {
     const route = new Route([this.pool], WETH9[process.env.REACT_APP_CHAIN_ID], myToken);
     const trade = await Trade.fromRoute(
       route,
-      CurrencyAmount.fromRawAmount(myToken, toXS(desiredXsAmount)),
+      CurrencyAmount.fromRawAmount(myToken, toBaseUnit(desiredXsAmount, 8, Web3.utils.BN).toString()),//toXS(desiredXsAmount)),
       TradeType.EXACT_OUTPUT
     )
     return (trade.maximumAmountIn(slippageTolerance).toSignificant(18));

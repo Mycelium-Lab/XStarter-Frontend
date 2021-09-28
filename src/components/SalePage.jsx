@@ -84,7 +84,7 @@ function SalePage(props) {
                 return <div className="xs-trade-change xs-sale-trade">
                             <div>Sale will start soon...</div>
                             {/* <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inTokenAmount} /> */}
-                            <button onClick={async () => { await sale.addTokensForSale("125000") }}>Add tokens for sale</button>
+                            <button className="btn xs-trade-action-btn" onClick={async () => { await sale.addTokensForSale("125000") }}>Add tokens for sale</button>
                         </div>
             }
         }

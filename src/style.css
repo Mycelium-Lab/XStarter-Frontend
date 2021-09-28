@@ -1034,6 +1034,10 @@ select::-ms-expand {
 .xs-sale-trade {
     width: 100%;
 }
+.xs-sale-load-more-btn {
+    width: 125px;
+    margin: 0 auto;
+}
 @media (max-width: 768px) {
     .xs-sale {
         display: flex;

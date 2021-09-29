@@ -12,7 +12,7 @@ const initialState = {
     method: '',
     provider: null,
     isLoaded: false,
-    correntChainId: process.env.NODE_ENV === 'development' ? '4' : '1'
+    correntChainId: process.env.NODE_ENV === 'development' ? '4' : '4'
 }
 
 export default function (state = initialState, action) {

@@ -24,7 +24,7 @@ export class contractMethods {
         this.walletAddress = wallet;
     }
     toXS(val){
-        var str = val.split('.')
+        var str = val.toString().split('.')
         let result = str[0] + (str[1]!==undefined ? str[1]: "") + "0".repeat(8-(str[1]!==undefined ? str[1].length : 0))
         return result;
     }

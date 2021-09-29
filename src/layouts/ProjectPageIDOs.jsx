@@ -5,14 +5,12 @@ import {useState, useEffect} from 'react';
 function ProjectPageIDOs(props) {
     const {handleChange} = props;
     const [sales, setSales] = useState(null);
-    const [saleMutables, setSaleMutables] = useState(null);
+    const [loadedSalesAmount, setloadedSalesAmount] = useState(0);
+    const [saleMutables, setSaleMutables] = useState([]);
     const setParams = async () => {
-        if (props.sales) {
-            const mutables = await Promise.all(props.sales.map((sale) => {
-                return sale.getMutables();
-            }))
-            setSaleMutables(mutables);
-            setSales(props.sales);
+        if(props.sales) {
+            setSales(props.sales)
+            await loadNextSales(3, props.sales)
         }
     }
     useEffect(() => {
@@ -21,9 +19,28 @@ function ProjectPageIDOs(props) {
         }
 
     }, [])
-    if (sales && sales.length > 0) {
+    const loadNextSales = async (howManySalesToLoad, sales) => {
+        if(sales && loadedSalesAmount < sales.length) {
+            //const lastIndex = sales.length - howManySalesToLoad >= loadedSalesAmount ? sales.length - howManySalesToLoad : sales.length
+            const lastIndex = loadedSalesAmount + howManySalesToLoad > sales.length ? sales.length : loadedSalesAmount + howManySalesToLoad
+            let mutables = []
+            console.log(loadedSalesAmount, lastIndex)
+            for (let i = loadedSalesAmount; i < lastIndex; i++) {
+                mutables.push(sales[i].getMutables())
+            }
+            const getMutablesResult = await Promise.all(mutables)
+            setloadedSalesAmount(lastIndex)
+            setSaleMutables(saleMutables.concat(getMutablesResult))
+        }
+    }
+    const loadMoreButton = () => {
+        if(sales && sales.length > 3 && loadedSalesAmount < sales.length){
+            return <button className="btn xs-sale-load-more-btn" onClick={async () => {await loadNextSales(3, sales)}}>Show more...</button>
+        }
+    }
+    if (sales && saleMutables && sales.length > 0 && saleMutables.length == loadedSalesAmount) {
         let children = []
-        for (let i = 0; i < sales.length; i++) {
+        for (let i = 0; i < loadedSalesAmount; i++) {
             children.push(
                 <div key={"sale" + props.title + i} className="xs-block">
                     <div className="xs-block-top">
@@ -31,7 +48,7 @@ function ProjectPageIDOs(props) {
                             <img src={topblockimg} alt=""/>
                         </div>
                         <div className="xs-block-top-content">
-                            <span className="xs-top-block-name">{sales[i].immutables.tokenName}</span>
+                            <span onClick={()=>handleChange('sale', sales[i])} className="xs-top-block-name">{sales[i].immutables.tokenName}</span>
                             <span className="xs-top-block-name-links">
                                 <a href="#">Website</a>
                                 <a href="#">Medium</a>
@@ -76,6 +93,7 @@ function ProjectPageIDOs(props) {
                 <div className={blocksClassName}>
                     {children}
                 </div>
+                {loadMoreButton()}
             </div>
         );
     } else

@@ -9,9 +9,11 @@ import './style.css';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { selectWallet } from './wallets/actions';
+import SalePage from "./components/SalePage";
 
 function App() {
   const [page, setPage] = useState('projects');
+  const [pageProps, setPageProps] = useState({});
   const dispatch = useDispatch();
   const currentChainId = useSelector(state => state.wallet.chainId);
   const wallet = useSelector(state => state.wallet.address);
@@ -21,8 +23,11 @@ function App() {
     selectWallet('metaMask', dispatch);
   }, [wallet, currentChainId, isLoaded])
 
-  function handleChange(page){
+  function handleChange(page, pageProps = {}){
     setPage(page);
+    if(pageProps){
+      setPageProps(pageProps);
+    }
   }
   
   return (
@@ -37,8 +42,10 @@ function App() {
       }
       { page == 'trade' &&
         <TradePage handleChange={handleChange}/>
-      }      
-
+      }
+      { page == 'sale' && pageProps &&
+          <SalePage handleChange={handleChange} sale={pageProps}/>
+      }
       <Footer/>
     </div>
   );

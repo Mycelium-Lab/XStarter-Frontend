@@ -48,9 +48,11 @@ function SPStake(props) {
       setIsLoaded(true);  
     }
   }
-  const setMaxAmount = () =>{
+  async function setMaxAmount() {
     setIsInsufficientBalance(false);
     setAmount(userBalance);
+    let isApproved = await methods.isEnoughAllowance(userBalance.toString());
+    setIsApproved(isApproved);
   }
   const switchNetwork = async() =>
   {
@@ -126,7 +128,7 @@ function SPStake(props) {
   const approve = async() =>{
     if(parseFloat(amount) && methods)
     {
-      const rx = await methods.approveStake(amount)
+      const rx = await methods.approveStake(amount.toString())
         dispatch(setTransactionInfo(
         {
           hash: rx,

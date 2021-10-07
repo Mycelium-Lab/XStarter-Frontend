@@ -120,7 +120,7 @@ function SalePage(props) {
     }
     if (saleMutables && sale) {
         return (
-            <div className="xs-body-trade">
+            <div className="xs-body-sale">
                 
                 <div className="xs-sale">
                 <div className="xs-sale-info">

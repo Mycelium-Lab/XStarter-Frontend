@@ -1040,7 +1040,20 @@ select::-ms-expand {
     width: 125px;
     margin: 0 auto;
 }
+.xs-body-sale {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 300px;
+}
 @media (max-width: 768px) {
+    .xs-body-sale {
+        margin-bottom: calc(100vw - 51vw);
+        width: 100%;
+        width: -webkit-fill-available;
+        width: fill-available;
+        padding: 0 20px;
+    }
     .xs-sale {
         display: flex;
         padding: 30px;

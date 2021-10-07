@@ -895,7 +895,9 @@ select::-ms-expand {
     width: 90px;
     background-position: 80%;
 }
-
+.xs-sale-trade .xs-trade-change-input-xs select {
+ width: 70px;
+}
 @media (max-width: 768px) {
     .xs-body-trade .xs-block {
         width: 100%;

@@ -86,6 +86,10 @@ function SalePage(props) {
                             {/* <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inTokenAmount} /> */}
                             <button className="btn xs-trade-action-btn" onClick={async () => { await sale.addTokensForSale("125000") }}>Add tokens for sale</button>
                         </div>
+            }else{
+                return <div className="xs-trade-change xs-sale-trade">
+                    <div>Sale will start soon...</div>
+                </div>
             }
         }
     }
@@ -97,8 +101,8 @@ function SalePage(props) {
             setOutTokenAmount(token.tokenAmount)
             setInTokenAmount(price.target.value)
         }else{
-            setInTokenAmount('0')
-            setOutTokenAmount('0')
+            setInTokenAmount('')
+            setOutTokenAmount('')
         }
     }
     const changeInputPrice = (price) => {
@@ -109,8 +113,8 @@ function SalePage(props) {
                 setOutTokenAmount(price.target.value)
                 setInTokenAmount(eth)
         }else{
-            setInTokenAmount('0')
-            setOutTokenAmount('0')
+            setInTokenAmount('')
+            setOutTokenAmount('')
         }
         
     }

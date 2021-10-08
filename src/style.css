@@ -1048,6 +1048,74 @@ select::-ms-expand {
     align-items: center;
     margin-bottom: 300px;
 }
+.xs-body-admin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 300px;
+}
+.xs-admin {
+    display: flex;
+    padding: 30px;
+    flex-direction: column;
+    width: 700px;
+    background: rgba(37, 40, 51, 0.8);
+    border: 1px solid #494949;
+    box-sizing: border-box;
+    box-shadow: 1px -1px 4px rgba(242, 242, 242, 0.25);
+    border-radius: 8px;
+    position: relative;
+    align-items: center;
+}
+.xs-admin-row-blocks {
+    display: flex;
+    flex-direction: row;
+}
+.xs-admin-button {
+    width: 300px;
+}
+.xs-admin-text{
+    text-align: left;
+    margin-bottom: 10px;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    color: #FFFFFF;
+}
+.xs-admin-sale-dates{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.xs-admin-sale-dates input{
+    width: 100px;
+}
+
+.xs-admin-block {
+    display: flex;
+    flex-flow: column;
+
+}
+.xs-admin-input input {
+    margin-bottom: 10px;
+    border: 1px solid #00B682;
+    border-radius: 8px;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 17px;
+    color: #FFFFFF;
+    background: transparent;
+    padding: 12px 40px 12px 20px;
+    outline:none;
+}
+.xs-admin-min-sum-inputs {
+    display: flex;
+    flex-wrap: wrap;
+}
+.xs-admin-min-sum-inputs input{
+    flex: 0 0 50%;
+}
 @media (max-width: 768px) {
     .xs-body-sale {
         margin-bottom: calc(100vw - 51vw);

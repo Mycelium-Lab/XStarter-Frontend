@@ -97,6 +97,7 @@ function Header(props) {
                   <li><button className="nav-link" onClick={()=>handleChange('projects')}>Projects</button></li>
                   <li><button className="nav-link" onClick={()=>handleChange('staking')}>Staking</button></li>
                   <li><button className="nav-link" onClick={()=>handleChange('trade')}>Trade XS</button></li>
+                  <li><button className="nav-link" onClick={()=>handleChange('admin')}>Admin</button></li>
                 </ul>
               </div>
             </nav>

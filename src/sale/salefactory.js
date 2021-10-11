@@ -1,6 +1,6 @@
 import Web3 from "web3";
 import saleFactoryAbi from "./Abi/SaleFactory.json";
-
+import xStarterStakingAbi from "./Abi/XStarterStaking.json"
 export class SaleFactory {
     static async create() {
         const obj = new SaleFactory()
@@ -29,5 +29,11 @@ export class SaleFactory {
             price,
             description
         ).send({from:this.account});
+    }
+    async getAmountOfTiers() {
+        const stakingContract = new this.web3.eth.Contract(xStarterStakingAbi,process.env.REACT_APP_STAKING_ADDRESS)
+        const amountOfTiers = await stakingContract.methods.amountOfTiers().call()
+        console.log(amountOfTiers)
+        return amountOfTiers
     }
 }

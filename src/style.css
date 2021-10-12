@@ -1109,7 +1109,7 @@ select::-ms-expand {
     line-height: 17px;
     color: #FFFFFF;
     background: transparent;
-    padding: 12px 40px 12px 20px;
+    padding: 12px 12px 12px 12px;
     outline:none;
     width: 100%;
 }
@@ -1125,7 +1125,24 @@ select::-ms-expand {
     width: 45%;
     padding: 12px 0 12px 0;
 }
+.xs-admin-button:disabled{
+    background-color: grey;
+    border-color: gray;
+}
+.xs-admin-button:disabled:hover{
+    color:white;
+}
 @media (max-width: 768px) {
+    .xs-admin-row-blocks{
+        flex-direction: column;
+        width: 100%;
+    }
+    .xs-admin{
+        width: 100%;
+    }
+    .xs-admin-block{
+        width: 100%;
+    }
     .xs-body-sale {
         margin-bottom: calc(100vw - 51vw);
         width: 100%;

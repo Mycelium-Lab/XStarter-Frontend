@@ -13,6 +13,9 @@ function AdminPage(props) {
     const [saleEndDate, setSaleEndDate] = useState('');
     const [description, setDescription] = useState('');
     const [saleFactory, setSaleFactory] = useState('');
+    const [price, setPrice] = useState('');
+    const [buttonActive, setButtonActive] = useState(false);
+    const [stateUpdated, setStateUpdated] = useState(false)
     const setParams = async () => {
         const saleFactory = await SaleFactory.create()
         let amountOfTiers = await saleFactory.getAmountOfTiers()
@@ -30,17 +33,44 @@ function AdminPage(props) {
         if(!saleFactory){
             setParams()
         }
-
-    }, [])
+        changeButtonState()
+    }, [stateUpdated])
     const createNewSale = async () => {
-        const saleFactory = await SaleFactory.create()
-        //saleFactory.createNewSale(tokenName, tokenAddress, tokenCreatorAddress, softcap, maxTierValues, )
+        setButtonActive(false)
+        try {
+            await saleFactory.createNewSale(
+                tokenName,
+                tokenAddress,
+                tokenCreatorAddress,
+                softcap,
+                maxTierValues,
+                dateToTimestamp(saleStartDate),
+                dateToTimestamp(saleEndDate),
+                price,
+                description
+            )
+        } catch (err) {
+            console.error(err)
+            setButtonActive(true)
+        }
+
+    }
+    const changeButtonState = () => {
+        //console.log(tokenName, tokenAddress, tokenCreatorAddress, softcap, saleStartDate, saleEndDate, price, description
+        if(tokenName!=='' && tokenAddress !=='' && tokenCreatorAddress !== '' && softcap !== '' && saleStartDate !== '' && saleEndDate !== '' && price !== '' && description !== ''){
+            setButtonActive(true)
+        }else{
+            setButtonActive(false)
+        }
+    }
+    const dateToTimestamp = (dateString) => {
+        let date = new Date(dateString)
+        return date.getTime()/1000;
     }
     const changeMaxTierValues = (onChangeEvent) => {
 
         if((!/^[0-9.]*$/.test(onChangeEvent.target.value.toString()))) {
         }else if(parseFloat(onChangeEvent.target.value)) {
-            console.log(onChangeEvent)
             const id = onChangeEvent.target.id.match(/(\d+)/)
             if(id!=null){
                 let newMaxTierValues = [...maxTierValues]
@@ -55,7 +85,6 @@ function AdminPage(props) {
                 setMaxTierValues(newMaxTierValues)
             }
         }
-        console.log(maxTierValues)
     }
     return (
         <div className="xs-body-admin">
@@ -65,8 +94,8 @@ function AdminPage(props) {
                         <div className="xs-admin-input">
                             <div className="xs-admin-text">Название токена</div>
                             <input type="text" onChange={(onChangeEvent)=> {
-                                console.log(onChangeEvent.target.value)
                                 setTokenName(onChangeEvent.target.value)
+                                setStateUpdated(!stateUpdated)
                             }}/>
                         </div>
                         <div className="xs-admin-input">
@@ -78,10 +107,23 @@ function AdminPage(props) {
                                 }else{
                                     setSoftcap('');
                                 }
+                                setStateUpdated(!stateUpdated)
                             }}/>
                         </div>
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Максимальная сумма (eth)</div>
+                            <div className="xs-admin-text">Цена за 1 токен</div>
+                            <input type="tel" placeholder={0.0} value={price} onChange={(onChangeEvent)=> {
+                                if((!/^[0-9.]*$/.test(onChangeEvent.target.value.toString()))) {
+                                }else if(parseFloat(onChangeEvent.target.value)) {
+                                    setPrice(onChangeEvent.target.value)
+                                }else{
+                                    setPrice('');
+                                }
+                                setStateUpdated(!stateUpdated)
+                            }}/>
+                        </div>
+                        <div className="xs-admin-input">
+                            <div className="xs-admin-text">Максимальная сумма в токенах</div>
                             <div className="xs-admin-min-sum-inputs ">
                                 {(()=>{
                                     let inputs = []
@@ -97,40 +139,42 @@ function AdminPage(props) {
                         <div className="xs-admin-input">
                             <div className="xs-admin-text">Адрес токена</div>
                             <input type="text" onChange={(onChangeEvent)=> {
-                                console.log(onChangeEvent.target.value)
                                 setTokenAddress(onChangeEvent.target.value)
+                                setStateUpdated(!stateUpdated)
                             }}/>
                         </div>
                         <div className="xs-admin-input">
                             <div className="xs-admin-text">Адрес кошелька создателя токена</div>
                             <input type="text" onChange={(onChangeEvent)=> {
-                                console.log(onChangeEvent.target.value)
                                 setTokenCreatorAddress(onChangeEvent.target.value)
+                                setStateUpdated(!stateUpdated)
                             }}/>
                         </div>
+
                         <div className="xs-admin-input">
                             <div className="xs-admin-text">Даты начала и конца сейла</div>
                             <div className="xs-admin-sale-dates">
                                 <input type="datetime-local" onChange={(onChangeEvent)=> {
-                                    console.log(onChangeEvent.target.value)
                                     setSaleStartDate(onChangeEvent.target.value)
+                                    setStateUpdated(!stateUpdated)
                                 }}/>
                                 <input type="datetime-local" onChange={(onChangeEvent)=> {
-                                    console.log(onChangeEvent.target.value)
                                     setSaleEndDate(onChangeEvent.target.value)
+                                    setStateUpdated(!stateUpdated)
                                 }}/>
                             </div>
                         </div>
+
                         <div className="xs-admin-input">
                             <div className="xs-admin-text">Ссылка на информацию</div>
                             <input type="text" onChange={(onChangeEvent)=> {
-                                console.log(onChangeEvent.target.value)
-                                setDescription(onChangeEvent.target.value)
+                                setDescription(onChangeEvent.target.value )
+                                setStateUpdated(!stateUpdated)
                             }}/>
                         </div>
                     </div>
                 </div>
-                <button onClick={createNewSale} className="btn xs-admin-button">Сохранить</button>
+                <button onClick={async () => {await createNewSale()}} className="btn xs-admin-button" disabled={!buttonActive}>Сохранить</button>
             </div>
 
         </div>

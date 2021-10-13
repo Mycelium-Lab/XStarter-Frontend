@@ -1035,7 +1035,24 @@ select::-ms-expand {
 .xs-sale-info {
     min-width: 200px;
 }
+.xs-sale-start-text{
+    margin-bottom: 20px;
+}
 .xs-sale-trade {
+    width: 100%;
+}
+.xs-sale-trade input{
+    margin-bottom: 10px;
+    border: 1px solid #00B682;
+    border-radius: 8px;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 17px;
+    color: #FFFFFF;
+    background: transparent;
+    padding: 12px 12px 12px 12px;
+    outline:none;
     width: 100%;
 }
 .xs-sale-load-more-btn {
@@ -1086,7 +1103,7 @@ select::-ms-expand {
 }
 .xs-admin-sale-dates{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-between;
 }
 
@@ -1122,8 +1139,7 @@ select::-ms-expand {
     width: 40%;
 }
 .xs-admin-sale-dates input{
-    width: 45%;
-    padding: 12px 0 12px 0;
+    width: 100%;
 }
 .xs-admin-button:disabled{
     background-color: grey;

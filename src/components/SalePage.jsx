@@ -10,6 +10,7 @@ function SalePage(props) {
     const [sale, setSale] = useState(null);
     const [inTokenAmount, setInTokenAmount] = useState(null)
     const [outTokenAmount, setOutTokenAmount] = useState(null)
+    const [addTokenAmount, setAddTokenAmount] = useState('')
     const [saleMutables, setSaleMutables] = useState(null);
     const setParams = async () => {
         if (props.sale) {
@@ -82,9 +83,9 @@ function SalePage(props) {
         }else if(saleMutables.status === "Upcoming"){
             if(sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()){
                 return <div className="xs-trade-change xs-sale-trade">
-                            <div>Sale will start soon...</div>
-                            {/* <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inTokenAmount} /> */}
-                            <button className="btn xs-trade-action-btn" onClick={async () => { await sale.addTokensForSale("125000") }}>Add tokens for sale</button>
+                            <div className="xs-sale-start-text">Sale will start soon...</div>
+                             <input onChange={async (e) => { await changeAddTokenAmount(e); }} type="tel" placeholder={0.0} value={addTokenAmount} />
+                            <button className="btn xs-trade-action-btn" onClick={async () => { await sale.addTokensForSale(addTokenAmount) }}>Add tokens for sale</button>
                         </div>
             }else{
                 return <div className="xs-trade-change xs-sale-trade">
@@ -117,6 +118,14 @@ function SalePage(props) {
             setOutTokenAmount('')
         }
         
+    }
+    const changeAddTokenAmount = (onChangeEvent) => {
+        if((!/^[0-9.]*$/.test(onChangeEvent.target.value.toString()))){
+        }else if(parseInt(onChangeEvent.target.value)){
+            setAddTokenAmount(onChangeEvent.target.value)
+        }else{
+            setAddTokenAmount('')
+        }
     }
     if (saleMutables && sale) {
         return (

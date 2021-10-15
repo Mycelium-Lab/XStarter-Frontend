@@ -97,6 +97,10 @@ function Header(props) {
                   <li><button className="nav-link" onClick={()=>handleChange('projects')}>Projects</button></li>
                   <li><button className="nav-link" onClick={()=>handleChange('staking')}>Staking</button></li>
                   <li><button className="nav-link" onClick={()=>handleChange('trade')}>Trade XS</button></li>
+                  {(() => {
+                      if(address.toLowerCase() === process.env.REACT_APP_ADMIN_ADDRESS.toLowerCase())
+                        return <li><button className="nav-link" onClick={()=>handleChange('admin')}>Admin</button></li>
+                    })()}
                 </ul>
               </div>
             </nav>

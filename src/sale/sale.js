@@ -143,10 +143,19 @@ export class Sale {
     async addTokensForSale(amount) {
         const erc20Contract = new this.web3.eth.Contract(erc20Abi, this.immutables.tokenAddress)
         const amountWithDecimals = this.addDecimals(amount);
-        await erc20Contract.methods.approve(this.saleContract.options.address, amountWithDecimals).send({from: this.account})
+        const isEnoughAllowance = await this.isEnoughAllowance(amountWithDecimals)
+        if(!isEnoughAllowance) {
+            await erc20Contract.methods.approve(this.saleContract.options.address, amountWithDecimals).send({from: this.account})
+        }
         await this.saleContract.methods.addTokensForSale(amountWithDecimals).send({from: this.account})
     }
-
+    async isEnoughAllowance(amount){
+        const tokenContract = new this.web3.eth.Contract(erc20Abi, this.immutables.tokenAddress);
+        const allowance = await tokenContract.methods.allowance(this.account, this.saleContract.options.address).call();
+        const amountBN = this.web3.utils.toBN(amount)
+        const allowanceBN = this.web3.utils.toBN(allowance)
+        return allowanceBN.gte(amountBN)
+    }
     async changePrice(newPrice) {
         return this.saleContract.methods.changePrice(newPrice).send()
     }

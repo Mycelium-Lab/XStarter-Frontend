@@ -290,7 +290,7 @@ nav ul li button:focus::after {
 .xs-blocks {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 }
 .xs-moreblocks {
     /*justify-content: space-between;*/
@@ -494,7 +494,7 @@ footer {
     margin-bottom: 25px;
     margin-right: 25px;
 }
-.xs-body-projects .xs-moreblocks .xs-block:nth-child(3) {
+.xs-body-projects .xs-moreblocks .xs-block:nth-child(3n+3) {
     margin-right: 0;
 }
 .xs-body-projects .xs-top-block-name{
@@ -512,7 +512,9 @@ footer {
     .mb100 {
         margin-bottom: 60px;
     }    
-    
+    .xs-blocks{
+        align-items: center;
+    }
     .nav-open {
         left: 10px;
         right: unset;
@@ -895,7 +897,9 @@ select::-ms-expand {
     width: 90px;
     background-position: 80%;
 }
-
+.xs-sale-trade .xs-trade-change-input-xs select {
+ width: 70px;
+}
 @media (max-width: 768px) {
     .xs-body-trade .xs-block {
         width: 100%;
@@ -1038,7 +1042,20 @@ select::-ms-expand {
     width: 125px;
     margin: 0 auto;
 }
+.xs-body-sale {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 300px;
+}
 @media (max-width: 768px) {
+    .xs-body-sale {
+        margin-bottom: calc(100vw - 51vw);
+        width: 100%;
+        width: -webkit-fill-available;
+        width: fill-available;
+        padding: 0 20px;
+    }
     .xs-sale {
         display: flex;
         padding: 30px;

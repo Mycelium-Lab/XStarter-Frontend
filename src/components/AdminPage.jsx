@@ -11,8 +11,8 @@ function AdminPage(props) {
     const [tokenCreatorAddress, setTokenCreatorAddress] = useState('');
     const [saleStartDate, setSaleStartDate] = useState('');
     const [saleEndDate, setSaleEndDate] = useState('');
-    const [description, setDescription] = useState('');
     const [saleFactory, setSaleFactory] = useState('');
+    const [socials, setSocials] = useState({});
     const [price, setPrice] = useState('');
     const [buttonActive, setButtonActive] = useState(false);
     const [stateUpdated, setStateUpdated] = useState(false)
@@ -38,6 +38,7 @@ function AdminPage(props) {
     const createNewSale = async () => {
         setButtonActive(false)
         try {
+            const description = JSON.stringify(socials)
             await saleFactory.createNewSale(
                 tokenName,
                 tokenAddress,
@@ -57,7 +58,7 @@ function AdminPage(props) {
     }
     const changeButtonState = () => {
         //console.log(tokenName, tokenAddress, tokenCreatorAddress, softcap, saleStartDate, saleEndDate, price, description
-        if(tokenName!=='' && tokenAddress !=='' && tokenCreatorAddress !== '' && softcap !== '' && saleStartDate !== '' && saleEndDate !== '' && price !== '' && description !== ''){
+        if(tokenName!=='' && tokenAddress !=='' && tokenCreatorAddress !== '' && softcap !== '' && saleStartDate !== '' && saleEndDate !== '' && price !== ''){
             setButtonActive(true)
         }else{
             setButtonActive(false)
@@ -85,6 +86,22 @@ function AdminPage(props) {
                 setMaxTierValues(newMaxTierValues)
             }
         }
+    }
+    const setSocialsKey = (value, key) => {
+        let newSocials = socials;
+        if (!socials.socials) {
+            newSocials.socials = {}
+        }
+        if (value === '') {
+            delete newSocials.socials[key]
+            if(Object.keys(newSocials.socials).length === 0){
+                delete newSocials.socials
+            }
+        } else{
+            newSocials.socials[key] = value
+        }
+        setSocials(newSocials)
+        setStateUpdated(!stateUpdated)
     }
     return (
         <div className="xs-body-admin">
@@ -166,10 +183,40 @@ function AdminPage(props) {
                         </div>
 
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Link to information</div>
+                            <div className="xs-admin-text">Text description</div>
                             <input type="text" onChange={(onChangeEvent)=> {
-                                setDescription(onChangeEvent.target.value )
+                                let newSocials = socials;
+                                if (onChangeEvent.target.value === '') {
+                                    delete newSocials.text
+                                } else{
+                                    newSocials.text = onChangeEvent.target.value
+                                }
+                                setSocials(newSocials)
                                 setStateUpdated(!stateUpdated)
+                            }}/>
+                        </div>
+                        <div className="xs-admin-input">
+                            <div className="xs-admin-text">Website</div>
+                            <input type="text" onChange={(onChangeEvent)=> {
+                                setSocialsKey(onChangeEvent.target.value, 'website')
+                            }}/>
+                        </div>
+                        <div className="xs-admin-input">
+                            <div className="xs-admin-text">Medium</div>
+                            <input type="text" onChange={(onChangeEvent)=> {
+                                setSocialsKey(onChangeEvent.target.value, 'medium')
+                            }}/>
+                        </div>
+                        <div className="xs-admin-input">
+                            <div className="xs-admin-text">Twitter</div>
+                            <input type="text" onChange={(onChangeEvent)=> {
+                                setSocialsKey(onChangeEvent.target.value, 'twitter')
+                            }}/>
+                        </div>
+                        <div className="xs-admin-input">
+                            <div className="xs-admin-text">Telegram</div>
+                            <input type="text" onChange={(onChangeEvent)=> {
+                                setSocialsKey(onChangeEvent.target.value, 'telegram')
                             }}/>
                         </div>
                     </div>

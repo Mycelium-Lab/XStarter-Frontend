@@ -92,14 +92,14 @@ function AdminPage(props) {
                 <div className="xs-admin-row-blocks">
                     <div className="xs-admin-block">
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Название токена</div>
+                            <div className="xs-admin-text">Token name</div>
                             <input type="text" onChange={(onChangeEvent)=> {
                                 setTokenName(onChangeEvent.target.value)
                                 setStateUpdated(!stateUpdated)
                             }}/>
                         </div>
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Сумма, которую необходимо собрать</div>
+                            <div className="xs-admin-text">Token softcap</div>
                             <input type="tel" placeholder={0.0} value={softcap} onChange={(onChangeEvent)=> {
                                 if((!/^[0-9.]*$/.test(onChangeEvent.target.value.toString()))) {
                                 }else if(parseFloat(onChangeEvent.target.value)) {
@@ -111,7 +111,7 @@ function AdminPage(props) {
                             }}/>
                         </div>
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Цена за 1 токен</div>
+                            <div className="xs-admin-text">Price per 1 token in ETH</div>
                             <input type="tel" placeholder={0.0} value={price} onChange={(onChangeEvent)=> {
                                 if((!/^[0-9.]*$/.test(onChangeEvent.target.value.toString()))) {
                                 }else if(parseFloat(onChangeEvent.target.value)) {
@@ -123,7 +123,7 @@ function AdminPage(props) {
                             }}/>
                         </div>
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Максимальная сумма в токенах</div>
+                            <div className="xs-admin-text">Maximum amount of tokens per tier</div>
                             <div className="xs-admin-min-sum-inputs ">
                                 {(()=>{
                                     let inputs = []
@@ -137,14 +137,14 @@ function AdminPage(props) {
                     </div>
                     <div className="xs-admin-block">
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Адрес токена</div>
+                            <div className="xs-admin-text">Token address</div>
                             <input type="text" onChange={(onChangeEvent)=> {
                                 setTokenAddress(onChangeEvent.target.value)
                                 setStateUpdated(!stateUpdated)
                             }}/>
                         </div>
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Адрес кошелька создателя токена</div>
+                            <div className="xs-admin-text">Token creator address</div>
                             <input type="text" onChange={(onChangeEvent)=> {
                                 setTokenCreatorAddress(onChangeEvent.target.value)
                                 setStateUpdated(!stateUpdated)
@@ -152,7 +152,7 @@ function AdminPage(props) {
                         </div>
 
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Даты начала и конца сейла</div>
+                            <div className="xs-admin-text">Sale start and sale end dates</div>
                             <div className="xs-admin-sale-dates">
                                 <input type="datetime-local" onChange={(onChangeEvent)=> {
                                     setSaleStartDate(onChangeEvent.target.value)
@@ -166,7 +166,7 @@ function AdminPage(props) {
                         </div>
 
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Ссылка на информацию</div>
+                            <div className="xs-admin-text">Link to information</div>
                             <input type="text" onChange={(onChangeEvent)=> {
                                 setDescription(onChangeEvent.target.value )
                                 setStateUpdated(!stateUpdated)
@@ -174,7 +174,7 @@ function AdminPage(props) {
                         </div>
                     </div>
                 </div>
-                <button onClick={async () => {await createNewSale()}} className="btn xs-admin-button" disabled={!buttonActive}>Сохранить</button>
+                <button onClick={async () => {await createNewSale()}} className="btn xs-admin-button" disabled={!buttonActive}>Save</button>
             </div>
 
         </div>

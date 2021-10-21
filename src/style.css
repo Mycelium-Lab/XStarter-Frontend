@@ -1131,6 +1131,9 @@ select::-ms-expand {
     outline:none;
     width: 100%;
 }
+.xs-admin-input input::placeholder{
+    color:gray;
+}
 .xs-admin-min-sum-inputs {
     display: flex;
     flex-wrap: wrap;

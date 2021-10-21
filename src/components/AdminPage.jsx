@@ -69,23 +69,18 @@ function AdminPage(props) {
         return date.getTime()/1000;
     }
     const changeMaxTierValues = (onChangeEvent) => {
-
-        if((!/^[0-9.]*$/.test(onChangeEvent.target.value.toString()))) {
-        }else if(parseFloat(onChangeEvent.target.value)) {
-            const id = onChangeEvent.target.id.match(/(\d+)/)
-            if(id!=null){
-                let newMaxTierValues = [...maxTierValues]
-                newMaxTierValues[parseInt(id[1])] = onChangeEvent.target.value
-                setMaxTierValues(newMaxTierValues)
-            }
-        }else {
-            const id = onChangeEvent.target.id.match(/(\d+)/)
-            if(id!=null){
-                let newMaxTierValues = [...maxTierValues]
-                newMaxTierValues[parseInt(id[1])] = ''
-                setMaxTierValues(newMaxTierValues)
-            }
+        const id = onChangeEvent.target.id.match(/(\d+)/)[1]
+        if(id == null) return
+        if (onChangeEvent.target.value === '') {
+            let newMaxTierValues = [...maxTierValues]
+            newMaxTierValues[parseInt(id)] = ''
+            setMaxTierValues(newMaxTierValues)
+        } else if ((/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value))) {
+            let newMaxTierValues = [...maxTierValues]
+            newMaxTierValues[parseInt(id)] = onChangeEvent.target.value
+            setMaxTierValues(newMaxTierValues)
         }
+
     }
     const setSocialsKey = (value, key) => {
         let newSocials = socials;
@@ -103,6 +98,15 @@ function AdminPage(props) {
         setSocials(newSocials)
         setStateUpdated(!stateUpdated)
     }
+    const handleNumberInput = (onChangeEvent, setVarFunction) => {
+        if (onChangeEvent.target.value === '') {
+            setVarFunction('')
+            setStateUpdated(!stateUpdated)
+        } else if ((/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value))) {
+            setVarFunction(onChangeEvent.target.value)
+            setStateUpdated(!stateUpdated)
+        }
+    }
     return (
         <div className="xs-body-admin">
             <div className="xs-admin">
@@ -118,25 +122,13 @@ function AdminPage(props) {
                         <div className="xs-admin-input">
                             <div className="xs-admin-text">Token softcap</div>
                             <input type="tel" placeholder={0.0} value={softcap} onChange={(onChangeEvent)=> {
-                                if((!/^[0-9.]*$/.test(onChangeEvent.target.value.toString()))) {
-                                }else if(parseFloat(onChangeEvent.target.value)) {
-                                    setSoftcap(onChangeEvent.target.value)
-                                }else{
-                                    setSoftcap('');
-                                }
-                                setStateUpdated(!stateUpdated)
+                                handleNumberInput(onChangeEvent, setSoftcap)
                             }}/>
                         </div>
                         <div className="xs-admin-input">
                             <div className="xs-admin-text">Price per 1 token in ETH</div>
-                            <input type="tel" placeholder={0.0} value={price} onChange={(onChangeEvent)=> {
-                                if((!/^[0-9.]*$/.test(onChangeEvent.target.value.toString()))) {
-                                }else if(parseFloat(onChangeEvent.target.value)) {
-                                    setPrice(onChangeEvent.target.value)
-                                }else{
-                                    setPrice('');
-                                }
-                                setStateUpdated(!stateUpdated)
+                            <input type="tel" placeholder={'0'} value={price} onChange={(onChangeEvent)=> {
+                                handleNumberInput(onChangeEvent, setPrice)
                             }}/>
                         </div>
                         <div className="xs-admin-input">

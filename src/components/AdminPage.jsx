@@ -16,10 +16,10 @@ function AdminPage(props) {
     const [price, setPrice] = useState('');
     const [buttonActive, setButtonActive] = useState(false);
     const [stateUpdated, setStateUpdated] = useState(false)
+    const [numberOfTiersInputs, setNumberOfTiersInputs] = useState(1)
     const setParams = async () => {
         const saleFactory = await SaleFactory.create()
         let amountOfTiers = await saleFactory.getAmountOfTiers()
-
         let newMaxTierValues = []
         for(let i = 0; i < parseInt(amountOfTiers); i++){
             newMaxTierValues.push('');
@@ -34,6 +34,7 @@ function AdminPage(props) {
             setParams()
         }
         changeButtonState()
+        setInvisibleTiersToLast()
     }, [stateUpdated])
     const createNewSale = async () => {
         setButtonActive(false)
@@ -69,18 +70,29 @@ function AdminPage(props) {
         return date.getTime()/1000;
     }
     const changeMaxTierValues = (onChangeEvent) => {
+        
         const id = onChangeEvent.target.id.match(/(\d+)/)[1]
         if(id == null) return
         if (onChangeEvent.target.value === '') {
             let newMaxTierValues = [...maxTierValues]
             newMaxTierValues[parseInt(id)] = ''
             setMaxTierValues(newMaxTierValues)
+            setStateUpdated(!stateUpdated)
         } else if ((/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value))) {
             let newMaxTierValues = [...maxTierValues]
             newMaxTierValues[parseInt(id)] = onChangeEvent.target.value
             setMaxTierValues(newMaxTierValues)
+            setStateUpdated(!stateUpdated)
         }
-
+    }
+    const setInvisibleTiersToLast = () =>{
+        if(numberOfTiersInputs < amountOfTiers){
+            let newMaxTierValues = [...maxTierValues]
+            for(let i = numberOfTiersInputs; i < amountOfTiers; i ++ ){
+                newMaxTierValues[i] = newMaxTierValues[numberOfTiersInputs - 1]
+            }
+            setMaxTierValues(newMaxTierValues)
+        }
     }
     const setSocialsKey = (value, key) => {
         let newSocials = socials;
@@ -107,6 +119,51 @@ function AdminPage(props) {
             setStateUpdated(!stateUpdated)
         }
     }
+    const addTier = () => {
+        if(numberOfTiersInputs < amountOfTiers){
+            setNumberOfTiersInputs(numberOfTiersInputs + 1)
+            setStateUpdated(!stateUpdated)
+        }
+       
+    }
+    const deleteTier = () => {
+        if(numberOfTiersInputs > 1){
+            setNumberOfTiersInputs(numberOfTiersInputs - 1)
+            setStateUpdated(!stateUpdated)
+        }
+        
+    }
+
+    const showTierInputs = () => {
+        const inputs = [];        
+        for(let i = 0 ; i < numberOfTiersInputs; i ++ ){
+            const deleteTierButton = i === numberOfTiersInputs - 1 && numberOfTiersInputs !== 1 ? <button className="xs-admin-delete-tier-button" onClick={()=>{deleteTier()}}>X</button> : null
+            inputs.push(<div key={"max-sum-"+ (i)} className={i===0 && numberOfTiersInputs === 1 ? "xs-admin-input-block-solo" : "xs-admin-input-block"}>
+            <div className="xs-admin-text">Tier {i+1}</div>
+            <div className="xs-admin-tier-input">
+            <input 
+                type="tel" 
+                id={"max-sum-"+ (i)} 
+                placeholder={0.0} 
+                value = {maxTierValues[i]}
+                onChange={(onChangeEvent) => changeMaxTierValues(onChangeEvent)} 
+            />
+            {deleteTierButton}
+            </div>
+            </div>)
+        }
+        const addTierButton = amountOfTiers > 1 ? <button className="btn xs-admin-add-tier-button" disabled={numberOfTiersInputs===amountOfTiers} onClick={()=>{addTier()}}>Add tier</button> : null
+        //const deleteTierButton = tierInputs && tierInputs.length > 1 ?  <button className="btn xs-admin-add-tier-button"onClick={()=>{deleteTier()}}>-</button> : null
+        return <div className="xs-admin-input">
+                <div className="xs-admin-text">Maximum amount of tokens per tier</div>
+                <div className="xs-admin-min-sum-inputs ">
+                    {inputs}
+                </div>
+                <div className="xs-admin-tier-action-buttons">
+                {addTierButton}
+                </div>
+            </div>
+    }
     return (
         <div className="xs-body-admin">
             <div className="xs-admin">
@@ -131,18 +188,21 @@ function AdminPage(props) {
                                 handleNumberInput(onChangeEvent, setPrice)
                             }}/>
                         </div>
+                            
                         <div className="xs-admin-input">
-                            <div className="xs-admin-text">Maximum amount of tokens per tier</div>
-                            <div className="xs-admin-min-sum-inputs ">
-                                {(()=>{
-                                    let inputs = []
-                                    for(let i = 0; i < amountOfTiers; i ++){
-                                        inputs.push(<input type="tel" key={"max-sum-"+i} id={"max-sum-"+i} placeholder={0.0} value={maxTierValues[i]} onChange={(onChangeEvent) => changeMaxTierValues(onChangeEvent)}/>)
-                                    }
-                                    return inputs
-                                })()}
+                            <div className="xs-admin-text">Sale start and sale end dates</div>
+                            <div className="xs-admin-sale-dates">
+                                <input type="datetime-local" onChange={(onChangeEvent)=> {
+                                    setSaleStartDate(onChangeEvent.target.value)
+                                    setStateUpdated(!stateUpdated)
+                                }}/>
+                                <input type="datetime-local" onChange={(onChangeEvent)=> {
+                                    setSaleEndDate(onChangeEvent.target.value)
+                                    setStateUpdated(!stateUpdated)
+                                }}/>
                             </div>
                         </div>
+                                {showTierInputs()}
                     </div>
                     <div className="xs-admin-block">
                         <div className="xs-admin-input">
@@ -160,19 +220,6 @@ function AdminPage(props) {
                             }}/>
                         </div>
 
-                        <div className="xs-admin-input">
-                            <div className="xs-admin-text">Sale start and sale end dates</div>
-                            <div className="xs-admin-sale-dates">
-                                <input type="datetime-local" onChange={(onChangeEvent)=> {
-                                    setSaleStartDate(onChangeEvent.target.value)
-                                    setStateUpdated(!stateUpdated)
-                                }}/>
-                                <input type="datetime-local" onChange={(onChangeEvent)=> {
-                                    setSaleEndDate(onChangeEvent.target.value)
-                                    setStateUpdated(!stateUpdated)
-                                }}/>
-                            </div>
-                        </div>
 
                         <div className="xs-admin-input">
                             <div className="xs-admin-text">Text description</div>

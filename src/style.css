@@ -1074,7 +1074,6 @@ select::-ms-expand {
 }
 .xs-admin {
     display: flex;
-    padding: 30px;
     flex-direction: column;
     width: 700px;
     background: rgba(37, 40, 51, 0.8);
@@ -1083,8 +1082,7 @@ select::-ms-expand {
     box-shadow: 1px -1px 4px rgba(242, 242, 242, 0.25);
     border-radius: 8px;
     position: relative;
-    align-items: center;
-    padding: 50px 50px 50px 50px;
+    padding: 50px;
 }
 .xs-admin-row-blocks {
     display: flex;
@@ -1093,6 +1091,7 @@ select::-ms-expand {
 }
 .xs-admin-button {
     width: 300px;
+    align-self: center;
 }
 .xs-admin-text{
     text-align: left;
@@ -1138,10 +1137,58 @@ select::-ms-expand {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-top: 20px;
 }
-.xs-admin-min-sum-inputs input{
+.xs-admin-input-block{
+    width: 45%;
+}
+.xs-admin-input-block-solo {
+    width: 100%;
+}
+.xs-admin-input-block-text{
+    color: #FFFFFF;
+    text-align: left;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+}
+.xs-admin-tier-input{
+    display: flex; 
+    flex-direction: row;
+}
+.xs-admin-delete-tier-button{
+    border: none;
+    padding: 0;
+    background: none;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 10px;
+    margin-left: 5px;
+}
+.xs-admin-add-tier-button{
+    width: 100px;
+}
+.xs-admin-add-tier-button:disabled{
+    background-color: grey;
+    border-color: gray;
+}
+.xs-admin-add-tier-button:disabled:hover{
+    background-color: grey;
+    border-color: gray;
+    color:white;
+}
+.xs-admin-delete-tier-button:disabled{
+    background-color: grey;
+    border-color: gray;
+}
+.xs-admin-tier-action-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+/* .xs-admin-min-sum-inputs input{
     width: 40%;
-}
+} */
 .xs-admin-sale-dates input{
     width: 100%;
 }

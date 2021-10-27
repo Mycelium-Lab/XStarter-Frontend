@@ -90,52 +90,46 @@ function TradePage(props) {
     changeOutputPrice(price);
     token0 === WETH ? setBaseToken('WETH') : setBaseToken('XST');
   }
-  const changeOutputPrice = async (price) => {
+  const changeOutputPrice = async (onChangeEvent) => {
     setIsLoaded(false);
-    if((!/^[0-9.]*$/.test(price.target.value.toString())))
-    {
-      // Do nothing
-    }
-    else if (parseFloat(price.target.value) && swapProvider) {
-      setIsExactInput(true);
-      token0 === WETH ? setBaseToken('WETH') : setBaseToken('XST')
-      setInTokenAmount(price.target.value)  
-      setInputValue(price.target.value)
-      // Number(price.target.value) % 1 === 0 ? setInputValue(parseInt(price.target.value)): setInputValue(parseFloat(price.target.value).toFixed(8))
-      const sellPrice = token0 === WETH ? await swapProvider.getWETHToXSPrice(price.target.value.toString()) : await swapProvider.getXSToWETHPrice(price.target.value.toString());
-      setOutTokenAmount(sellPrice);
-      Number(sellPrice) % 1 === 0 ? setOutputValue((sellPrice).toString()): setOutputValue(parseFloat(Number(sellPrice).toFixed(8)).toString())  
-      const isInsufficientBalance = parseFloat(token0Balance) >= parseFloat(price.target.value) ? false : true;
-      setIsInsufficientBalance(isInsufficientBalance);
-      if(token0 !== '')
-      {
-        const isApproved = await swapProvider.isEnoughAllowance(price.target.value.toString(), token0, token0Symbol);
-        setIsApproved(isApproved);
-      }
-    }
-    else
-    {
-      setInTokenAmount(price.target.value)
+    if (onChangeEvent.target.value === '') {
+      setInTokenAmount(onChangeEvent.target.value)
       setInputValue('');
       setOutTokenAmount('');
       setOutputValue('');
+    }else if(/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value)) {
+      setIsExactInput(true);
+      token0 === WETH ? setBaseToken('WETH') : setBaseToken('XST')
+      setInTokenAmount(onChangeEvent.target.value)  
+      setInputValue(onChangeEvent.target.value)
+      // Number(price.target.value) % 1 === 0 ? setInputValue(parseInt(price.target.value)): setInputValue(parseFloat(price.target.value).toFixed(8))
+      const sellPrice = token0 === WETH ? await swapProvider.getWETHToXSPrice(onChangeEvent.target.value.toString()) : await swapProvider.getXSToWETHPrice(onChangeEvent.target.value.toString());
+      setOutTokenAmount(sellPrice);
+      Number(sellPrice) % 1 === 0 ? setOutputValue((sellPrice).toString()): setOutputValue(parseFloat(Number(sellPrice).toFixed(8)).toString())  
+      const isInsufficientBalance = parseFloat(token0Balance) >= parseFloat(onChangeEvent.target.value) ? false : true;
+      setIsInsufficientBalance(isInsufficientBalance);
+      if(token0 !== '')
+      {
+        const isApproved = await swapProvider.isEnoughAllowance(onChangeEvent.target.value.toString(), token0, token0Symbol);
+        setIsApproved(isApproved);
+      }
     }
     setIsLoaded(true);
   }
-
-  const changeInputPrice = async (price) =>{
+  const changeInputPrice = async (onChangeEvent) =>{
     setIsLoaded(false);
-    if((!/^[0-9.]*$/.test(price.target.value.toString())))
-    {
-      // Do nothing
-    }
-    else if (parseFloat(price.target.value) && swapProvider) {
+    if (onChangeEvent.target.value === '') {
+      setInTokenAmount('');
+      setInputValue('');
+      setOutTokenAmount(onChangeEvent.target.value);
+      setOutputValue('');
+    } else if ((/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value))) {
       setIsExactInput(false);
       token1 === WETH ? setBaseToken('WETH') : setBaseToken('XST')
-      setOutTokenAmount(price.target.value) 
-      setOutputValue(price.target.value);
+      setOutTokenAmount(onChangeEvent.target.value) 
+      setOutputValue(onChangeEvent.target.value);
       // Number(price.target.value) % 1 === 0 ? setOutputValue(parseInt(price.target.value).toString()): setOutputValue(parseFloat(price.target.value).toFixed(8).toString())
-      const buyPrice = token1 === WETH ? await swapProvider.getWETHfromXSPrice(price.target.value.toString()) : await swapProvider.getXSfromWETHPrice(price.target.value.toString());
+      const buyPrice = token1 === WETH ? await swapProvider.getWETHfromXSPrice(onChangeEvent.target.value.toString()) : await swapProvider.getXSfromWETHPrice(onChangeEvent.target.value.toString());
       setInTokenAmount(buyPrice);
       Number(buyPrice) % 1 === 0 ? setInputValue(parseInt(buyPrice).toString()): setInputValue(parseFloat(Number(buyPrice).toFixed(8)).toString())
       const isInsufficientBalance = parseFloat(token0Balance) >= parseFloat(buyPrice) ? false : true;
@@ -146,15 +140,8 @@ function TradePage(props) {
         setIsApproved(isApproved);
       }
     }
-    else{
-      setInTokenAmount('');
-      setInputValue('');
-      setOutTokenAmount(price.target.value);
-      setOutputValue('');
-    }
     setIsLoaded(true);
-  };
-  
+  }
   const swapTokens = async ()=>{
     if(inTokenAmount > 0)
     {

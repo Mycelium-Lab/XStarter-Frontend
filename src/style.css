@@ -659,6 +659,9 @@ footer {
     padding: 12px 40px 12px 20px;
     outline:none;
 }
+.staking-tier-stats-input input::placeholder{
+    color:#808080;
+}
 .staking-tier-stats-input::after {
     content: 'XS';
     position: absolute;
@@ -856,6 +859,9 @@ tbody tr td {
     outline: none;
     text-align: left;
     padding-left: 20px;
+}
+.xs-trade-change-input input::placeholder{
+    color: #808080;
 }
 select {
     -webkit-appearance: none;
@@ -1058,6 +1064,9 @@ select::-ms-expand {
     outline:none;
     width: 100%;
 }
+.xs-sale-trade input::placeholder{
+    color:#808080;
+}
 .xs-sale-load-more-btn {
     width: 125px;
     margin: 0 auto;
@@ -1133,7 +1142,7 @@ select::-ms-expand {
     width: 100%;
 }
 .xs-admin-input input::placeholder{
-    color:gray;
+    color:#808080;
 }
 .xs-admin-min-sum-inputs {
     display: flex;
@@ -1171,17 +1180,17 @@ select::-ms-expand {
     width: 100px;
 }
 .xs-admin-add-tier-button:disabled{
-    background-color: grey;
-    border-color: gray;
+    background-color: #808080;
+    border-color: #808080;
 }
 .xs-admin-add-tier-button:disabled:hover{
-    background-color: grey;
-    border-color: gray;
+    background-color: #808080;
+    border-color: #808080;
     color:white;
 }
 .xs-admin-delete-tier-button:disabled{
-    background-color: grey;
-    border-color: gray;
+    background-color: #808080;
+    border-color: #808080;
 }
 .xs-admin-tier-action-buttons{
     display: flex;
@@ -1195,8 +1204,8 @@ select::-ms-expand {
     width: 100%;
 }
 .xs-admin-button:disabled{
-    background-color: grey;
-    border-color: gray;
+    background-color: #808080;
+    border-color: #808080;
 }
 .xs-admin-button:disabled:hover{
     color:white;

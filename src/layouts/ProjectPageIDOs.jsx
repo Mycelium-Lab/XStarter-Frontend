@@ -24,7 +24,6 @@ function ProjectPageIDOs(props) {
             //const lastIndex = sales.length - howManySalesToLoad >= loadedSalesAmount ? sales.length - howManySalesToLoad : sales.length
             const lastIndex = loadedSalesAmount + howManySalesToLoad > sales.length ? sales.length : loadedSalesAmount + howManySalesToLoad
             let mutables = []
-            console.log(loadedSalesAmount, lastIndex)
             for (let i = loadedSalesAmount; i < lastIndex; i++) {
                 mutables.push(sales[i].getMutables())
             }

@@ -133,7 +133,6 @@ function AdminPage(props) {
         }
         
     }
-
     const showTierInputs = () => {
         const inputs = [];        
         for(let i = 0 ; i < numberOfTiersInputs; i ++ ){
@@ -192,13 +191,20 @@ function AdminPage(props) {
                         <div className="xs-admin-input">
                             <div className="xs-admin-text">Sale start and sale end dates</div>
                             <div className="xs-admin-sale-dates">
-                                <input type="datetime-local" onChange={(onChangeEvent)=> {
+                                <input type="datetime-local" min={new Date().toISOString().replace(/:\d+\.[\s\S]+$/, '')} onChange={(onChangeEvent)=> {
+                                    const date = new Date(onChangeEvent.target.value)
+                                    if(date > new Date(saleEndDate)){
+                                        setSaleEndDate('')
+                                    }
                                     setSaleStartDate(onChangeEvent.target.value)
                                     setStateUpdated(!stateUpdated)
                                 }}/>
-                                <input type="datetime-local" onChange={(onChangeEvent)=> {
-                                    setSaleEndDate(onChangeEvent.target.value)
-                                    setStateUpdated(!stateUpdated)
+                                <input type="datetime-local" min={saleStartDate} value={saleEndDate} onChange={(onChangeEvent)=> {
+                                    const date = new Date(onChangeEvent.target.value)
+                                    if(date > new Date(saleStartDate)){
+                                        setSaleEndDate(onChangeEvent.target.value)
+                                        setStateUpdated(!stateUpdated)
+                                    }
                                 }}/>
                             </div>
                         </div>

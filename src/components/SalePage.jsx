@@ -1,10 +1,5 @@
 import React from 'react';
-import topblockimg from '../img/top-block-img.png';
-import SPStake from '../layouts/SPStake';
-import SPTableCoins from '../layouts/SPTableCoins';
-import SPTableProfits from '../layouts/SPTableProfits';
 import { useState, useEffect } from 'react';
-import settingsImg from '../img/settings.svg';
 function SalePage(props) {
     const { handleChange } = props;
     const [sale, setSale] = useState(null);
@@ -42,7 +37,6 @@ function SalePage(props) {
             return <div className="xs-trade-change xs-sale-trade">
                         <div className="xs-trade-change-top">
                             <span>Buy tokens</span>
-                            <button><img src={settingsImg} alt="" /></button>
                         </div>
                         <div className="xs-trade-change-input  xs-trade-change-input-xs">
                             <select defaultValue="ETH" >

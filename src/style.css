@@ -878,7 +878,8 @@ select {
     border-radius: 8px;
     position: absolute;
     top: 10px;
-    left: 200px;
+    right: 10px;
+    /* left: 200px; */
 }
 
 select option {
@@ -973,7 +974,8 @@ select::-ms-expand {
     position: absolute;
     width: 50px;
     top: 5px;
-    left: 200px;
+    /* left: 200px; */
+    right: 50px;
     color:#FF824B;
     background-color: transparent;
     cursor: pointer;
@@ -981,7 +983,7 @@ select::-ms-expand {
 .btn-max-trade
 {
     top: 8px;
-    left: 140px;
+    right: 110px;
 }
 .btn-modal
 {

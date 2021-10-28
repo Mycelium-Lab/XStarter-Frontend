@@ -32,6 +32,11 @@ function SalePage(props) {
         const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
         return time;
     }
+    const approveSaleButton = () => {
+        if(!saleMutables.approved){
+            return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.approveSale() }}>Approve sale</button>
+        }
+    }
     const saleAction = () => {
         if(saleMutables.status === "Current"){
             return <div className="xs-trade-change xs-sale-trade">
@@ -78,8 +83,11 @@ function SalePage(props) {
             if(sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()){
                 return <div className="xs-trade-change xs-sale-trade">
                             <div className="xs-sale-start-text">Sale will start soon...</div>
+                            
                              <input onChange={async (e) => { await changeAddTokenAmount(e); }} type="tel" placeholder={0.0} value={addTokenAmount} />
+                        
                             <button className="btn xs-trade-action-btn" onClick={async () => { await sale.addTokensForSale(addTokenAmount) }}>Add tokens for sale</button>
+                            {approveSaleButton()}
                         </div>
             }else{
                 return <div className="xs-trade-change xs-sale-trade">

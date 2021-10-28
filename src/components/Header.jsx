@@ -2,7 +2,8 @@ import React from 'react';
 import logo from '../img/logo.png';
 import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
-
+import Web3 from 'web3';
+import saleFactoryAbi from '../sale/Abi/SaleFactory.json'
 function Header(props) {
   const { handleChange } = props;
   const [isWalletConnectionError, setIsWalletConnectionError] = useState(false);
@@ -16,11 +17,11 @@ function Header(props) {
   const rightChainId = useSelector(state => state.wallet.correntChainId);
   const provider = useSelector(state => state.wallet.provider)
   const isLoaded = useSelector(state => state.wallet.isLoaded)
-
+  const [canCreateSales, setCanCreateSales] = useState(false);
 
   useEffect(() => {
     rightChainId === '1' ? setChainName('Mainnet') : setChainName('Rinkeby');
-
+    getCanCreateSales()
   }, [address, currentChainId, isLoaded])
 
   const switchNetwork = async() =>
@@ -36,6 +37,16 @@ function Header(props) {
     }catch(err){
       // setIsNetworkConnectionError(true);
     }
+  }
+  const getCanCreateSales = async () => {
+    if (window.ethereum && address) {
+      const web3 = new Web3(window.ethereum)
+      const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
+      const canCreateSales = await saleFactoryContract.methods.saleCreators(address).call()
+      setCanCreateSales(canCreateSales)
+      return canCreateSales
+    }
+    return false
   }
 
   const goToTransaction = () =>{
@@ -98,7 +109,7 @@ function Header(props) {
                   <li><button className="nav-link" onClick={()=>handleChange('staking')}>Staking</button></li>
                   <li><button className="nav-link" onClick={()=>handleChange('trade')}>Trade XS</button></li>
                   {(() => {
-                      if(address && address.toLowerCase() === process.env.REACT_APP_ADMIN_ADDRESS.toLowerCase())
+                      if(canCreateSales)
                         return <li><button className="nav-link" onClick={()=>handleChange('admin')}>Admin</button></li>
                     })()}
                 </ul>

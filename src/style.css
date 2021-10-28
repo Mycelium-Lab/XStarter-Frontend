@@ -659,6 +659,9 @@ footer {
     padding: 12px 40px 12px 20px;
     outline:none;
 }
+.staking-tier-stats-input input::placeholder{
+    color:#808080;
+}
 .staking-tier-stats-input::after {
     content: 'XS';
     position: absolute;
@@ -857,6 +860,9 @@ tbody tr td {
     text-align: left;
     padding-left: 20px;
 }
+.xs-trade-change-input input::placeholder{
+    color: #808080;
+}
 select {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -878,7 +884,8 @@ select {
     border-radius: 8px;
     position: absolute;
     top: 10px;
-    left: 200px;
+    right: 10px;
+    /* left: 200px; */
 }
 
 select option {
@@ -898,7 +905,8 @@ select::-ms-expand {
     background-position: 80%;
 }
 .xs-sale-trade .xs-trade-change-input-xs select {
- width: 70px;
+    width: 70px;
+    top: 7px;
 }
 @media (max-width: 768px) {
     .xs-body-trade .xs-block {
@@ -972,7 +980,8 @@ select::-ms-expand {
     position: absolute;
     width: 50px;
     top: 5px;
-    left: 200px;
+    /* left: 200px; */
+    right: 50px;
     color:#FF824B;
     background-color: transparent;
     cursor: pointer;
@@ -980,7 +989,7 @@ select::-ms-expand {
 .btn-max-trade
 {
     top: 8px;
-    left: 140px;
+    right: 110px;
 }
 .btn-modal
 {
@@ -1055,6 +1064,9 @@ select::-ms-expand {
     outline:none;
     width: 100%;
 }
+.xs-sale-trade input::placeholder{
+    color:#808080;
+}
 .xs-sale-load-more-btn {
     width: 125px;
     margin: 0 auto;
@@ -1073,7 +1085,6 @@ select::-ms-expand {
 }
 .xs-admin {
     display: flex;
-    padding: 30px;
     flex-direction: column;
     width: 700px;
     background: rgba(37, 40, 51, 0.8);
@@ -1082,8 +1093,7 @@ select::-ms-expand {
     box-shadow: 1px -1px 4px rgba(242, 242, 242, 0.25);
     border-radius: 8px;
     position: relative;
-    align-items: center;
-    padding: 50px 50px 50px 50px;
+    padding: 50px;
 }
 .xs-admin-row-blocks {
     display: flex;
@@ -1092,6 +1102,7 @@ select::-ms-expand {
 }
 .xs-admin-button {
     width: 300px;
+    align-self: center;
 }
 .xs-admin-text{
     text-align: left;
@@ -1130,20 +1141,71 @@ select::-ms-expand {
     outline:none;
     width: 100%;
 }
+.xs-admin-input input::placeholder{
+    color:#808080;
+}
 .xs-admin-min-sum-inputs {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-top: 20px;
 }
-.xs-admin-min-sum-inputs input{
+.xs-admin-input-block{
+    width: 45%;
+}
+.xs-admin-input-block-solo {
+    width: 100%;
+}
+.xs-admin-input-block-text{
+    color: #FFFFFF;
+    text-align: left;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+}
+.xs-admin-tier-input{
+    display: flex; 
+    flex-direction: row;
+}
+.xs-admin-delete-tier-button{
+    border: none;
+    padding: 0;
+    background: none;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 10px;
+    margin-left: 5px;
+}
+.xs-admin-add-tier-button{
+    width: 100px;
+}
+.xs-admin-add-tier-button:disabled{
+    background-color: #808080;
+    border-color: #808080;
+}
+.xs-admin-add-tier-button:disabled:hover{
+    background-color: #808080;
+    border-color: #808080;
+    color:white;
+}
+.xs-admin-delete-tier-button:disabled{
+    background-color: #808080;
+    border-color: #808080;
+}
+.xs-admin-tier-action-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+/* .xs-admin-min-sum-inputs input{
     width: 40%;
-}
+} */
 .xs-admin-sale-dates input{
     width: 100%;
 }
 .xs-admin-button:disabled{
-    background-color: grey;
-    border-color: gray;
+    background-color: #808080;
+    border-color: #808080;
 }
 .xs-admin-button:disabled:hover{
     color:white;

@@ -1,10 +1,5 @@
 import React from 'react';
-import topblockimg from '../img/top-block-img.png';
-import SPStake from '../layouts/SPStake';
-import SPTableCoins from '../layouts/SPTableCoins';
-import SPTableProfits from '../layouts/SPTableProfits';
 import { useState, useEffect } from 'react';
-import settingsImg from '../img/settings.svg';
 function SalePage(props) {
     const { handleChange } = props;
     const [sale, setSale] = useState(null);
@@ -42,7 +37,6 @@ function SalePage(props) {
             return <div className="xs-trade-change xs-sale-trade">
                         <div className="xs-trade-change-top">
                             <span>Buy tokens</span>
-                            <button><img src={settingsImg} alt="" /></button>
                         </div>
                         <div className="xs-trade-change-input  xs-trade-change-input-xs">
                             <select defaultValue="ETH" >
@@ -94,37 +88,32 @@ function SalePage(props) {
             }
         }
     }
-    const changeOutputPrice = (price) => {
-        if((!/^[0-9.]*$/.test(price.target.value.toString()))){
-            
-        }else if(parseFloat(price.target.value)){
-            const token = sale.calculatePriceETHToToken(price.target.value, saleMutables.price);
-            setOutTokenAmount(token.tokenAmount)
-            setInTokenAmount(price.target.value)
-        }else{
+    const changeOutputPrice = (onChangeEvent) => {
+        if (onChangeEvent.target.value === '') {
             setInTokenAmount('')
             setOutTokenAmount('')
+        } else if (/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value)){
+            const token = sale.calculatePriceETHToToken(onChangeEvent.target.value, saleMutables.price);
+            setOutTokenAmount(token.tokenAmount)
+            setInTokenAmount(onChangeEvent.target.value)
         }
     }
-    const changeInputPrice = (price) => {
-        if((!/^[0-9.]*$/.test(price.target.value.toString()))){
-            
-        }else if(parseInt(price.target.value)){
-                const eth = sale.calculatePriceTokenToETH(price.target.value, saleMutables.price);
-                setOutTokenAmount(price.target.value)
-                setInTokenAmount(eth)
-        }else{
+    const changeInputPrice = (onChangeEvent) => {
+        if (onChangeEvent.target.value === '') {
             setInTokenAmount('')
             setOutTokenAmount('')
+        } else if (/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value)){
+            const eth = sale.calculatePriceTokenToETH(onChangeEvent.target.value, saleMutables.price);
+            setOutTokenAmount(onChangeEvent.target.value)
+            setInTokenAmount(eth)
         }
         
     }
     const changeAddTokenAmount = (onChangeEvent) => {
-        if((!/^[0-9.]*$/.test(onChangeEvent.target.value.toString()))){
-        }else if(parseInt(onChangeEvent.target.value)){
-            setAddTokenAmount(onChangeEvent.target.value)
-        }else{
+        if (onChangeEvent.target.value === '') {
             setAddTokenAmount('')
+        } else if (/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value)){
+            setAddTokenAmount(onChangeEvent.target.value)
         }
     }
     if (saleMutables && sale) {

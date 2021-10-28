@@ -29,7 +29,7 @@ export class Sale {
             softcap,
             startTimestamp,
             endTimestamp,
-            description
+            jsonDescription
         ] = await Promise.all([
             this.saleContract.methods.tokenCreator().call(),
             this.saleContract.methods.tokenName().call(),
@@ -42,6 +42,13 @@ export class Sale {
         const erc20Contract = new this.web3.eth.Contract(erc20Abi, tokenAddress)
         const tokenSymbol = await erc20Contract.methods.symbol().call()
         const decimals = await erc20Contract.methods.decimals().call()
+        let description = {}
+        try{
+            description = JSON.parse(jsonDescription)
+        } catch(err){
+            description = {text:jsonDescription}
+        }
+    
         return {
             tokenCreator,
             tokenName,

@@ -159,6 +159,47 @@
    },
    {
       "inputs":[
+         
+      ],
+      "name":"admin",
+      "outputs":[
+         {
+            "internalType":"address",
+            "name":"",
+            "type":"address"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"approve",
+      "outputs":[
+         
+      ],
+      "stateMutability":"nonpayable",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"approved",
+      "outputs":[
+         {
+            "internalType":"bool",
+            "name":"",
+            "type":"bool"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
          {
             "internalType":"address",
             "name":"",
@@ -185,6 +226,21 @@
          
       ],
       "stateMutability":"payable",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         {
+            "internalType":"address",
+            "name":"_newAdmin",
+            "type":"address"
+         }
+      ],
+      "name":"changeAdmin",
+      "outputs":[
+         
+      ],
+      "stateMutability":"nonpayable",
       "type":"function"
    },
    {

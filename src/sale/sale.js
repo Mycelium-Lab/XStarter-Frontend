@@ -101,6 +101,10 @@ export class Sale {
         }
     }
 
+    async isApproved(){
+        return this.saleContract.methods.approved().call()
+    }
+
     async getTotalTokensSold() {
         const totalTokensSold = await this.saleContract.methods.totalTokensSold().call()
         return this.noDecimals(totalTokensSold, this.immutables.decimals)
@@ -171,6 +175,9 @@ export class Sale {
         return this.saleContract.methods.withdrawFunds().send({from: this.account})
     }
 
+    async approveSale(){
+        return this.saleContract.methods.approve().send({from: this.account})
+    }
     async withdrawSaleResult() {
         return this.saleContract.methods.withdrawSaleResult().send({from:this.account})
     }
@@ -192,14 +199,16 @@ export class Sale {
             totalTokensSold,
             hardcap,
             price,
-            hardcapCompletionPercent
+            hardcapCompletionPercent,
+            approved
         ] = await Promise.all([
             this.getStatus(),
             this.getNumberOfParticipants(),
             this.getTotalTokensSold(),
             this.getHardcap(),
             this.getPriceWithoutDecimals(),
-            this.getHardcapCompletionPercent()
+            this.getHardcapCompletionPercent(),
+            this.isApproved()
         ])
         return {
             status,
@@ -207,7 +216,8 @@ export class Sale {
             totalTokensSold,
             hardcap,
             price,
-            hardcapCompletionPercent
+            hardcapCompletionPercent,
+            approved
         }
     }
 

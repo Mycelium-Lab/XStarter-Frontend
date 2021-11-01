@@ -10,7 +10,8 @@ import './style.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectWallet } from './wallets/actions';
 import SalePage from "./components/SalePage";
-import AdminPage from "./components/AdminPage";
+import CreateSalePage from "./components/CreateSalePage";
+import AdminPage from './components/AdminPage';
 
 function App() {
   const [page, setPage] = useState('projects');
@@ -46,6 +47,9 @@ function App() {
       }
       { page == 'sale' && pageProps &&
           <SalePage handleChange={handleChange} sale={pageProps}/>
+      }
+      { page == 'createsale' &&
+          <CreateSalePage handleChange={handleChange}/>
       }
       { page == 'admin' &&
           <AdminPage handleChange={handleChange}/>

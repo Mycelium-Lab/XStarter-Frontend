@@ -18,10 +18,12 @@ function Header(props) {
   const provider = useSelector(state => state.wallet.provider)
   const isLoaded = useSelector(state => state.wallet.isLoaded)
   const [canCreateSales, setCanCreateSales] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     rightChainId === '1' ? setChainName('Mainnet') : setChainName('Rinkeby');
     getCanCreateSales()
+    isAddressAdmin()
   }, [address, currentChainId, isLoaded])
 
   const switchNetwork = async() =>
@@ -46,9 +48,22 @@ function Header(props) {
       setCanCreateSales(canCreateSales)
       return canCreateSales
     }
+    setCanCreateSales(false)
     return false
   }
-
+  const isAddressAdmin = async () => {
+    if (window.ethereum && address) {
+      const web3 = new Web3(window.ethereum)
+      const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
+      const admin = await saleFactoryContract.methods.admin().call()
+      if(admin.toLowerCase() === address.toLowerCase()){
+        setIsAdmin(true)
+        return true
+      }
+    }
+    setIsAdmin(false)
+    return false
+  }
   const goToTransaction = () =>{
     const url = "https://rinkeby.etherscan.io/tx/" + transactionHash
     window.open(url)
@@ -108,10 +123,15 @@ function Header(props) {
                   <li><button className="nav-link" onClick={()=>handleChange('projects')}>Projects</button></li>
                   <li><button className="nav-link" onClick={()=>handleChange('staking')}>Staking</button></li>
                   <li><button className="nav-link" onClick={()=>handleChange('trade')}>Trade XS</button></li>
-                  {(() => {
-                      if(canCreateSales)
-                        return <li><button className="nav-link" onClick={()=>handleChange('admin')}>Admin</button></li>
-                    })()}
+                  {
+                    isAdmin &&
+                    <li><button className="nav-link" onClick={()=>handleChange('admin')}>Admin</button></li>
+                  }
+                  {
+                    canCreateSales &&
+                    <li><button className="nav-link" onClick={()=>handleChange('createsale')}>Create Sale</button></li>
+                  }
+                  
                 </ul>
               </div>
             </nav>

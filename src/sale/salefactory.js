@@ -45,4 +45,10 @@ export class SaleFactory {
         const stakingContract = new this.web3.eth.Contract(xStarterStakingAbi,process.env.REACT_APP_STAKING_ADDRESS)
         return stakingContract.methods.amountOfTiers().call()
     }
+    async checkCanCreateSale(address) {
+        return this.saleFactoryContract.methods.saleCreators(address).call()
+    }
+    async setSaleCreator(address, value) {
+        return this.saleFactoryContract.methods.setSaleCreator(address, value).send({from: this.account})
+    }
 }

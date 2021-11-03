@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 import erc20Abi from './Abi/Erc20.json'
 import saleAbi from "../sale/Abi/Sale.json"
-
+import { toBaseUnit } from '../utils/toBaseUnit'
 export class Sale {
     static async create(saleAddress) {
         const obj = new Sale()
@@ -82,24 +82,6 @@ export class Sale {
         const result = valueBN.div(tenPowDecimals)
         return result.toString()
     }
-    addDecimals(value) {
-        if(!(typeof(value) === 'string')){
-            value = value.toString()
-        }
-        const floatRegex =  /^-?\d+(?:[.,]\d*?)?$/
-        if(floatRegex.test(value)){
-            const splitValue = value.split('.')
-            const result = splitValue[0] + (splitValue[1]!==undefined ? splitValue[1]: "") + "0".repeat(8-(splitValue[1]!==undefined ? splitValue[1].length : 0))
-            return result;
-        }else{
-            const ten = new Web3.utils.BN('10')
-            const decimals = new Web3.utils.BN(this.immutables.decimals.toString())
-            const tenPowDecimals = ten.pow(decimals)
-            const valueBN = new Web3.utils.BN(value)
-            const result = valueBN.mul(tenPowDecimals)
-            return result.toString()
-        }
-    }
 
     async isApproved(){
         return this.saleContract.methods.approved().call()
@@ -153,7 +135,8 @@ export class Sale {
 
     async addTokensForSale(amount) {
         const erc20Contract = new this.web3.eth.Contract(erc20Abi, this.immutables.tokenAddress)
-        const amountWithDecimals = this.addDecimals(amount);
+        const amountWithDecimals = toBaseUnit(amount, this.immutables.decimals, Web3.utils.BN).toString()
+        
         const isEnoughAllowance = await this.isEnoughAllowance(amountWithDecimals)
         if(!isEnoughAllowance) {
             await erc20Contract.methods.approve(this.saleContract.options.address, amountWithDecimals).send({from: this.account})

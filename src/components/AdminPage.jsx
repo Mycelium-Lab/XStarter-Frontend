@@ -1,37 +1,56 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { SaleFactory } from '../sale/salefactory';
+import { useSelector } from 'react-redux';
 import Web3 from "web3";
 function AdminPage(props) {
+    const { handleChange } = props;
     const [saleFactory, setSaleFactory] = useState(null)
-    const [address, setAddress] = useState('')
+    const [inputAddress, setInputAddress] = useState('')
     const [status, setStatus] =  useState(null)
     const [addButtonActive, setAddButtonActive] = useState(false)
     const [removeButtonActive, setRemoveButtonActive] = useState(false)
     const [transactionCompleted, setTransactionCompleted] = useState(true)
+    const provider = useSelector(state => state.wallet.provider)
+    const isLoaded = useSelector(state => state.wallet.isLoaded)
+    const address = useSelector(state => state.wallet.address)
+    const isAdmin = useSelector(state => state.wallet.isAdmin)
     useEffect(() => {
-        if (!saleFactory) {
+        if (!saleFactory && isLoaded && provider && address) {
             setParams()
         }
-        onAddressChange()
-    }, [address, transactionCompleted])
+    }, [isLoaded])
+    useEffect(() => {
+        if(!isAdmin){
+            handleChange('projects')
+        }
+    }, [isAdmin])
+    useEffect(() => {
+        if (saleFactory && isAdmin) {
+            saleFactory.setAccountAddress(address)
+        }
+    }, [address])
+    useEffect(() => {
+        onInputAddressChange()
+    }, [inputAddress, transactionCompleted])
     const setParams = async () => {
-        const sf = await SaleFactory.create()
+        const sf = await SaleFactory.create(provider, address)
         setSaleFactory(sf)
     }
     const setSaleCreator = async (value) => {
-        if(address!=='' && Web3.utils.isAddress(address.toLowerCase()) && saleFactory != null){
-            await saleFactory.setSaleCreator(address, value)
+        if(inputAddress!=='' && Web3.utils.isAddress(inputAddress.toLowerCase()) && saleFactory != null){
+            await saleFactory.setSaleCreator(inputAddress, value)
             setTransactionCompleted(!transactionCompleted)
         }
     }
-    const onAddressChange = async () => {
-        if(address!=='' && Web3.utils.isAddress(address.toLowerCase()) && saleFactory != null){
+    const onInputAddressChange = async () => {
+        if(inputAddress!=='' && Web3.utils.isAddress(inputAddress.toLowerCase()) && saleFactory != null){
             setStatus(<div className="xs-admin-text">Status: loading...</div>)
             let canCreateSale = false;
             try{
-                canCreateSale = await saleFactory.checkCanCreateSale(address)
+                canCreateSale = await saleFactory.checkCanCreateSale(inputAddress)
             } catch(err){
+                console.error(err)
                 setStatus(<div className="xs-admin-text">Status: an error while getting address' status</div>)
                 return
             }
@@ -44,7 +63,7 @@ function AdminPage(props) {
                 setAddButtonActive(true)
                 setRemoveButtonActive(false)
             } 
-        }else if (address===''){
+        }else if (inputAddress===''){
             setAddButtonActive(false)
             setRemoveButtonActive(false)
             setStatus(null)
@@ -56,12 +75,12 @@ function AdminPage(props) {
         }
     }
     const onChangeInput = async (onChangeEvent) => {
-        setAddress(onChangeEvent.target.value)
+        setInputAddress(onChangeEvent.target.value)
     }
     return <div className="xs-body-admin">
         <div className="xs-block">
         <div className="xs-admin-text">Team address</div>
-            <input className="xs-admin-input" value={address} onChange={async (onChangeEvent) => {await onChangeInput(onChangeEvent)}}></input>
+            <input className="xs-admin-input" value={inputAddress} onChange={async (onChangeEvent) => {await onChangeInput(onChangeEvent)}}></input>
             { status }
             <div className="xs-admin-block">
                 <button className="btn xs-admin-btn" disabled={!addButtonActive} onClick={async ()=>{ await setSaleCreator(true)}}>Grant permission to create sales</button>

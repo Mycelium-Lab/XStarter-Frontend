@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {SaleFactory} from "../sale/salefactory";
-
+import { useSelector } from 'react-redux';
 function CreateSalePage(props) {
     const { handleChange } = props;
     const [amountOfTiers, setAmountOfTiers] = useState(0);
@@ -19,8 +19,12 @@ function CreateSalePage(props) {
     const [numberOfTiersInputs, setNumberOfTiersInputs] = useState(1)
     const [showTransactionPendingModal, setShowTransactionPendingModal] = useState(false)
     const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const provider = useSelector(state => state.wallet.provider)
+    const address = useSelector(state => state.wallet.address)
+    const canCreateSales = useSelector(state => state.wallet.canCreateSales)
+    const isLoaded = useSelector(state => state.wallet.isLoaded)
     const setParams = async () => {
-        const saleFactory = await SaleFactory.create()
+        const saleFactory = await SaleFactory.create(provider, address)
         let amountOfTiers = await saleFactory.getAmountOfTiers()
         let newMaxTierValues = []
         for(let i = 0; i < parseInt(amountOfTiers); i++){
@@ -32,9 +36,21 @@ function CreateSalePage(props) {
 
     }
     useEffect(() => {
-        if(!saleFactory){
+        if (!saleFactory && isLoaded && provider && address) {
             setParams()
         }
+    }, [isLoaded])
+    useEffect(()=> {
+        if(!canCreateSales){
+            handleChange('projects')
+        }
+    }, [canCreateSales])
+    useEffect(()=> {
+        if(address && canCreateSales && saleFactory){
+            saleFactory.setAccountAddress(address)
+        }
+    }, [address])
+    useEffect(() => {
         changeButtonState()
         setInvisibleTiersToLast()
     }, [stateUpdated])

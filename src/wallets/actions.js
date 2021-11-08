@@ -1,12 +1,13 @@
-import { setChainId, setProvider, setAddress, setMethods, setIsLoaded } from '../redux/wallets/actions'
+import { setChainId, setProvider, setAddress, setMethods, setIsLoaded, setIsAdmin, setCanCreateSales } from '../redux/wallets/actions'
 //import { closeModal } from '../redux/modal/actions'
 import Web3 from 'web3'
+import saleFactoryAbi from '../sale/Abi/SaleFactory.json'
 import { contractMethods} from '../utils/Utils.js';
 //import WalletConnectProvider from '@walletconnect/web3-provider'
 
 const addProvider = (provider, provider_name, dispatch, address) => {
     window.web3 = new Web3(provider);
-    dispatch(setProvider(new Web3(provider)));
+    dispatch(setProvider(provider));
     //window.web3.enable();
     let methods = new contractMethods(window.web3, address);
     dispatch(setMethods(methods));
@@ -15,9 +16,11 @@ const addProvider = (provider, provider_name, dispatch, address) => {
 
 
 const addProviderListeners = (provider, dispatch) => {
-    provider.on("accountsChanged", (accounts) => {
+    provider.on("accountsChanged", async (accounts) => {
         dispatch(setIsLoaded(true));
         dispatch(setAddress(accounts[0]))
+        await checkIsAdmin(new Web3(provider), accounts[0], dispatch)
+        await checkCanCreateSales(new Web3(provider), accounts[0], dispatch)
     })
 
     provider.on("chainChanged", (chainId) => {
@@ -33,7 +36,40 @@ const addProviderListeners = (provider, dispatch) => {
     })
     provider.on("disconnect", (code, reason) => {})
 }
-
+const checkIsAdmin = async (web3, address, dispatch) => {
+    if(!address || !web3){
+        dispatch(setIsAdmin(false))
+        return;
+    }
+    try{
+        const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
+        const adminAddress = await saleFactoryContract.methods.admin().call()
+        if(adminAddress.toLowerCase() === address.toLowerCase()){
+            dispatch(setIsAdmin(true))
+        }else{
+            dispatch(setIsAdmin(false))
+        }
+    } catch (err){
+        dispatch(setIsAdmin(false))
+    }
+}
+const checkCanCreateSales = async (web3, address, dispatch) => {
+    if(!address || !web3){
+        dispatch(setCanCreateSales(false))
+        return;
+    }
+    try{
+        const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
+        const canCreateSales = await saleFactoryContract.methods.saleCreators(address).call()
+        if(canCreateSales){
+            dispatch(setCanCreateSales(true))
+        }else{
+            dispatch(setCanCreateSales(false))
+        }
+    } catch (err){
+        dispatch(setCanCreateSales(false))
+    }
+}
 export const selectWallet = async (wallet, dispatch) => {
     switch (wallet) {
         case 'binanceWallet':
@@ -45,13 +81,11 @@ export const selectWallet = async (wallet, dispatch) => {
                   .then((netId) => {
                     dispatch(setChainId(netId.toString()))
                   })
-
-                await window.ethereum
-                  .request({ method: "eth_requestAccounts" })
-                  .then((response) => {
-                    dispatch(setAddress(response[0]))
-                    addProvider(window.ethereum, 'metaMask', dispatch, response[0])
-                  })
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
+                dispatch(setAddress(accounts[0]))
+                addProvider(window.ethereum, 'metaMask', dispatch, accounts[0])
+                await checkIsAdmin(new Web3(window.ethereum), accounts[0], dispatch)
+                await checkCanCreateSales(new Web3(window.ethereum), accounts[0], dispatch)
                 addProviderListeners(window.ethereum, dispatch)
                 dispatch(setIsLoaded(true));
               } catch (err) {
@@ -109,6 +143,8 @@ export const selectWallet = async (wallet, dispatch) => {
 export const logout = async (provider, dispatch) => {
     dispatch(setAddress(''))
     dispatch(setChainId(''))
+    dispatch(setCanCreateSales(false))
+    dispatch(setIsAdmin(false))
     if (provider) {
       if (provider.close) {
         await provider.close()

@@ -4,26 +4,28 @@ import xStarterStakingAbi from "./Abi/XStarterStaking.json"
 import erc20Abi from './Abi/Erc20.json'
 import {toBaseUnit} from "../utils/toBaseUnit";
 export class SaleFactory {
-    static async create() {
+    static async create(provider, address) {
         const obj = new SaleFactory()
-        await obj.initialize()
+        await obj.initialize(provider, address)
         return obj
     }
 
-    async initialize() {
-        if (window.ethereum && ((window).ethereum.isMetaMask === true)) {
-            this.web3 = new Web3(window.ethereum)
-            let accounts = await window.ethereum.request({method: 'eth_requestAccounts'})
-            this.web3.eth.defaultAccount = accounts[0]
-            this.account = accounts[0]
+    async initialize(provider, address) {
+        if (provider && address) {
+            this.web3 = new Web3(provider)
+            this.web3.eth.defaultAccount = address
+            this.account = address
             this.saleFactoryContract = new this.web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
         }
+    }
+    async setAccountAddress(accountAddress) {
+        this.account = accountAddress
     }
     async createNewSale(tokenName, tokenAddress, tokenCreator, softcap, tiersMaxAmountValues, startTimestamp, endTimestamp, price, description){
         const erc20Contract = new this.web3.eth.Contract(erc20Abi, tokenAddress)
         const tokenDecimals = await erc20Contract.methods.decimals.call().call()
         const tiersMaxAmountValuesWithDecimals = tiersMaxAmountValues.map((value) => {
-            if(value == ''){
+            if(value === ''){
                 return '0'
             }else {
                 return toBaseUnit(value, tokenDecimals, Web3.utils.BN).toString()

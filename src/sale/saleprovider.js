@@ -3,16 +3,18 @@ import saleFactoryAbi from "./Abi/SaleFactory.json"
 import {Sale} from './sale'
 
 export class SaleProvider {
-    async initialize(web3) {
-        if (web3) {
-            this.web3 = web3
+    async initialize(provider, address) {
+        if (provider && address) {
+            this.web3 = new Web3(provider)
+            this.web3.eth.defaultAccount = address
+            this.account = address
             this.saleFactory = new this.web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
         }
     }
 
-    static async create(web3) {
+    static async create(provider, address) {
         const obj = new SaleProvider()
-        await obj.initialize(web3)
+        await obj.initialize(provider, address)
         return obj
     }
 

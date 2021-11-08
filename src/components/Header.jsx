@@ -2,8 +2,6 @@ import React from 'react';
 import logo from '../img/logo.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import Web3 from 'web3';
-import saleFactoryAbi from '../sale/Abi/SaleFactory.json'
 import { selectWallet } from '../wallets/actions';
 function Header(props) {
   const { handleChange } = props;
@@ -17,15 +15,13 @@ function Header(props) {
   const transactionType = useSelector(state => state.transactionInfo.transactionInfo.type);
   const currentChainId = useSelector(state => state.wallet.chainId);
   const rightChainId = useSelector(state => state.wallet.correntChainId);
+  const isAdmin = useSelector(state => state.wallet.isAdmin)
   const provider = useSelector(state => state.wallet.provider)
   const isLoaded = useSelector(state => state.wallet.isLoaded)
-  const [canCreateSales, setCanCreateSales] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const canCreateSales = useSelector(state => state.wallet.canCreateSales)
 
   useEffect(() => {
     rightChainId === '1' ? setChainName('Mainnet') : setChainName('Rinkeby');
-    getCanCreateSales()
-    isAddressAdmin()
   }, [address, currentChainId, isLoaded])
 
   const switchNetwork = async() =>
@@ -41,30 +37,6 @@ function Header(props) {
     }catch(err){
       // setIsNetworkConnectionError(true);
     }
-  }
-  const getCanCreateSales = async () => {
-    if (provider && address) {
-      const web3 = provider
-      const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
-      const canCreateSales = await saleFactoryContract.methods.saleCreators(address).call()
-      setCanCreateSales(canCreateSales)
-      return canCreateSales
-    }
-    setCanCreateSales(false)
-    return false
-  }
-  const isAddressAdmin = async () => {
-    if (provider && address) {
-      const web3 = provider
-      const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
-      const admin = await saleFactoryContract.methods.admin().call()
-      if(admin.toLowerCase() === address.toLowerCase()){
-        setIsAdmin(true)
-        return true
-      }
-    }
-    setIsAdmin(false)
-    return false
   }
   const goToTransaction = () =>{
     const url = "https://rinkeby.etherscan.io/tx/" + transactionHash

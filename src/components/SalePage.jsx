@@ -1,8 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import saleFactoryAbi from '../sale/Abi/SaleFactory.json'
-import Web3 from 'web3';
 function SalePage(props) {
     const { handleChange } = props;
     const [sale, setSale] = useState(null);
@@ -10,8 +8,9 @@ function SalePage(props) {
     const [outTokenAmount, setOutTokenAmount] = useState(null)
     const [addTokenAmount, setAddTokenAmount] = useState('')
     const [saleMutables, setSaleMutables] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false);
+    // const [isAdmin, setIsAdmin] = useState(false);
     const address = useSelector(state => state.wallet.address);
+    const isAdmin = useSelector(state => state.wallet.isAdmin);
     const currentChainId = useSelector(state => state.wallet.chainId);
     const isLoaded = useSelector(state => state.wallet.isLoaded)
     const setParams = async () => {
@@ -25,8 +24,6 @@ function SalePage(props) {
         if (!sale) {
             setParams()
         }
-        isAddressAdmin()
-
     }, [address, currentChainId, isLoaded])
     const timeConverter = (UNIX_timestamp) => {
         const a = new Date(UNIX_timestamp * 1000);
@@ -41,23 +38,10 @@ function SalePage(props) {
         return time;
     }
     const approveSaleButton = () => {
-        if(!saleMutables.approved && isAddressAdmin){
+        if(!saleMutables.approved && isAdmin){
             return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.approveSale() }}>Approve sale</button>
         }
     }
-    const isAddressAdmin = async () => {
-        if (window.ethereum && address) {
-          const web3 = new Web3(window.ethereum)
-          const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
-          const admin = await saleFactoryContract.methods.admin().call()
-          if(admin.toLowerCase() === address.toLowerCase()){
-            setIsAdmin(true)
-            return true
-          }
-        }
-        setIsAdmin(false)
-        return false
-      }
     const saleAction = () => {
         if(saleMutables.status === "Current"){
             return <div className="xs-trade-change xs-sale-trade">

@@ -10,6 +10,7 @@ import './style.css';
 import SalePage from "./components/SalePage";
 import CreateSalePage from "./components/CreateSalePage";
 import AdminPage from './components/AdminPage';
+import ConnectWalletModal from './layouts/ConnectWalletModal';
 
 function App() {
   const [page, setPage] = useState('projects');
@@ -23,6 +24,7 @@ function App() {
   
   return (
     <div className="App">
+      <ConnectWalletModal></ConnectWalletModal>
       <Header handleChange={handleChange}/>
       <div className="mtop135"></div>
       { page == 'projects' &&

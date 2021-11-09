@@ -1210,7 +1210,7 @@ select::-ms-expand {
 .xs-create-sale-button:disabled:hover{
     color:white;
 }
-.xs-create-sale-modal{
+.xs-modal-block{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1218,17 +1218,17 @@ select::-ms-expand {
     padding: 30px;
     background: rgba(37, 40, 51, 1);
 }
-.xs-create-sale-modal-text{
+.xs-modal-text{
     color:#FFFFFF;
     font-size: 14px;
 }
-.xs-create-sale-page-success-text {
+.xs-modal-header-text {
     color:#FFFFFF;
     font-weight: bold;
     font-size: 18px;
     margin-bottom: 20px;
 }
-.xs-create-sale-page-modal-button {
+.xs-modal-button {
     margin-top: 20px;
     width: 150px;
 }

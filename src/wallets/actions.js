@@ -70,12 +70,35 @@ export const checkCanCreateSales = async (web3, address, dispatch) => {
         dispatch(setCanCreateSales(false))
     }
 }
+export const checkConnection = async () => {
+
+    // Check if browser is running Metamask
+    let web3
+    if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+    } else if (window.web3) {
+        web3 = new Web3(window.web3.currentProvider);
+    };
+
+    // Check if User is already connected by retrieving the accounts
+    try{
+        let accounts = await web3.eth.getAccounts()
+        if(accounts.length > 0){
+            return true
+        }else{
+            return false
+        }
+    } catch (err){
+        return false
+    }
+}
 export const selectWallet = async (wallet, dispatch) => {
     switch (wallet) {
         case 'binanceWallet':
             break
         case 'metaMask':
             try {
+
                 await window.ethereum
                   .request({ method: "net_version" })
                   .then((netId) => {

@@ -189,19 +189,19 @@ function CreateSalePage(props) {
     const ModalWindow = (props) => {
         if(showSuccessModal){
         return (<div className="modal">
-          <div className="xs-block xs-create-sale-modal">
-              <div className='xs-create-sale-page-success-text mb20'>Success!</div>
-              <div className='xs-create-sale-modal-text'>A new sale has been created. It will appear on projects page when admin approves it.</div>
-              <button onClick={()=>{handleChange('projects')}} className='btn xs-create-sale-page-modal-button'>Go to projects page</button>
+          <div className="xs-block xs-modal-block">
+              <div className='xs-modal-header-text mb20'>Success!</div>
+              <div className='xs-modal-text'>A new sale has been created. It will appear on projects page when admin approves it.</div>
+              <button onClick={()=>{handleChange('projects')}} className='btn xs-modal-button'>Go to projects page</button>
        </div>
       </div>)
         }
         else if(showTransactionPendingModal){
            return(<div className="modal">
-          <div className="xs-block xs-create-sale-modal">
-              <div className='xs-create-sale-page-success-text mb20'>Transaction pending...</div>
-              <div className='xs-create-sale-modal-text'>A new sale will appear on projects page when transaction finishes and admin approves the sale.</div>
-              <button onClick={()=>{handleChange('projects')}} className='btn xs-create-sale-page-modal-button'>Go to projects page</button>
+          <div className="xs-block xs-modal-block">
+              <div className='xs-modal-header-text mb20'>Transaction pending...</div>
+              <div className='xs-modal-text'>A new sale will appear on projects page when transaction finishes and admin approves the sale.</div>
+              <button onClick={()=>{handleChange('projects')}} className='btn xs-modal-button'>Go to projects page</button>
        </div>
       </div>)
             }

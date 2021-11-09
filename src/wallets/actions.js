@@ -53,7 +53,7 @@ const checkIsAdmin = async (web3, address, dispatch) => {
         dispatch(setIsAdmin(false))
     }
 }
-const checkCanCreateSales = async (web3, address, dispatch) => {
+export const checkCanCreateSales = async (web3, address, dispatch) => {
     if(!address || !web3){
         dispatch(setCanCreateSales(false))
         return;

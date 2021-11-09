@@ -1,10 +1,13 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { SaleFactory } from '../sale/salefactory';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { checkCanCreateSales } from '../wallets/actions';
+
 import Web3 from "web3";
 function AdminPage(props) {
     const { handleChange } = props;
+    const dispatch = useDispatch();
     const [saleFactory, setSaleFactory] = useState(null)
     const [inputAddress, setInputAddress] = useState('')
     const [status, setStatus] =  useState(null)
@@ -40,6 +43,9 @@ function AdminPage(props) {
     const setSaleCreator = async (value) => {
         if(inputAddress!=='' && Web3.utils.isAddress(inputAddress.toLowerCase()) && saleFactory != null){
             await saleFactory.setSaleCreator(inputAddress, value)
+            if(address && provider && address.toLowerCase() === inputAddress.toLowerCase()){
+                await checkCanCreateSales(new Web3(provider), address, dispatch)
+            }
             setTransactionCompleted(!transactionCompleted)
         }
     }

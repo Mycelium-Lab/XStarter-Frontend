@@ -2,7 +2,6 @@ import React from 'react';
 import ProjectPageIDOs from '../layouts/ProjectPageIDOs';
 import { SaleProvider } from '../sale/saleprovider';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectWallet } from '../wallets/actions'
 import { useState, useEffect } from 'react';
 import saleFactoryAbi from '../sale/Abi/SaleFactory.json'
 import Web3 from "web3";
@@ -15,15 +14,15 @@ function ProjectPage(props) {
   const currentChainId = useSelector(state => state.wallet.chainId);
   const wallet = useSelector(state => state.wallet.address);
   const isLoaded = useSelector(state => state.wallet.isLoaded)
+  const provider = useSelector(state => state.wallet.provider)
   useEffect(() => {
-    if(!sales){
+    if(!sales && provider){
       setParams()
     }
-    selectWallet('metaMask', dispatch);
-  }, [wallet, currentChainId,isLoaded])
+  }, [wallet, currentChainId,isLoaded, provider])
   const setParams = async () => {
     await getAdminFromContract();
-    const saleProvider = await SaleProvider.create()
+    const saleProvider = await SaleProvider.create(provider)
     const sales = await saleProvider.getSales();
     const [unapproved, current, upcoming, finished] = await saleProvider.splitByStatus(sales);
     setSales({unapproved, current, upcoming, finished})

@@ -6,7 +6,7 @@ import { contractMethods} from '../utils/Utils.js';
 
 const addProvider = (provider, provider_name, dispatch, address) => {
     window.web3 = new Web3(provider);
-    dispatch(setProvider(provider));
+    dispatch(setProvider(new Web3(provider)));
     //window.web3.enable();
     let methods = new contractMethods(window.web3, address);
     dispatch(setMethods(methods));

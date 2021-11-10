@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {SaleFactory} from "../sale/salefactory";
-
+import { useSelector } from 'react-redux';
 function CreateSalePage(props) {
     const { handleChange } = props;
     const [amountOfTiers, setAmountOfTiers] = useState(0);
@@ -19,8 +19,12 @@ function CreateSalePage(props) {
     const [numberOfTiersInputs, setNumberOfTiersInputs] = useState(1)
     const [showTransactionPendingModal, setShowTransactionPendingModal] = useState(false)
     const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const provider = useSelector(state => state.wallet.provider)
+    const address = useSelector(state => state.wallet.address)
+    const canCreateSales = useSelector(state => state.wallet.canCreateSales)
+    const isLoaded = useSelector(state => state.wallet.isLoaded)
     const setParams = async () => {
-        const saleFactory = await SaleFactory.create()
+        const saleFactory = await SaleFactory.create(provider, address)
         let amountOfTiers = await saleFactory.getAmountOfTiers()
         let newMaxTierValues = []
         for(let i = 0; i < parseInt(amountOfTiers); i++){
@@ -32,9 +36,21 @@ function CreateSalePage(props) {
 
     }
     useEffect(() => {
-        if(!saleFactory){
+        if (!saleFactory && isLoaded && provider && address) {
             setParams()
         }
+    }, [isLoaded])
+    useEffect(()=> {
+        if(!canCreateSales){
+            handleChange('projects')
+        }
+    }, [canCreateSales])
+    useEffect(()=> {
+        if(address && canCreateSales && saleFactory){
+            saleFactory.setAccountAddress(address)
+        }
+    }, [address])
+    useEffect(() => {
         changeButtonState()
         setInvisibleTiersToLast()
     }, [stateUpdated])
@@ -173,19 +189,19 @@ function CreateSalePage(props) {
     const ModalWindow = (props) => {
         if(showSuccessModal){
         return (<div className="modal">
-          <div className="xs-block xs-create-sale-modal">
-              <div className='xs-create-sale-page-success-text mb20'>Success!</div>
-              <div className='xs-create-sale-modal-text'>A new sale has been created. It will appear on projects page when admin approves it.</div>
-              <button onClick={()=>{handleChange('projects')}} className='btn xs-create-sale-page-modal-button'>Go to projects page</button>
+          <div className="xs-block xs-modal-block">
+              <div className='xs-modal-header-text mb20'>Success!</div>
+              <div className='xs-modal-text'>A new sale has been created. It will appear on projects page when admin approves it.</div>
+              <button onClick={()=>{handleChange('projects')}} className='btn xs-modal-button'>Go to projects page</button>
        </div>
       </div>)
         }
         else if(showTransactionPendingModal){
            return(<div className="modal">
-          <div className="xs-block xs-create-sale-modal">
-              <div className='xs-create-sale-page-success-text mb20'>Transaction pending...</div>
-              <div className='xs-create-sale-modal-text'>A new sale will appear on projects page when transaction finishes and admin approves the sale.</div>
-              <button onClick={()=>{handleChange('projects')}} className='btn xs-create-sale-page-modal-button'>Go to projects page</button>
+          <div className="xs-block xs-modal-block">
+              <div className='xs-modal-header-text mb20'>Transaction pending...</div>
+              <div className='xs-modal-text'>A new sale will appear on projects page when transaction finishes and admin approves the sale.</div>
+              <button onClick={()=>{handleChange('projects')}} className='btn xs-modal-button'>Go to projects page</button>
        </div>
       </div>)
             }

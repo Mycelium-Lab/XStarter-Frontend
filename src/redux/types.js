@@ -5,6 +5,8 @@ export const SET_PROVIDER = "SET_PROVIDER"
 export const SET_METHODS = "SET_METHODS"
 export const SET_ERROR = "SET_ERROR"
 export const SET_IS_LOADED = "SET_IS_LOADED"
+export const SET_IS_ADMIN = "SET_IS_ADMIN"
+export const SET_CAN_CREATE_SALES = "SET_CAN_CREATE_SALES"
 
 // INFO
 export const SET_USER = "SET_USER"

@@ -1,11 +1,11 @@
 import React from 'react';
 import logo from '../img/logo.png';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import Web3 from 'web3';
-import saleFactoryAbi from '../sale/Abi/SaleFactory.json'
+import { selectWallet } from '../wallets/actions';
 function Header(props) {
   const { handleChange } = props;
+  const dispatch = useDispatch();
   const [isWalletConnectionError, setIsWalletConnectionError] = useState(false);
   const [isLoadingState, setIsLoadinState] = useState(false);
   const [isNetworkConnectionError, setIsNetworkConnectionError] = useState(false);
@@ -15,15 +15,13 @@ function Header(props) {
   const transactionType = useSelector(state => state.transactionInfo.transactionInfo.type);
   const currentChainId = useSelector(state => state.wallet.chainId);
   const rightChainId = useSelector(state => state.wallet.correntChainId);
+  const isAdmin = useSelector(state => state.wallet.isAdmin)
   const provider = useSelector(state => state.wallet.provider)
   const isLoaded = useSelector(state => state.wallet.isLoaded)
-  const [canCreateSales, setCanCreateSales] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const canCreateSales = useSelector(state => state.wallet.canCreateSales)
 
   useEffect(() => {
     rightChainId === '1' ? setChainName('Mainnet') : setChainName('Rinkeby');
-    getCanCreateSales()
-    isAddressAdmin()
   }, [address, currentChainId, isLoaded])
 
   const switchNetwork = async() =>
@@ -39,30 +37,6 @@ function Header(props) {
     }catch(err){
       // setIsNetworkConnectionError(true);
     }
-  }
-  const getCanCreateSales = async () => {
-    if (window.ethereum && address) {
-      const web3 = new Web3(window.ethereum)
-      const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
-      const canCreateSales = await saleFactoryContract.methods.saleCreators(address).call()
-      setCanCreateSales(canCreateSales)
-      return canCreateSales
-    }
-    setCanCreateSales(false)
-    return false
-  }
-  const isAddressAdmin = async () => {
-    if (window.ethereum && address) {
-      const web3 = new Web3(window.ethereum)
-      const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
-      const admin = await saleFactoryContract.methods.admin().call()
-      if(admin.toLowerCase() === address.toLowerCase()){
-        setIsAdmin(true)
-        return true
-      }
-    }
-    setIsAdmin(false)
-    return false
   }
   const goToTransaction = () =>{
     const url = "https://rinkeby.etherscan.io/tx/" + transactionHash
@@ -92,16 +66,14 @@ function Header(props) {
         var button = <span className="xs-username" onClick={goToTransaction}>Withdrawing XST...</span>
       }
     }
-    else if((!address || !provider) && isLoaded)
+    else if(!address || !provider)
     {
-      var button = <span className="xs-username">Connect wallet</span>
+      var button = <span onClick={async () => {await selectWallet('metaMask', dispatch)}} className="xs-username">Connect wallet</span>
     }
     else if(currentChainId !== rightChainId && !!address && isLoaded)
     {
       var button =<span className="xs-username" onClick={switchNetwork}>Switch to {chainName}</span>
-    }
-    else
-    {
+    }else{
       var button = <span className="xs-username">{`${address.slice(0,6)}...${address.slice(-4)}`}</span>
     }
     return (

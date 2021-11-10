@@ -7,24 +7,14 @@ import TradePage from './components/TradePage.jsx';
 import './App.css';
 import './style.css';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { selectWallet } from './wallets/actions';
 import SalePage from "./components/SalePage";
 import CreateSalePage from "./components/CreateSalePage";
 import AdminPage from './components/AdminPage';
+import ConnectWalletModal from './layouts/ConnectWalletModal';
 
 function App() {
   const [page, setPage] = useState('projects');
   const [pageProps, setPageProps] = useState({});
-  const dispatch = useDispatch();
-  const currentChainId = useSelector(state => state.wallet.chainId);
-  const wallet = useSelector(state => state.wallet.address);
-  const isLoaded = useSelector(state => state.wallet.isLoaded)
-
-  useEffect(() => {
-    selectWallet('metaMask', dispatch);
-  }, [wallet, currentChainId, isLoaded])
-
   function handleChange(page, pageProps = {}){
     setPage(page);
     if(pageProps){
@@ -34,6 +24,7 @@ function App() {
   
   return (
     <div className="App">
+      <ConnectWalletModal></ConnectWalletModal>
       <Header handleChange={handleChange}/>
       <div className="mtop135"></div>
       { page == 'projects' &&

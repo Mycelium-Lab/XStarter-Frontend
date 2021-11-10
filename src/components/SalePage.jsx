@@ -1,8 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import saleFactoryAbi from '../sale/Abi/SaleFactory.json'
-import Web3 from 'web3';
 function SalePage(props) {
     const { handleChange } = props;
     const [sale, setSale] = useState(null);
@@ -10,10 +8,11 @@ function SalePage(props) {
     const [outTokenAmount, setOutTokenAmount] = useState(null)
     const [addTokenAmount, setAddTokenAmount] = useState('')
     const [saleMutables, setSaleMutables] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false);
     const address = useSelector(state => state.wallet.address);
+    const isAdmin = useSelector(state => state.wallet.isAdmin);
     const currentChainId = useSelector(state => state.wallet.chainId);
     const isLoaded = useSelector(state => state.wallet.isLoaded)
+
     const setParams = async () => {
         if (props.sale) {
             const mutables = await props.sale.getMutables();
@@ -25,9 +24,12 @@ function SalePage(props) {
         if (!sale) {
             setParams()
         }
-        isAddressAdmin()
-
     }, [address, currentChainId, isLoaded])
+    useEffect(() => {
+        if(address && address !== '' && sale){
+            sale.setAccountAddress(address)
+        }
+    }, [address])
     const timeConverter = (UNIX_timestamp) => {
         const a = new Date(UNIX_timestamp * 1000);
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -41,23 +43,10 @@ function SalePage(props) {
         return time;
     }
     const approveSaleButton = () => {
-        if(!saleMutables.approved && isAddressAdmin){
-            return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.approveSale() }}>Approve sale</button>
+        if(!saleMutables.approved && isAdmin){
+            return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.approveSale(); setSaleMutables({...saleMutables, approved: true})}}>Approve sale</button>
         }
     }
-    const isAddressAdmin = async () => {
-        if (window.ethereum && address) {
-          const web3 = new Web3(window.ethereum)
-          const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
-          const admin = await saleFactoryContract.methods.admin().call()
-          if(admin.toLowerCase() === address.toLowerCase()){
-            setIsAdmin(true)
-            return true
-          }
-        }
-        setIsAdmin(false)
-        return false
-      }
     const saleAction = () => {
         if(saleMutables.status === "Current"){
             return <div className="xs-trade-change xs-sale-trade">
@@ -84,8 +73,8 @@ function SalePage(props) {
                             <div>Sale ended!</div>
                             <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawBoughtTokens() }}>Withdraw tokens</button>
                             {(() => {
-                                if(sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()) {
-                                    return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawSaleResult() }}>Withdraw sale result</button>
+                                if(sale.immutables.tokenCreator.toLowerCase() === address.toLowerCase()) {
+                                    return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawSaleResult() }}>Withdraw raised funds</button>
                                 }
                             })()}
                         </div>
@@ -94,20 +83,20 @@ function SalePage(props) {
                             <div>Sale failed!</div>
                             <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawFunds() }}>Withdraw funds</button>
                             {(() => {
-                                if(sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()) {
-                                    return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawSaleResult() }}>Withdraw sale result</button>
+                                if(sale.immutables.tokenCreator.toLowerCase() === address.toLowerCase()) {
+                                    return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawSaleResult() }}>Withdraw unsold tokens</button>
                                 }
                             })()}
                         </div>
             }
         }else if(saleMutables.status === "Upcoming"){
-            if(sale.immutables.tokenCreator.toLowerCase() === sale.account.toLowerCase()){
+            if(sale.immutables.tokenCreator.toLowerCase() === address.toLowerCase()){
                 return <div className="xs-trade-change xs-sale-trade">
                             <div className="xs-sale-start-text">Sale will start soon...</div>
                             
                              <input onChange={async (e) => { await changeAddTokenAmount(e); }} type="tel" placeholder={0.0} value={addTokenAmount} />
                         
-                            <button className="btn xs-trade-action-btn" onClick={async () => { await sale.addTokensForSale(addTokenAmount) }}>Add tokens for sale</button>
+                            <button className="btn xs-trade-action-btn" onClick={async () => { await sale.addTokensForSale(addTokenAmount); const newHardcap = await sale.getHardcap(); setSaleMutables({...saleMutables, hardcap: newHardcap}) }}>Add tokens for sale</button>
                             {approveSaleButton()}
                         </div>
             }else {

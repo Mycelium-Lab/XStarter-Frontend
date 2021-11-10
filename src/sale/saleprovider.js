@@ -3,29 +3,31 @@ import saleFactoryAbi from "./Abi/SaleFactory.json"
 import {Sale} from './sale'
 
 export class SaleProvider {
-    async initialize() {
-        if (window.ethereum && ((window).ethereum.isMetaMask === true)) {
-            this.web3 = new Web3(window.ethereum)
-            let accounts = await window.ethereum.request({method: 'eth_requestAccounts'})
-            this.web3.eth.defaultAccount = accounts[0]
-            this.account = accounts[0]
+    async initialize(provider, address) {
+        if (provider && address) {
+            this.web3 = new Web3(provider)
+            this.provider = provider
+            this.web3.eth.defaultAccount = address
+            this.account = address
             this.saleFactory = new this.web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
         }
     }
 
-    static async create() {
+    static async create(provider, address) {
         const obj = new SaleProvider()
-        await obj.initialize()
+        await obj.initialize(provider, address)
         return obj
     }
-
+    setAccountAddress (accountAddress) {
+        this.account = accountAddress
+    }
     async getSales() {
         const salesCreatedEvents = await this.saleFactory.getPastEvents('saleCreated', {
             fromBlock: 0,
             toBlock: 'latest'
         })
         const saleAddresses = salesCreatedEvents.map(event => event.returnValues.saleAddress)
-        const saleCreationPromises = saleAddresses.map(saleAddress => Sale.create(saleAddress))
+        const saleCreationPromises = saleAddresses.map(saleAddress => Sale.create(saleAddress, this.provider, this.account))
         return Promise.all(saleCreationPromises)
     }
 

@@ -3,18 +3,17 @@ import erc20Abi from './Abi/Erc20.json'
 import saleAbi from "../sale/Abi/Sale.json"
 import { toBaseUnit } from '../utils/toBaseUnit'
 export class Sale {
-    static async create(saleAddress) {
+    static async create(saleAddress, provider, address) {
         const obj = new Sale()
-        await obj.initialize(saleAddress)
+        await obj.initialize(saleAddress, provider, address)
         return obj
     }
 
-    async initialize(saleAddress) {
-        if (window.ethereum && ((window).ethereum.isMetaMask === true)) {
-            this.web3 = new Web3(window.ethereum)
-            let accounts = await window.ethereum.request({method: 'eth_requestAccounts'})
-            this.web3.eth.defaultAccount = accounts[0]
-            this.account = accounts[0]
+    async initialize(saleAddress, provider, address) {
+        if (provider && address) {
+            this.web3 = new Web3(provider)
+            this.web3.eth.defaultAccount = address
+            this.account = address
             this.saleContract = new this.web3.eth.Contract(saleAbi, saleAddress)
             this.immutables = await this.initializeImmutables()
             this.status = await this.getStatus()
@@ -61,7 +60,9 @@ export class Sale {
             decimals
         }
     }
-
+    setAccountAddress (accountAddress) {
+        this.account = accountAddress
+    }
     getSaleImmutables() {
         return this.immutables
     }
@@ -151,7 +152,7 @@ export class Sale {
         return allowanceBN.gte(amountBN)
     }
     async changePrice(newPrice) {
-        return this.saleContract.methods.changePrice(newPrice).send()
+        return this.saleContract.methods.changePrice(newPrice).send({from: this.account})
     }
 
     async withdrawFunds() {

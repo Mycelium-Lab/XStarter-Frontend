@@ -908,6 +908,14 @@ select::-ms-expand {
     width: 70px;
     top: 7px;
 }
+.xs-sale-add-tokens-text {
+    text-align: left;
+    margin-bottom: 10px;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    color: #FFFFFF;
+}
 @media (max-width: 768px) {
     .xs-body-trade .xs-block {
         width: 100%;
@@ -1046,6 +1054,7 @@ select::-ms-expand {
 }
 .xs-sale-start-text{
     margin-bottom: 20px;
+    font-weight: bold;
 }
 .xs-sale-trade {
     width: 100%;

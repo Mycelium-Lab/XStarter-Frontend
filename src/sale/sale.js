@@ -134,15 +134,14 @@ export class Sale {
         return this.precisionRound(parseInt(tokenAmount)*parseFloat(price), 12);
     }
 
-    async addTokensForSale(amount) {
-        const erc20Contract = new this.web3.eth.Contract(erc20Abi, this.immutables.tokenAddress)
+    async approveTokens(amount) {
         const amountWithDecimals = toBaseUnit(amount, this.immutables.decimals, Web3.utils.BN).toString()
-        
-        const isEnoughAllowance = await this.isEnoughAllowance(amountWithDecimals)
-        if(!isEnoughAllowance) {
-            await erc20Contract.methods.approve(this.saleContract.options.address, amountWithDecimals).send({from: this.account})
-        }
-        await this.saleContract.methods.addTokensForSale(amountWithDecimals).send({from: this.account})
+        const erc20Contract = new this.web3.eth.Contract(erc20Abi, this.immutables.tokenAddress)
+        await erc20Contract.methods.approve(this.saleContract.options.address, amountWithDecimals).send({from: this.account})
+    }
+    async addTokensForSale(amount) {
+        const amountWithDecimals = toBaseUnit(amount, this.immutables.decimals, Web3.utils.BN).toString()
+        return this.saleContract.methods.addTokensForSale(amountWithDecimals).send({from: this.account})
     }
     async isEnoughAllowance(amount){
         const tokenContract = new this.web3.eth.Contract(erc20Abi, this.immutables.tokenAddress);

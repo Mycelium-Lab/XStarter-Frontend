@@ -6,7 +6,6 @@ function SalePage(props) {
     const [sale, setSale] = useState(null);
     const [inTokenAmount, setInTokenAmount] = useState(null)
     const [outTokenAmount, setOutTokenAmount] = useState(null)
-    const [addTokenAmount, setAddTokenAmount] = useState('')
     const [saleMutables, setSaleMutables] = useState(null);
     const address = useSelector(state => state.wallet.address);
     const isAdmin = useSelector(state => state.wallet.isAdmin);
@@ -46,6 +45,63 @@ function SalePage(props) {
         if(!saleMutables.approved && isAdmin){
             return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.approveSale(); setSaleMutables({...saleMutables, approved: true})}}>Approve sale</button>
         }
+    }
+    const AddTokens = (props) => {
+        const [isEnoughAllowance,setIsEnoughAllowance] = useState(false)
+        const [updateButtonState, setUpdateButtonState] = useState(false)
+        const [addTokenAmount, setAddTokenAmount] = useState('')
+        const [isEnoughAllowanceLoading, setIsEnoughAllowanceLoading] = useState(false)
+        useEffect(() => {
+            checkIsEnoughAllowance()
+        }, [addTokenAmount, updateButtonState])
+        const checkIsEnoughAllowance = async () => {
+            if(!(addTokenAmount === '' || /^[0]+$/.test(addTokenAmount))){
+                setIsEnoughAllowanceLoading(true)
+                const isEnoughAllowance = await sale.isEnoughAllowance(addTokenAmount)
+                if(!isEnoughAllowance) {
+                    setIsEnoughAllowance(false)
+                }else{
+                    setIsEnoughAllowance(true)
+                }
+                setIsEnoughAllowanceLoading(false)
+            }
+        }
+        const addTokens = async () => {
+            if(isEnoughAllowance){
+                await sale.addTokensForSale(addTokenAmount)
+                const newHardcap = await sale.getHardcap()
+                setSaleMutables({...saleMutables, hardcap: newHardcap})
+                setAddTokenAmount('')
+            }
+        }
+        const approveTokens = async () => {
+            await sale.approveTokens(addTokenAmount)
+            setUpdateButtonState(!updateButtonState)
+        }
+        const changeAddTokenAmount = async (onChangeEvent) => {
+            if (onChangeEvent.target.value === '') {
+                setAddTokenAmount('')
+            } else if (/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value)){
+                setAddTokenAmount(onChangeEvent.target.value)
+            }
+        }
+        const addTokensButton = () => {
+            if(addTokenAmount === '' || /^[0]+$/.test(addTokenAmount)){
+                return <button className="btn xs-trade-action-btn">Enter an amount</button>
+            } else if (isEnoughAllowanceLoading){
+                return <button className="btn xs-trade-action-btn">Loading...</button>
+            }
+            else if(isEnoughAllowance){
+                return <button className="btn xs-trade-action-btn" onClick={async () => { await addTokens() }}>Add tokens for sale</button>
+            } else{
+                return <button className="btn xs-trade-action-btn" onClick={async () => { await approveTokens() }}>Approve</button>
+            }
+        }
+        return (<>
+            <div className="xs-sale-add-tokens-text">Add tokens for sale:</div>
+            <input onChange={async (e) => { await changeAddTokenAmount(e); }} type="tel" placeholder={0.0} value={addTokenAmount} />
+            {addTokensButton()}
+            </>)
     }
     const saleAction = () => {
         if(saleMutables.status === "Current"){
@@ -94,9 +150,7 @@ function SalePage(props) {
                 return <div className="xs-trade-change xs-sale-trade">
                             <div className="xs-sale-start-text">Sale will start soon...</div>
                             
-                             <input onChange={async (e) => { await changeAddTokenAmount(e); }} type="tel" placeholder={0.0} value={addTokenAmount} />
-                        
-                            <button className="btn xs-trade-action-btn" onClick={async () => { await sale.addTokensForSale(addTokenAmount); const newHardcap = await sale.getHardcap(); setSaleMutables({...saleMutables, hardcap: newHardcap}) }}>Add tokens for sale</button>
+                            <AddTokens></AddTokens>
                             {approveSaleButton()}
                         </div>
             }else {
@@ -127,13 +181,6 @@ function SalePage(props) {
             setInTokenAmount(eth)
         }
         
-    }
-    const changeAddTokenAmount = (onChangeEvent) => {
-        if (onChangeEvent.target.value === '') {
-            setAddTokenAmount('')
-        } else if (/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(onChangeEvent.target.value)){
-            setAddTokenAmount(onChangeEvent.target.value)
-        }
     }
     if (saleMutables && sale) {
         return (

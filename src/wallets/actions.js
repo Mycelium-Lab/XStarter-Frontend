@@ -70,7 +70,7 @@ export const checkCanCreateSales = async (web3, address, dispatch) => {
         dispatch(setCanCreateSales(false))
     }
 }
-export const checkConnection = async () => {
+export const checkConnection = async (dispatch) => {
 
     // Check if browser is running Metamask
     let web3
@@ -84,6 +84,14 @@ export const checkConnection = async () => {
     try{
         let accounts = await web3.eth.getAccounts()
         if(accounts.length > 0){
+            dispatch(setAddress(accounts[0]))
+            const netId = await web3.eth.net.getId()
+            dispatch(setChainId(netId.toString()))
+            addProvider(window.ethereum, 'metaMask', dispatch, accounts[0])
+            await checkIsAdmin(new Web3(window.ethereum), accounts[0], dispatch)
+            await checkCanCreateSales(new Web3(window.ethereum), accounts[0], dispatch)
+            addProviderListeners(window.ethereum, dispatch)
+            dispatch(setIsLoaded(true));
             return true
         }else{
             return false

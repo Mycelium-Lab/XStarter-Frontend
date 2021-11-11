@@ -2,6 +2,7 @@ import React from 'react';
 import logo from '../img/logo.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
+
 import { checkConnection, selectWallet } from '../wallets/actions';
 const ConnectWalletModal = (props) => {
     const {handleChange} = props
@@ -17,16 +18,17 @@ const ConnectWalletModal = (props) => {
         }
     },[address, isLoaded, provider])
     const setupConnection = async () => {
-        const isConnected = await checkConnection();
+        const isConnected = await checkConnection(dispatch);
         if(isConnected){
-            await selectWallet('metaMask', dispatch)
             setConnected(true)
         }else{
             setConnected(false)
         }
         setPageLoaded(true)
     }
-    setupConnection()
+    useEffect(()=> {
+        setupConnection()
+    },[])
     const connectToWallet = async () => {
         if(!isLoaded || !provider || !address){
             await selectWallet('metaMask', dispatch)

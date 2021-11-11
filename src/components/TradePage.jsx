@@ -37,7 +37,7 @@ function TradePage(props) {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!swapProvider && !!wallet && currentChainId === rightChainId) {
+    if (!swapProvider && !!wallet && provider && currentChainId === rightChainId) {
       setParams()
     }
     else if(!!wallet && currentChainId === rightChainId)
@@ -64,7 +64,7 @@ function TradePage(props) {
   }
 
   const setParams = async () => {
-    const swapProvider = await SwapProvider.create();
+    const swapProvider = await SwapProvider.create(provider, wallet);
     setSwapProvider(swapProvider);
     const token0Balance = await swapProvider.getTokenBalance(token0, token0Symbol);
     const token1Balance = await swapProvider.getTokenBalance(token1, token1Symbol);

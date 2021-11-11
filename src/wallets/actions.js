@@ -19,11 +19,11 @@ const addProviderListeners = (provider, dispatch) => {
     provider.on("accountsChanged", async (accounts) => {
         dispatch(setIsLoaded(true));
         dispatch(setAddress(accounts[0]))
-        await checkIsAdmin(new Web3(provider), accounts[0], dispatch)
-        await checkCanCreateSales(new Web3(provider), accounts[0], dispatch)
+        await checkIsAdmin(provider, accounts[0], dispatch)
+        await checkCanCreateSales(provider, accounts[0], dispatch)
     })
 
-    provider.on("chainChanged", (chainId) => {
+    provider.on("chainChanged", async (chainId) => {
         let convertedChainId
         if (provider.isWalletConnect) {
             convertedChainId = parseInt(chainId).toString()
@@ -36,12 +36,13 @@ const addProviderListeners = (provider, dispatch) => {
     })
     provider.on("disconnect", (code, reason) => {})
 }
-const checkIsAdmin = async (web3, address, dispatch) => {
-    if(!address || !web3){
+export const checkIsAdmin = async (provider, address, dispatch) => {
+    if(!address || !provider){
         dispatch(setIsAdmin(false))
         return;
     }
     try{
+        const web3 = new Web3(provider)
         const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
         const adminAddress = await saleFactoryContract.methods.admin().call()
         if(adminAddress.toLowerCase() === address.toLowerCase()){
@@ -53,12 +54,13 @@ const checkIsAdmin = async (web3, address, dispatch) => {
         dispatch(setIsAdmin(false))
     }
 }
-export const checkCanCreateSales = async (web3, address, dispatch) => {
-    if(!address || !web3){
+export const checkCanCreateSales = async (provider, address, dispatch) => {
+    if(!address || !provider){
         dispatch(setCanCreateSales(false))
         return;
     }
     try{
+        const web3 = new Web3(provider)
         const saleFactoryContract = new web3.eth.Contract(saleFactoryAbi, process.env.REACT_APP_SALE_FACTORY_ADDRESS)
         const canCreateSales = await saleFactoryContract.methods.saleCreators(address).call()
         if(canCreateSales){
@@ -88,8 +90,8 @@ export const checkConnection = async (dispatch) => {
             const netId = await web3.eth.net.getId()
             dispatch(setChainId(netId.toString()))
             addProvider(window.ethereum, 'metaMask', dispatch, accounts[0])
-            await checkIsAdmin(new Web3(window.ethereum), accounts[0], dispatch)
-            await checkCanCreateSales(new Web3(window.ethereum), accounts[0], dispatch)
+            await checkIsAdmin(window.ethereum, accounts[0], dispatch)
+            await checkCanCreateSales(window.ethereum, accounts[0], dispatch)
             addProviderListeners(window.ethereum, dispatch)
             dispatch(setIsLoaded(true));
             return true
@@ -115,8 +117,8 @@ export const selectWallet = async (wallet, dispatch) => {
                 const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
                 dispatch(setAddress(accounts[0]))
                 addProvider(window.ethereum, 'metaMask', dispatch, accounts[0])
-                await checkIsAdmin(new Web3(window.ethereum), accounts[0], dispatch)
-                await checkCanCreateSales(new Web3(window.ethereum), accounts[0], dispatch)
+                await checkIsAdmin(window.ethereum, accounts[0], dispatch)
+                await checkCanCreateSales(window.ethereum, accounts[0], dispatch)
                 addProviderListeners(window.ethereum, dispatch)
                 dispatch(setIsLoaded(true));
               } catch (err) {

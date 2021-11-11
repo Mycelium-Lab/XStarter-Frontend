@@ -11,6 +11,7 @@ import SalePage from "./components/SalePage";
 import CreateSalePage from "./components/CreateSalePage";
 import AdminPage from './components/AdminPage';
 import ConnectWalletModal from './layouts/ConnectWalletModal';
+import ChangeNetworkModal from './layouts/ChangeNetworkModal';
 
 function App() {
   const [page, setPage] = useState('projects');
@@ -25,6 +26,7 @@ function App() {
   return (
     <div className="App">
       <ConnectWalletModal></ConnectWalletModal>
+      <ChangeNetworkModal></ChangeNetworkModal>
       <Header handleChange={handleChange}/>
       <div className="mtop135"></div>
       { page == 'projects' &&

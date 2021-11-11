@@ -1,11 +1,9 @@
 import React from 'react';
-import logo from '../img/logo.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 
 import { checkConnection, selectWallet } from '../wallets/actions';
 const ConnectWalletModal = (props) => {
-    const {handleChange} = props
     const isLoaded = useSelector(state => state.wallet.isLoaded)
     const provider =  useSelector(state => state.wallet.provider)
     const address =  useSelector(state => state.wallet.address)

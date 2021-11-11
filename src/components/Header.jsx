@@ -96,11 +96,11 @@ function Header(props) {
                   <li><button className="nav-link" onClick={()=>handleChange('staking')}>Staking</button></li>
                   <li><button className="nav-link" onClick={()=>handleChange('trade')}>Trade XS</button></li>
                   {
-                    isAdmin &&
+                    isAdmin && currentChainId === rightChainId &&
                     <li><button className="nav-link" onClick={()=>handleChange('admin')}>Admin</button></li>
                   }
                   {
-                    canCreateSales &&
+                    canCreateSales && currentChainId === rightChainId  &&
                     <li><button className="nav-link" onClick={()=>handleChange('createsale')}>Create Sale</button></li>
                   }
                   

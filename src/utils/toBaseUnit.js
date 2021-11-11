@@ -6,10 +6,6 @@ function isString(s) {
     if (!isString(value)) {
       throw new Error('Pass strings to prevent floating point precision issues.')
     }
-    // console.log(decimals)
-    if(decimals === '0' || decimals === 0){
-      return new BN(value)
-    }
     const ten = new BN(10);
     const base = ten.pow(new BN(decimals));
   
@@ -34,7 +30,7 @@ function isString(s) {
     if (!whole) { whole = '0'; }
     if (!fraction) { fraction = '0'; }
     if (fraction.length > decimals) { 
-      throw new Error('Too many decimal places'); 
+      fraction = fraction.slice(0, decimals)
     }
   
     while (fraction.length < decimals) {
@@ -42,12 +38,14 @@ function isString(s) {
     }
   
     whole = new BN(whole);
-    fraction = new BN(fraction);
-    let wei = (whole.mul(base)).add(fraction);
-  
+    let wei = whole.mul(base)
+    if(fraction !== ''){
+      fraction = new BN(fraction);
+      wei = wei.add(fraction)
+    }
     if (negative) {
       wei = wei.neg();
     }
-  
-    return new BN(wei.toString(10), 10);
+    
+        return new BN(wei.toString(10), 10);
   }

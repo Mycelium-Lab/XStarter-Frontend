@@ -11,11 +11,23 @@ function ProjectPage(props) {
   const isLoaded = useSelector(state => state.wallet.isLoaded)
   const isAdmin = useSelector(state => state.wallet.isAdmin)
   const provider = useSelector(state => state.wallet.provider)
+  const rightChainId = useSelector(state => state.wallet.correntChainId);
   useEffect(() => {
-    if(!sales && provider){
+    if(!sales && provider && isLoaded && rightChainId === currentChainId){
       setParams()
+    } else if(rightChainId !== currentChainId && isLoaded){
+      setSales(null)
     }
-  }, [wallet, currentChainId,isLoaded, provider])
+  }, [currentChainId, rightChainId, provider, isLoaded])
+  useEffect( () => {
+    if(sales && wallet){
+        Object.keys(sales).forEach((saleType) => {
+          sales[saleType].forEach((sale) => {
+            sale.setAccountAddress(wallet)
+          })
+        })
+    }
+  }, [wallet])
   const setParams = async () => {
     const saleProvider = await SaleProvider.create(provider, wallet)
     const sales = await saleProvider.getSales();
@@ -37,7 +49,34 @@ function ProjectPage(props) {
       </div>
       );
   }else{
-    return (<div className="xs-body-projects"></div>)
+    return (
+      <div className="xs-body-projects">
+          <div className="xs-current-ido mb100">
+                <div className="xs-ido">
+                Current IDOs
+                </div>
+                <div className="xs-ido-noupcoming">
+                    There is no current IDOs yet. Stay tuned
+                </div>
+            </div>
+            <div className="xs-current-ido mb100">
+                <div className="xs-ido">
+                Upcoming IDOs
+                </div>
+                <div className="xs-ido-noupcoming">
+                    There is no upcoming IDOs yet. Stay tuned
+                </div>
+            </div>
+            <div className="xs-current-ido mb100">
+                <div className="xs-ido">
+                Finished IDOs
+                </div>
+                <div className="xs-ido-noupcoming">
+                    There is no finished IDOs yet. Stay tuned
+                </div>
+            </div>
+      </div>
+      );
   }
 
 }

@@ -44,7 +44,7 @@ function AdminPage(props) {
         if(inputAddress!=='' && Web3.utils.isAddress(inputAddress.toLowerCase()) && saleFactory != null){
             await saleFactory.setSaleCreator(inputAddress, value)
             if(address && provider && address.toLowerCase() === inputAddress.toLowerCase()){
-                await checkCanCreateSales(new Web3(provider), address, dispatch)
+                await checkCanCreateSales(provider, address, dispatch)
             }
             setTransactionCompleted(!transactionCompleted)
         }

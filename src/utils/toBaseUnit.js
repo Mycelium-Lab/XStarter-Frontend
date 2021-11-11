@@ -6,6 +6,10 @@ function isString(s) {
     if (!isString(value)) {
       throw new Error('Pass strings to prevent floating point precision issues.')
     }
+    // console.log(decimals)
+    if(decimals === '0' || decimals === 0){
+      return new BN(value)
+    }
     const ten = new BN(10);
     const base = ten.pow(new BN(decimals));
   

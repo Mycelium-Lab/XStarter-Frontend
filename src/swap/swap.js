@@ -16,21 +16,20 @@ const feeAmount = FeeAmount.MEDIUM
 
 export class SwapProvider {
   
-  async initialize() {
-    if (window.ethereum && ((window).ethereum.isMetaMask === true)) {
-      this.web3 = new Web3(window.ethereum)
-      let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-      this.web3.eth.defaultAccount = accounts[0]
-      this.account = accounts[0]
+  async initialize(provider, address) {
+    if (provider && address) {
+      this.web3 = new Web3(provider)
+      this.web3.eth.defaultAccount = address
+      this.account = address
       this.immutables = await this.getPoolImmutables();
       [this.liquidity, this.slot] = await this.getPoolState();
       this.pool = await this.setupPool();
       this.INTERFACE = new Interface(swapRouterAbi)
     }
   }
-  static async create() {
+  static async create(provider, address) {
     const obj = new SwapProvider()
-    await obj.initialize()
+    await obj.initialize(provider, address)
     return obj
   }
   async getPoolImmutables() {

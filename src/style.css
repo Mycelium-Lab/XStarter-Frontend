@@ -321,6 +321,8 @@ nav ul li button:focus::after {
     margin-right: 30px;
 }
 .xs-block-top-img img {
+    height: 50px;
+    width: 50px;
     border-radius: 50%;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;

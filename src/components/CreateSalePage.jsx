@@ -311,6 +311,19 @@ function CreateSalePage(props) {
                                 setSocialsKey(onChangeEvent.target.value, 'telegram')
                             }}/>
                         </div>
+                        <div className="xs-create-sale-input">
+                            <div className="xs-create-sale-text">Logo URL</div>
+                            <input type="text" onChange={(onChangeEvent)=> {
+                                let newSocials = socials;
+                                if (onChangeEvent.target.value === '') {
+                                    delete newSocials.logo
+                                } else{
+                                    newSocials.logo = onChangeEvent.target.value
+                                }
+                                setSocials(newSocials)
+                                setStateUpdated(!stateUpdated)
+                            }}/>
+                        </div>
                     </div>
                 </div>
                 <button onClick={async () => {await createNewSale()}} className="btn xs-create-sale-button" disabled={!buttonActive}>Save</button>

@@ -17,8 +17,10 @@ function CreateSalePage(props) {
     const [buttonActive, setButtonActive] = useState(false);
     const [stateUpdated, setStateUpdated] = useState(false)
     const [numberOfTiersInputs, setNumberOfTiersInputs] = useState(1)
+    const [previewImage, setPreviewImage] = useState(null)
     const [showTransactionPendingModal, setShowTransactionPendingModal] = useState(false)
     const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const [isLogoCorrect, setIsLogoCorrect] = useState(true);
     const provider = useSelector(state => state.wallet.provider)
     const address = useSelector(state => state.wallet.address)
     const canCreateSales = useSelector(state => state.wallet.canCreateSales)
@@ -61,8 +63,8 @@ function CreateSalePage(props) {
             setShowTransactionPendingModal(true)
             await saleFactory.createNewSale(
                 tokenName,
-                tokenAddress,
-                tokenCreatorAddress,
+                tokenAddress.trim(),
+                tokenCreatorAddress.trim(),
                 softcap,
                 maxTierValues,
                 dateToTimestamp(saleStartDate),
@@ -82,7 +84,7 @@ function CreateSalePage(props) {
     }
     const changeButtonState = () => {
         //console.log(tokenName, tokenAddress, tokenCreatorAddress, softcap, saleStartDate, saleEndDate, price, description
-        if(tokenName!=='' && tokenAddress !=='' && tokenCreatorAddress !== '' && softcap !== '' && saleStartDate !== '' && saleEndDate !== '' && price !== ''){
+        if(tokenName!=='' && tokenAddress !=='' && tokenCreatorAddress !== '' && softcap !== '' && saleStartDate !== '' && saleEndDate !== '' && price !== '' && isLogoCorrect){
             setButtonActive(true)
         }else{
             setButtonActive(false)
@@ -209,6 +211,15 @@ function CreateSalePage(props) {
             return(<></>)
         }
     }
+    const previewImageFunc = () => {
+        if(isLogoCorrect && socials.logo && socials.logo !== ''){
+            return <img className='xs-create-sale-preview-img' onError={()=> {setIsLogoCorrect(false)}} src={socials.logo} alt=''></img>
+        } else if(!socials.logo || socials.logo === ''){
+           return null;
+        } else {
+            return <div className="xs-create-sale-preview-error-text">Can't load preview... Please, check if your link is correct.</div>
+        }
+    }
     return (<>
         <ModalWindow></ModalWindow>
         <div className="xs-body-create-sale">
@@ -294,35 +305,53 @@ function CreateSalePage(props) {
                             }}/>
                         </div>
                         <div className="xs-create-sale-input">
-                            <div className="xs-create-sale-text">Medium</div>
+                        <div className="xs-create-sale-social">
+                                <div className="xs-create-sale-social-text">medium.com/</div>
                             <input type="text" onChange={(onChangeEvent)=> {
                                 setSocialsKey(onChangeEvent.target.value, 'medium')
                             }}/>
+                            </div>
                         </div>
                         <div className="xs-create-sale-input">
-                            <div className="xs-create-sale-text">Twitter</div>
-                            <input type="text" onChange={(onChangeEvent)=> {
-                                setSocialsKey(onChangeEvent.target.value, 'twitter')
-                            }}/>
+                        
+                            <div className="xs-create-sale-social">
+                                <div className="xs-create-sale-social-text">twitter.com/</div>
+                                <input type="text" onChange={(onChangeEvent)=> {
+                                    setSocialsKey(onChangeEvent.target.value, 'twitter')
+                                }}/>
+                            </div>
                         </div>
                         <div className="xs-create-sale-input">
-                            <div className="xs-create-sale-text">Telegram</div>
-                            <input type="text" onChange={(onChangeEvent)=> {
-                                setSocialsKey(onChangeEvent.target.value, 'telegram')
-                            }}/>
+                            <div className="xs-create-sale-social">
+                                <div className="xs-create-sale-social-text">t.me/</div>
+                                <input type="text" onChange={(onChangeEvent)=> {
+                                    setSocialsKey(onChangeEvent.target.value, 'telegram')
+                                }}/>
+                            </div>
                         </div>
                         <div className="xs-create-sale-input">
                             <div className="xs-create-sale-text">Logo URL</div>
                             <input type="text" onChange={(onChangeEvent)=> {
+                                const errorText = <div className="xs-create-sale-preview-error-text">Can't load preview... Please, check if your link is correct.</div>
+                                const urlRegex = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
                                 let newSocials = socials;
                                 if (onChangeEvent.target.value === '') {
                                     delete newSocials.logo
-                                } else{
+                                    //setPreviewImage(null)
+                                    setIsLogoCorrect(true)
+                                    setPreviewImage(null)
+                                } else if(urlRegex.test(onChangeEvent.target.value)){
                                     newSocials.logo = onChangeEvent.target.value
+                                    setIsLogoCorrect(true)
+                                    setPreviewImage(<img className='xs-create-sale-preview-img' onError={()=> {setIsLogoCorrect(false); setPreviewImage(errorText)}} src={onChangeEvent.target.value} alt=''></img>)
+                                } else {
+                                    setIsLogoCorrect(false)
+                                    setPreviewImage(errorText)
                                 }
                                 setSocials(newSocials)
                                 setStateUpdated(!stateUpdated)
                             }}/>
+                            {previewImageFunc()}
                         </div>
                     </div>
                 </div>

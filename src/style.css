@@ -1181,7 +1181,7 @@ select::-ms-expand {
     width: 100%;
 }
 .xs-create-sale-social input{
-    max-width: 150px;
+    max-width: 50%;
 }
 .xs-create-sale-input input::placeholder{
     color:#808080;
@@ -1208,6 +1208,12 @@ select::-ms-expand {
 .xs-create-sale-tier-input{
     display: flex; 
     flex-direction: row;
+}
+.xs-create-sale-error-text{
+    color: #ffb6c1;
+    text-align: left;
+    font-style: normal;
+    font-size: 14px;
 }
 .xs-create-sale-delete-tier-button{
     border: none;

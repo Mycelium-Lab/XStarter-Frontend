@@ -42,6 +42,13 @@ function ProjectPageIDOs(props) {
             return <div className="ido-status-desc mb30">{sale.immutables.description.text}</div>
         }
     }
+    const topImage = (sale) => {
+        if(sale && sale.immutables.description.logo) {
+            return <img src={sale.immutables.description.logo} alt="" />
+        }else{
+            return <img src={topblockimg} alt="" />
+        }
+    }
     const socialLinks = (sale) => {
         if (sale) {
             let socialLinks = [];
@@ -74,7 +81,7 @@ function ProjectPageIDOs(props) {
                 <div key={"sale" + props.title + i} className="xs-block">
                     <div className="xs-block-top">
                         <div className="xs-block-top-img">
-                            <img src={topblockimg} alt="" />
+                        {topImage(sales[i])}
                         </div>
                         <div className="xs-block-top-content">
                             <span onClick={() => handleChange('sale', sales[i])} className="xs-top-block-name">{sales[i].immutables.tokenName}</span>

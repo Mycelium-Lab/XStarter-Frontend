@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {SaleFactory} from "../sale/salefactory";
 import { useSelector } from 'react-redux';
+import Web3 from "web3";
 function CreateSalePage(props) {
     const { handleChange } = props;
     const [amountOfTiers, setAmountOfTiers] = useState(0);
@@ -8,7 +9,12 @@ function CreateSalePage(props) {
     const [softcap, setSoftcap] = useState('');
     const [maxTierValues, setMaxTierValues] = useState('');
     const [tokenAddress, setTokenAddress] = useState('');
+    const [logo, setLogo] = useState('')
     const [tokenCreatorAddress, setTokenCreatorAddress] = useState('');
+    const [tokenAddressError, setTokenAddressError] = useState(false);
+    const [tokenCreatorAddressError, setTokenCreatorAddressError] = useState(false);
+    const [showPreviewLogo, setShowPreviewLogo] = useState(false)
+    const [logoError, setLogoError] = useState('')
     const [saleStartDate, setSaleStartDate] = useState('');
     const [saleEndDate, setSaleEndDate] = useState('');
     const [saleFactory, setSaleFactory] = useState('');
@@ -56,13 +62,18 @@ function CreateSalePage(props) {
     }, [stateUpdated])
     const createNewSale = async () => {
         setButtonActive(false)
-        try {
-            const description = JSON.stringify(socials)
+        try { 
+            const socialsWithLogo = socials
+            if(logo !== '' && logoError === '' && showPreviewLogo === true){
+                socialsWithLogo.logo = logo
+            }
+            const description = JSON.stringify(socialsWithLogo)
             setShowTransactionPendingModal(true)
+
             await saleFactory.createNewSale(
                 tokenName,
-                tokenAddress,
-                tokenCreatorAddress,
+                tokenAddress.trim(),
+                tokenCreatorAddress.trim(),
                 softcap,
                 maxTierValues,
                 dateToTimestamp(saleStartDate),
@@ -72,17 +83,27 @@ function CreateSalePage(props) {
             )
             setShowTransactionPendingModal(false)
             setShowSuccessModal(true)
+           
         } catch (err) {
             setShowTransactionPendingModal(false)
             setShowSuccessModal(false)
             console.error(err)
             setButtonActive(true)
         }
-
     }
+
     const changeButtonState = () => {
         //console.log(tokenName, tokenAddress, tokenCreatorAddress, softcap, saleStartDate, saleEndDate, price, description
-        if(tokenName!=='' && tokenAddress !=='' && tokenCreatorAddress !== '' && softcap !== '' && saleStartDate !== '' && saleEndDate !== '' && price !== ''){
+        if(tokenName!=='' && 
+        tokenAddress !=='' && 
+        tokenCreatorAddress !== '' && 
+        softcap !== '' && 
+        saleStartDate !== '' && 
+        saleEndDate !== '' && 
+        price !== '' && 
+        !tokenAddressError &&
+        !tokenCreatorAddressError &&
+        (logo === '' || (logo !== '' && logoError === '' && showPreviewLogo === true))){
             setButtonActive(true)
         }else{
             setButtonActive(false)
@@ -209,6 +230,62 @@ function CreateSalePage(props) {
             return(<></>)
         }
     }
+    const previewImageFunc = () => {
+        if(showPreviewLogo && logo !== ''){
+            return <img className='xs-create-sale-preview-img' src={logo} alt=''></img>
+        }
+    }
+    const logoOnChangeEventHandler = async (onChangeEvent) => {
+        setLogo(onChangeEvent.target.value)
+        const urlRegex = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i
+        setShowPreviewLogo(false)
+        setLogoError('')
+        if (onChangeEvent.target.value === '') {
+            setShowPreviewLogo(false)
+            setLogoError('')
+            return
+        }
+        if (urlRegex.test(onChangeEvent.target.value)) {
+            try {
+                const isImage = await testImage(onChangeEvent.target.value, 1000)
+                if (isImage) {
+                    setShowPreviewLogo(true)
+                    setLogoError('')
+                } else {
+                    setShowPreviewLogo(false)
+                    setLogoError("Error: Can't load image from this URL")
+                }
+            } catch (err) {
+                setShowPreviewLogo(false)
+                setLogoError("Error: Can't load image from this URL")
+            }
+        } else {
+            setShowPreviewLogo(false)
+            setLogoError("Error: Invalid URL")
+        }
+        setStateUpdated(!stateUpdated)
+    }
+    const testImage = (url, timeoutT) => {
+        return new Promise(function (resolve, reject) {
+            var timeout = timeoutT || 5000;
+            var timer, img = new Image();
+            img.onerror = img.onabort = function () {
+                clearTimeout(timer);
+                reject("error");
+            };
+            img.onload = function () {
+                clearTimeout(timer);
+                resolve("success");
+            };
+            timer = setTimeout(function () {
+                // reset .src to invalid URL so it stops previous
+                // loading, but doesn't trigger new load
+                img.src = "//!!!!/test.jpg";
+                reject("timeout");
+            }, timeout);
+            img.src = url;
+        });
+    }
     return (<>
         <ModalWindow></ModalWindow>
         <div className="xs-body-create-sale">
@@ -263,14 +340,26 @@ function CreateSalePage(props) {
                             <input type="text" onChange={(onChangeEvent)=> {
                                 setTokenAddress(onChangeEvent.target.value)
                                 setStateUpdated(!stateUpdated)
+                                if(onChangeEvent.target.value === '' || Web3.utils.isAddress(onChangeEvent.target.value.trim().toLowerCase())){
+                                    setTokenAddressError(false)
+                                }else{
+                                    setTokenAddressError(true)
+                                }
                             }}/>
+                            {tokenAddressError && <div className="xs-create-sale-error-text">Error: Invalid address!</div>}
                         </div>
                         <div className="xs-create-sale-input">
                             <div className="xs-create-sale-text">Token creator address</div>
                             <input type="text" onChange={(onChangeEvent)=> {
                                 setTokenCreatorAddress(onChangeEvent.target.value)
                                 setStateUpdated(!stateUpdated)
+                                if(onChangeEvent.target.value === '' || Web3.utils.isAddress(onChangeEvent.target.value.trim().toLowerCase())){
+                                    setTokenCreatorAddressError(false)
+                                }else{
+                                    setTokenCreatorAddressError(true)
+                                }
                             }}/>
+                             {tokenCreatorAddressError && <div className="xs-create-sale-error-text">Error: Invalid address!</div>}
                         </div>
 
 
@@ -294,22 +383,35 @@ function CreateSalePage(props) {
                             }}/>
                         </div>
                         <div className="xs-create-sale-input">
-                            <div className="xs-create-sale-text">Medium</div>
+                        <div className="xs-create-sale-social">
+                                <div className="xs-create-sale-social-text">medium.com/@</div>
                             <input type="text" onChange={(onChangeEvent)=> {
                                 setSocialsKey(onChangeEvent.target.value, 'medium')
                             }}/>
+                            </div>
                         </div>
                         <div className="xs-create-sale-input">
-                            <div className="xs-create-sale-text">Twitter</div>
-                            <input type="text" onChange={(onChangeEvent)=> {
-                                setSocialsKey(onChangeEvent.target.value, 'twitter')
-                            }}/>
+                        
+                            <div className="xs-create-sale-social">
+                                <div className="xs-create-sale-social-text">twitter.com/</div>
+                                <input type="text" onChange={(onChangeEvent)=> {
+                                    setSocialsKey(onChangeEvent.target.value, 'twitter')
+                                }}/>
+                            </div>
                         </div>
                         <div className="xs-create-sale-input">
-                            <div className="xs-create-sale-text">Telegram</div>
-                            <input type="text" onChange={(onChangeEvent)=> {
-                                setSocialsKey(onChangeEvent.target.value, 'telegram')
-                            }}/>
+                            <div className="xs-create-sale-social">
+                                <div className="xs-create-sale-social-text">t.me/</div>
+                                <input type="text" onChange={(onChangeEvent)=> {
+                                    setSocialsKey(onChangeEvent.target.value, 'telegram')
+                                }}/>
+                            </div>
+                        </div>
+                        <div className="xs-create-sale-input">
+                            <div className="xs-create-sale-text">Logo URL</div>
+                            <input type="text" value={logo} onChange={logoOnChangeEventHandler}/>
+                            {previewImageFunc()}
+                            {logoError !== '' && <div className="xs-create-sale-error-text">{logoError}</div>}
                         </div>
                     </div>
                 </div>

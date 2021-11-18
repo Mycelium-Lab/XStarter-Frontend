@@ -321,6 +321,8 @@ nav ul li button:focus::after {
     margin-right: 30px;
 }
 .xs-block-top-img img {
+    height: 50px;
+    width: 50px;
     border-radius: 50%;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
@@ -1104,6 +1106,34 @@ select::-ms-expand {
     position: relative;
     padding: 50px;
 }
+.xs-create-sale-preview-img {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+}
+.xs-create-sale-preview-error-text{
+    color: #FFFFFF;
+    font-size: 14px;
+    text-align: left;
+}
+.xs-create-sale-social{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.xs-create-sale-social-text{
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+    align-self: center;
+    margin-bottom: 10px;
+}
 .xs-create-sale-row-blocks {
     display: flex;
     flex-direction: row;
@@ -1150,6 +1180,9 @@ select::-ms-expand {
     outline:none;
     width: 100%;
 }
+.xs-create-sale-social input{
+    max-width: 50%;
+}
 .xs-create-sale-input input::placeholder{
     color:#808080;
 }
@@ -1175,6 +1208,12 @@ select::-ms-expand {
 .xs-create-sale-tier-input{
     display: flex; 
     flex-direction: row;
+}
+.xs-create-sale-error-text{
+    color: #ffb6c1;
+    text-align: left;
+    font-style: normal;
+    font-size: 14px;
 }
 .xs-create-sale-delete-tier-button{
     border: none;

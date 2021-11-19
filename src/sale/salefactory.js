@@ -43,6 +43,15 @@ export class SaleFactory {
             description
         ).send({from:this.account});
     }
+    async ckeckIfAddressERC20(address) {
+        try{
+            const erc20Contract = new this.web3.eth.Contract(erc20Abi, address)
+            await erc20Contract.methods.symbol.call().call()
+            return true
+        }catch(err){
+            return false
+        }
+    }
     async getAmountOfTiers() {
         const stakingContract = new this.web3.eth.Contract(xStarterStakingAbi,process.env.REACT_APP_STAKING_ADDRESS)
         return stakingContract.methods.amountOfTiers().call()

@@ -11,7 +11,7 @@ function CreateSalePage(props) {
     const [tokenAddress, setTokenAddress] = useState('');
     const [logo, setLogo] = useState('')
     const [tokenCreatorAddress, setTokenCreatorAddress] = useState('');
-    const [tokenAddressError, setTokenAddressError] = useState(false);
+    const [tokenAddressError, setTokenAddressError] = useState('');
     const [tokenCreatorAddressError, setTokenCreatorAddressError] = useState(false);
     const [showPreviewLogo, setShowPreviewLogo] = useState(false)
     const [logoError, setLogoError] = useState('')
@@ -101,7 +101,7 @@ function CreateSalePage(props) {
         saleStartDate !== '' && 
         saleEndDate !== '' && 
         price !== '' && 
-        !tokenAddressError &&
+        tokenAddressError === '' &&
         !tokenCreatorAddressError &&
         (logo === '' || (logo !== '' && logoError === '' && showPreviewLogo === true))){
             setButtonActive(true)
@@ -337,16 +337,24 @@ function CreateSalePage(props) {
                     <div className="xs-create-sale-block">
                         <div className="xs-create-sale-input">
                             <div className="xs-create-sale-text">Token address</div>
-                            <input type="text" onChange={(onChangeEvent)=> {
+                            <input type="text" onChange={async (onChangeEvent)=> {
                                 setTokenAddress(onChangeEvent.target.value)
-                                setStateUpdated(!stateUpdated)
-                                if(onChangeEvent.target.value === '' || Web3.utils.isAddress(onChangeEvent.target.value.trim().toLowerCase())){
-                                    setTokenAddressError(false)
-                                }else{
-                                    setTokenAddressError(true)
+                                if(onChangeEvent.target.value === ''){
+                                    setTokenAddressError('')
+                                }else if(Web3.utils.isAddress(onChangeEvent.target.value.trim().toLowerCase())){
+                                    const isERC20 = await saleFactory.ckeckIfAddressERC20(onChangeEvent.target.value.trim())
+                                    if(isERC20){
+                                        setTokenAddressError('')
+                                    } else {
+                                        setTokenAddressError('Error: token address can be only ERC20 contract')
+                                    }
+                                    
+                                } else{
+                                    setTokenAddressError('Error: invalid address')
                                 }
+                                setStateUpdated(!stateUpdated)
                             }}/>
-                            {tokenAddressError && <div className="xs-create-sale-error-text">Error: Invalid address!</div>}
+                            {tokenAddressError !== '' && <div className="xs-create-sale-error-text">{tokenAddressError}</div>}
                         </div>
                         <div className="xs-create-sale-input">
                             <div className="xs-create-sale-text">Token creator address</div>

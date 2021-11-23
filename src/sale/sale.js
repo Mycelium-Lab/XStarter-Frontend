@@ -87,6 +87,9 @@ export class Sale {
     async isApproved(){
         return this.saleContract.methods.approved().call()
     }
+    async isDeclined(){
+        return this.saleContract.methods.declined().call()
+    }
 
     async getTotalTokensSold() {
         const totalTokensSold = await this.saleContract.methods.totalTokensSold().call()
@@ -161,6 +164,9 @@ export class Sale {
     async approveSale(){
         return this.saleContract.methods.approve().send({from: this.account})
     }
+    async declineSale(){
+        return this.saleContract.methods.decline().send({from: this.account})
+    }
     async withdrawSaleResult() {
         return this.saleContract.methods.withdrawSaleResult().send({from:this.account})
     }
@@ -183,7 +189,8 @@ export class Sale {
             hardcap,
             price,
             hardcapCompletionPercent,
-            approved
+            approved,
+            declined
         ] = await Promise.all([
             this.getStatus(),
             this.getNumberOfParticipants(),
@@ -191,7 +198,8 @@ export class Sale {
             this.getHardcap(),
             this.getPriceWithoutDecimals(),
             this.getHardcapCompletionPercent(),
-            this.isApproved()
+            this.isApproved(),
+            this.isDeclined()
         ])
         return {
             status,
@@ -200,7 +208,8 @@ export class Sale {
             hardcap,
             price,
             hardcapCompletionPercent,
-            approved
+            approved,
+            declined
         }
     }
 

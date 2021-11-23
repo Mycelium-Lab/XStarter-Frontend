@@ -1227,6 +1227,10 @@ select::-ms-expand {
 .xs-create-sale-add-tier-button{
     width: 100px;
 }
+.xs-create-sale-sale-status-buttons{
+    display: flex;
+    flex-direction: row;
+}
 .xs-create-sale-add-tier-button:disabled{
     background-color: #808080;
     border-color: #808080;

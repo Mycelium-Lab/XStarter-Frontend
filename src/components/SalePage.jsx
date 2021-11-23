@@ -41,9 +41,12 @@ function SalePage(props) {
         const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
         return time;
     }
-    const approveSaleButton = () => {
-        if(!saleMutables.approved && isAdmin){
-            return <button className="btn xs-trade-action-btn" onClick={async () => { await sale.approveSale(); setSaleMutables({...saleMutables, approved: true})}}>Approve sale</button>
+    const saleChangeStatusButtons = () => {
+        if(!saleMutables.approved && !saleMutables.declined && isAdmin){
+            return <div className="xs-create-sale-sale-status-buttons">
+                <button className="btn xs-trade-action-btn" onClick={async () => { await sale.approveSale(); setSaleMutables({...saleMutables, approved: true})}}>Approve sale</button>
+                <button className="btn xs-trade-action-btn" onClick={async () => { await sale.declineSale(); setSaleMutables({...saleMutables, declined: true})}}>Decline sale</button>
+            </div>
         }
     }
     const AddTokens = (props) => {
@@ -103,6 +106,7 @@ function SalePage(props) {
             {addTokensButton()}
             </>)
     }
+
     const saleAction = () => {
         if(saleMutables.status === "Current"){
             return <div className="xs-trade-change xs-sale-trade">
@@ -151,12 +155,12 @@ function SalePage(props) {
                             <div className="xs-sale-start-text">Sale will start soon...</div>
                             
                             <AddTokens></AddTokens>
-                            {approveSaleButton()}
+                            {saleChangeStatusButtons()}
                         </div>
             }else {
                 return <div className="xs-trade-change xs-sale-trade">
                 <div className="xs-sale-start-text">Sale will start soon...</div>
-                {approveSaleButton()}
+                {saleChangeStatusButtons()}
             </div>
             }
         }

@@ -188,7 +188,7 @@ function CreateSalePage(props) {
                 type="tel" 
                 id={"max-sum-"+ (i)} 
                 placeholder={0.0} 
-                value = {maxTierValues[i]}
+                value = {maxTierValues[i] || ''}
                 onChange={(onChangeEvent) => changeMaxTierValues(onChangeEvent)} 
             />
             {deleteTierButton}

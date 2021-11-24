@@ -227,6 +227,32 @@
       "inputs":[
          
       ],
+      "name":"decline",
+      "outputs":[
+         
+      ],
+      "stateMutability":"nonpayable",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"declined",
+      "outputs":[
+         {
+            "internalType":"bool",
+            "name":"",
+            "type":"bool"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
       "name":"description",
       "outputs":[
          {
@@ -513,6 +539,17 @@
          
       ],
       "name":"withdrawSaleResult",
+      "outputs":[
+         
+      ],
+      "stateMutability":"nonpayable",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"withdrawTokensFromInvalidSale",
       "outputs":[
          
       ],

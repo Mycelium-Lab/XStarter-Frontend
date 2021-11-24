@@ -40,17 +40,20 @@ export class SaleProvider {
         let finished = []
         await Promise.all(sales.map(async (sale) => {
             const isApproved = await sale.isApproved()
+            const isDeclined = await sale.isDeclined()
             const currentTimestamp = await sale.getCurrentTimestamp()
-            if(!isApproved){
-                if(currentTimestamp < sale.immutables.startTimestamp){
-                    unapproved.push(sale)
+            if(!isDeclined){
+                if(!isApproved){
+                    if(currentTimestamp < sale.immutables.startTimestamp){
+                        unapproved.push(sale)
+                    }
+                }else if(sale.status === "Current"){
+                    current.push(sale)
+                }else if (sale.status === "Upcoming"){
+                    upcoming.push(sale)
+                }else if (sale.status === "Finished"){
+                    finished.push(sale)
                 }
-            }else if(sale.status === "Current"){
-                current.push(sale)
-            }else if (sale.status === "Upcoming"){
-                upcoming.push(sale)
-            }else if (sale.status === "Finished"){
-                finished.push(sale)
             }
         }))
         // const current = sales.filter(sale => sale.status === "Current")

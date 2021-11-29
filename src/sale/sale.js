@@ -8,7 +8,11 @@ export class Sale {
         await obj.initialize(saleAddress, provider, address)
         return obj
     }
-
+    static async createWithEvent(provider, address, saleCreatedEvent){
+        const obj = new Sale()
+        await obj.initializeWithEvent(provider, address, saleCreatedEvent)
+        return obj
+    }
     async initialize(saleAddress, provider, address) {
         if (provider && address) {
             this.web3 = new Web3(provider)
@@ -19,7 +23,55 @@ export class Sale {
             this.status = await this.getStatus()
         }
     }
-
+    async initializeWithEvent(provider, address, saleCreatedEvent) {
+        if (provider && address && saleCreatedEvent) {
+            this.web3 = new Web3(provider)
+            this.web3.eth.defaultAccount = address
+            this.account = address
+            this.saleContract = new this.web3.eth.Contract(saleAbi, saleCreatedEvent.returnValues.saleAddress)
+            this.immutables = await this.initializeImmutablesWithEvent(saleCreatedEvent)
+            this.status = await this.getStatus()
+        }
+    }
+    async initializeImmutablesWithEvent (saleCreatedEvent) {
+        const [
+            tokenCreator,
+            tokenName,
+            tokenAddress,
+            softcap,
+            startTimestamp,
+            endTimestamp,
+            jsonDescription
+        ] = [
+            saleCreatedEvent.returnValues.tokenCreator,
+            saleCreatedEvent.returnValues.tokenName,
+            saleCreatedEvent.returnValues.tokenAddress,
+            saleCreatedEvent.returnValues.softcap,
+            saleCreatedEvent.returnValues.startTimestamp,
+            saleCreatedEvent.returnValues.endTimestamp,
+            saleCreatedEvent.returnValues.description
+        ]
+        const erc20Contract = new this.web3.eth.Contract(erc20Abi, tokenAddress)
+        const tokenSymbol = await erc20Contract.methods.symbol().call()
+        const decimals = await erc20Contract.methods.decimals().call()
+        let description = {}
+        try{
+            description = JSON.parse(jsonDescription)
+        } catch(err){
+            description = {text:jsonDescription}
+        }
+        return {
+            tokenCreator,
+            tokenName,
+            tokenSymbol,
+            tokenAddress,
+            softcap: this.noDecimals(softcap, decimals),
+            startTimestamp,
+            endTimestamp,
+            description,
+            decimals
+        }
+    }
     async initializeImmutables() {
         const [
             tokenCreator,

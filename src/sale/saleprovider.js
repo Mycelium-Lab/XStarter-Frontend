@@ -26,22 +26,20 @@ export class SaleProvider {
             fromBlock: 0,
             toBlock: 'latest'
         })
-        const saleAddresses = salesCreatedEvents.map(event => event.returnValues.saleAddress)
-        const saleCreationPromises = saleAddresses.map(saleAddress => Sale.create(saleAddress, this.provider, this.account))
+        const saleCreationPromises = salesCreatedEvents.map(saleCreatedEvent => Sale.createWithEvent(this.provider, this.account, saleCreatedEvent))
         return Promise.all(saleCreationPromises)
     }
 
     async splitByStatus(sales) {
-
-        const approvedPromises = sales.map(sale => sale.isApproved())
         let current = []
         let upcoming = []
         let unapproved = []
         let finished = []
+        const latestBlock = await this.web3.eth.getBlock('latest')
+        let currentTimestamp = latestBlock.timestamp
         await Promise.all(sales.map(async (sale) => {
             const isApproved = await sale.isApproved()
             const isDeclined = await sale.isDeclined()
-            const currentTimestamp = await sale.getCurrentTimestamp()
             if(!isDeclined){
                 if(!isApproved){
                     if(currentTimestamp < sale.immutables.startTimestamp){
@@ -56,9 +54,6 @@ export class SaleProvider {
                 }
             }
         }))
-        // const current = sales.filter(sale => sale.status === "Current")
-        // const upcoming = sales.filter(sale => sale.status === "Upcoming")
-        // const finished = sales.filter(sale => sale.status === "Finished")
         return [unapproved, current, upcoming, finished]
     }
 }

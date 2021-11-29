@@ -3,6 +3,7 @@ import ProjectPageIDOs from '../layouts/ProjectPageIDOs';
 import { SaleProvider } from '../sale/saleprovider';
 import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
+import ClipLoader from "react-spinners/ClipLoader";
 function ProjectPage(props) {
   const { handleChange } = props;
   const [sales, setSales] = useState(null);
@@ -50,35 +51,9 @@ function ProjectPage(props) {
       );
   }else{
     return (
-      <div className="xs-body-projects">
-          <div className="xs-current-ido mb100">
-                <div className="xs-ido">
-                Current IDOs
-                </div>
-                <div className="xs-ido-noupcoming">
-                    There is no current IDOs yet. Stay tuned
-                </div>
-            </div>
-            <div className="xs-current-ido mb100">
-                <div className="xs-ido">
-                Upcoming IDOs
-                </div>
-                <div className="xs-ido-noupcoming">
-                    There is no upcoming IDOs yet. Stay tuned
-                </div>
-            </div>
-            <div className="xs-current-ido mb100">
-                <div className="xs-ido">
-                Finished IDOs
-                </div>
-                <div className="xs-ido-noupcoming">
-                    There is no finished IDOs yet. Stay tuned
-                </div>
-            </div>
-      </div>
+        <ClipLoader size={50} color={"#FFFFFF"} speedMultiplier={1} />
       );
   }
 
 }
-
 export default ProjectPage;

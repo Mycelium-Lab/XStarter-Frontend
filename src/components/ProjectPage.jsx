@@ -3,7 +3,7 @@ import ProjectPageIDOs from '../layouts/ProjectPageIDOs';
 import { SaleProvider } from '../sale/saleprovider';
 import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
-import ClipLoader from "react-spinners/ClipLoader";
+import PulseLoader from "react-spinners/PulseLoader";
 function ProjectPage(props) {
   const { handleChange } = props;
   const [sales, setSales] = useState(null);
@@ -51,7 +51,7 @@ function ProjectPage(props) {
       );
   }else{
     return (
-        <ClipLoader size={50} color={"#FFFFFF"} speedMultiplier={1} />
+        <PulseLoader size={15} color={"#FFFFFF"} speedMultiplier={1} />
       );
   }
 

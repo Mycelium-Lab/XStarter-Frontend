@@ -11,10 +11,13 @@ function SPStake(props) {
   const [userTier, setUserTier] = useState('');
   const [currentStakes, setCurrentStakes] = useState([]);
   const [isApproved, setIsApproved] = useState(false);
+  const [totalRewardAmount, setTotalRewardAmount] = useState('');
   const [isModal, setIsModal] = useState(false);
   const [isInsufficientBalance, setIsInsufficientBalance] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [chainName, setChainName] = useState('');
+  const [currentAPR, setCurrentAPR] = useState('');
+  const [tvl, setTVL] = useState('');
   const methods = useSelector(state => state.wallet.methods);
   const wallet = useSelector(state => state.wallet.address);
   const currentChainId = useSelector(state => state.wallet.chainId);
@@ -39,7 +42,13 @@ function SPStake(props) {
       const tier = await methods.getUserTier();
       const currentStakes = await methods.getCurrentStakes();
       const isInsufficientBalance = parseFloat(balance) >= parseFloat(amount) ? false : true;
-  
+      const currentAPR = await methods.getCurrentAPR();
+      const tvl = await methods.getTVL();
+      const totalRewardAmount = calculateTotalRewardAmount(currentStakes)
+
+      setTotalRewardAmount(totalRewardAmount);
+      setTVL(tvl);
+      setCurrentAPR(currentAPR);
       setIsInsufficientBalance(isInsufficientBalance);
       setCurrentStakes(currentStakes)
       setUserBalance(balance);
@@ -47,6 +56,14 @@ function SPStake(props) {
       setUserTier(tier);
       setIsLoaded(true);  
     }
+  }
+  const calculateTotalRewardAmount = (currentStakes) => {
+    let totalReward = 0;
+    currentStakes.forEach((item)=>{
+      const { reward } = item
+      totalReward += reward;
+    })
+    return totalReward
   }
   async function setMaxAmount() {
     setIsInsufficientBalance(false);
@@ -272,13 +289,22 @@ function SPStake(props) {
   //     button
   //   );
   // }
+  function round(value, precision) {
+    if (Number.isInteger(precision)) {
+      let shift = Math.pow(10, precision);
+      // Limited preventing decimal issue
+      return (Math.round( value * shift + 0.00000000000001 ) / shift);
+    } else {
+      return Math.round(value);
+    }
+  }
   function UnstakeButton(props)
   {
     let stakeButton
     
     if(userStakedAmount == 0 || !isLoaded ||currentChainId !== rightChainId && !!wallet && isInitialized)
     {
-      stakeButton = <div></div>
+      stakeButton = <button className="btn xs-staking-button">UNSTAKE</button>
     }
     else
     {
@@ -317,7 +343,7 @@ function SPStake(props) {
     <div className="xs-staking-info-blocks">
       <div className="xs-staking-block xs-staking-block-green xs-staking-info-block">
         <div className="xs-staking-info-block-header">
-          0 %
+          {currentAPR} %
         </div>
         <div className="xs-staking-info-block-content">
           CURRENT APR
@@ -325,7 +351,7 @@ function SPStake(props) {
       </div>
       <div className="xs-staking-block xs-staking-info-block">
         <div className="xs-staking-info-block-header">
-          $0
+          {tvl}XS
         </div>
         <div className="xs-staking-info-block-content">
           TVL IN STAKING POOL
@@ -333,7 +359,7 @@ function SPStake(props) {
       </div>
       <div className="xs-staking-block xs-staking-info-block">
         <div className="xs-staking-info-block-header">
-          $0
+          {round((userStakedAmount * parseInt(currentAPR))/365, 5)}XS
         </div>
         <div className="xs-staking-info-block-content">
           YOUR AVERAGE REWARDS PER DAY
@@ -358,16 +384,16 @@ function SPStake(props) {
       <div className="xs-staking-reward mb10">
         <img src={logo}></img>
         <div className="xs-staking-reward-text-block">
-          <div className="xs-staking-reward-value">-</div>
+          <div className="xs-staking-reward-value">{totalRewardAmount}</div>
           <div className="xs-staking-reward-tokenname">XS</div>
         </div>
       </div>
-      <button className="btn btn-wo-bg xs-staking-claim-rewards-button">CLAIM REWARDS</button>
+      <button onClick={openModal}className="btn btn-wo-bg xs-staking-claim-rewards-button">CLAIM REWARDS</button>
       <div className="xs-staking-input-label">STAKED</div>
       <div className="xs-staking-reward mb30">
         <img src={logo}></img>
         <div className="xs-staking-reward-text-block">
-          <div className="xs-staking-reward-value">-</div>
+          <div className="xs-staking-reward-value">{userStakedAmount}</div>
           <div className="xs-staking-reward-tokenname">XS</div>
         </div>
       </div>
@@ -375,7 +401,7 @@ function SPStake(props) {
       <div className="xs-staking-reward">
         <img src={logo}></img>
         <div className="xs-staking-reward-text-block">
-          <div className="xs-staking-reward-value">-</div>
+          <div className="xs-staking-reward-value">{userBalance - userStakedAmount}</div>
           <div className="xs-staking-reward-tokenname">XS</div>
         </div>
       </div>

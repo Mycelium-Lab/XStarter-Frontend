@@ -15,8 +15,8 @@ export class contractMethods {
         this.web3 = web;
         this.CASE_PRECISION = 10 ** 8;
         this.ZERO_ADDR = "0x0000000000000000000000000000000000000000";
-        this.tokenContract = new this.web3.eth.Contract(abiProxy, xsToken);
-        this.contractStake = new this.web3.eth.Contract(abiStake, stakeCase);
+        this.tokenContract = new this.web3.eth.Contract(abiProxy, process.env.REACT_APP_XSTOKEN_ADDRESS);
+        this.contractStake = new this.web3.eth.Contract(abiStake, process.env.REACT_APP_STAKING_ADDRESS);
         this.walletAddress = walletAddress;
     }
     setWallet(wallet)
@@ -62,6 +62,32 @@ export class contractMethods {
 
         })
     }
+    noDecimals(value, decimals){
+        const ten = new this.web3.utils.BN('10')
+        const decimalsBN = new this.web3.utils.BN(decimals)
+        const tenPowDecimals = ten.pow(decimalsBN)
+        const valueBN = new this.web3.utils.BN(value)
+        const result = valueBN.div(tenPowDecimals)
+        return result.toString()
+    }
+    async getCurrentAPR(){
+        const aprPeriodsLength = await this.contractStake.methods.aprPeriodsLength().call();
+        const currentAPRPeriod = await this.contractStake.methods.aprPeriods(aprPeriodsLength - 1).call();
+        return currentAPRPeriod.aprRate;
+    }
+    async calculateRewardPerDay(){
+        
+    }
+    async getTVL(){
+        const decimals = await this.tokenContract.methods.decimals().call();
+        const totalStaked = await this.contractStake.methods.totalStakedTokens().call();
+
+        return this.noDecimals(totalStaked, decimals);
+    }
+    async getRewards(currentStakes){
+        
+        //const rewards = await this.contractStake.methods.
+    }
     getUserTier()
     {
         return new Promise((resolve, reject) => {
@@ -84,7 +110,7 @@ export class contractMethods {
     approveStake(amount)
     {
         return new Promise((resolve, reject) => {
-            this.tokenContract.methods.approve(stakeCase,(this.toXS(amount)).toString()).send({from: this.walletAddress})
+            this.tokenContract.methods.approve(process.env.REACT_APP_STAKING_ADDRESS,(this.toXS(amount)).toString()).send({from: this.walletAddress})
             .on('transactionHash', function(hash) {
                 resolve(hash);
             })
@@ -94,7 +120,7 @@ export class contractMethods {
     async isEnoughAllowance(amount)
     {
         const newAmount = this.toXS(amount)
-        const allowance = await this.tokenContract.methods.allowance(this.walletAddress, stakeCase).call();
+        const allowance = await this.tokenContract.methods.allowance(this.walletAddress, process.env.REACT_APP_STAKING_ADDRESS).call();
         const num1 = this.web3.utils.toBN(allowance);
         const num2 = this.web3.utils.toBN(newAmount);
         return num1.gte(num2);

@@ -1515,6 +1515,8 @@ select::-ms-expand {
 .xs-staking-reward-text-block{
     display: flex;
     flex-direction: column;
+    text-align: left;
+    margin-left: 10px;
 }
 .xs-staking-reward-tokenname{
     color: #FF824B;

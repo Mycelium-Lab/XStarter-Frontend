@@ -255,40 +255,6 @@ function SPStake(props) {
       button
     );
   }
-  // function StakeButton(props) {
-  //   let button
-  //   if((!wallet || !provider) && isInitialized)
-  //   {
-  //     button = <div className="xs-staking-active-button">Connect wallet</div>
-  //   }
-  //   else if(currentChainId !== rightChainId && !!wallet && isInitialized)
-  //   {
-  //     button = <div className="xs-staking-active-button" onClick={switchNetwork}>Switch to {chainName}</div>
-  //   }
-  //   else if(!isLoaded)
-  //   {
-  //     button = <div className="xs-staking-active-button">Loading....</div>
-  //   }
-  //   else if (amount == 0)
-  //   {
-  //     button = <div className="xs-staking-active-button">Enter an amount</div>
-  //   }
-  //   else if(isInsufficientBalance)
-  //   {
-  //     button = <div className="xs-staking-active-button">Insufficient balance</div>
-  //   }
-  //   else if(isApproved)
-  //   {
-  //     button = <div className="xs-staking-active-button" onClick = {stakeXST}>Stake</div>
-  //   }
-  //   else
-  //   {
-  //     button = <div className="xs-staking-active-button" onClick = {approve}>Approve</div>
-  //   }
-  //   return (
-  //     button
-  //   );
-  // }
   function round(value, precision) {
     if (Number.isInteger(precision)) {
       let shift = Math.pow(10, precision);
@@ -314,26 +280,6 @@ function SPStake(props) {
   }
   return (
     <>
-    {/* <div className="staking-tier mb80">
-      <StakesTable data={currentStakes}></StakesTable>
-      <span className="staking-tier-text mb40">
-        We are proud to see you as part of XStarter community. Your current tier is: {userTier}
-      </span>
-      <div className="xs-block">
-        <div className="staking-tier-stats">
-          <div><span>Balance:</span> <span>{userBalance} XS</span></div>
-          <div><span>Staked:</span> <span>{userStakedAmount} XS</span></div>
-        </div>
-        <div className="staking-tier-stats-input">
-          <input onChange={async (e) => {changeInput(e)}} type="tel" placeholder={0.0} value={amount}/>
-          <button className="btn btn-max" onClick={setMaxAmount}>MAX</button>
-        </div>
-        <div className="staking-tier-stats-btns">
-          <StakeButton></StakeButton>
-          <UnstakeButton></UnstakeButton>
-        </div>
-      </div>
-    </div> */}
     <StakesTable data={currentStakes}></StakesTable>
     <div className="xs-staking-info-header mb30">
       STAKE YOUR XS TO GET YOUR ALLOCATION TIER 
@@ -343,7 +289,7 @@ function SPStake(props) {
     <div className="xs-staking-info-blocks">
       <div className="xs-staking-block xs-staking-block-green xs-staking-info-block">
         <div className="xs-staking-info-block-header">
-          {currentAPR} %
+          {currentAPR||'0'} %
         </div>
         <div className="xs-staking-info-block-content">
           CURRENT APR
@@ -351,7 +297,7 @@ function SPStake(props) {
       </div>
       <div className="xs-staking-block xs-staking-info-block">
         <div className="xs-staking-info-block-header">
-          {tvl}XS
+          {tvl||'0'}XS
         </div>
         <div className="xs-staking-info-block-content">
           TVL IN STAKING POOL
@@ -359,7 +305,7 @@ function SPStake(props) {
       </div>
       <div className="xs-staking-block xs-staking-info-block">
         <div className="xs-staking-info-block-header">
-          {round((userStakedAmount * parseInt(currentAPR))/365, 5)}XS
+          {round((userStakedAmount * parseInt(currentAPR))/365, 5) || '0'}XS
         </div>
         <div className="xs-staking-info-block-content">
           YOUR AVERAGE REWARDS PER DAY

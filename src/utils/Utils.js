@@ -75,18 +75,14 @@ export class contractMethods {
         const currentAPRPeriod = await this.contractStake.methods.aprPeriods(aprPeriodsLength - 1).call();
         return currentAPRPeriod.aprRate;
     }
-    async calculateRewardPerDay(){
-        
+    async changeAPR(newAPR){
+        return this.contractStake.methods.changeAPR(newAPR).send({from: this.walletAddress})
     }
     async getTVL(){
         const decimals = await this.tokenContract.methods.decimals().call();
         const totalStaked = await this.contractStake.methods.totalStakedTokens().call();
 
         return this.noDecimals(totalStaked, decimals);
-    }
-    async getRewards(currentStakes){
-        
-        //const rewards = await this.contractStake.methods.
     }
     getUserTier()
     {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import goBackArrow from '../img/go-back-arrow.svg'
 import { useSelector } from 'react-redux';
 import PulseLoader from "react-spinners/PulseLoader";
 function SalePage(props) {
@@ -279,7 +280,10 @@ function SalePage(props) {
             <div className="xs-body-sale">
 
                 <div className="xs-sale">
-                    <div className="xs-sale-go-back" onClick={() => { handleChange("projects") }}>GO BACK TO IDOs LIST</div>
+                    <div className="xs-sale-go-back" onClick={() => { handleChange("projects") }}>
+                        <img className="xs-sale-go-back-arrow" alt="<" src={goBackArrow}/>
+                        <div>GO BACK TO IDOs LIST</div>
+                    </div>
                     <div className="xs-sale-block xs-sale-block-top">
                         <div className="xs-block-top-img">
                             <img src={sale.immutables.description.logo} alt="" />

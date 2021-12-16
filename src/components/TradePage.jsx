@@ -406,7 +406,7 @@ function TradePage(props) {
       <div className="xs-block">
         <div className="xs-trade-change">
           <div className="xs-trade-change-top">
-            <span>Обменять</span>
+            <span>Trade XS</span>
             <button><img src={settingsImg} alt="" /></button>
           </div>
           <p>Balance: {parseFloat(token0Balance).toFixed(5)} {token0Symbol}</p>

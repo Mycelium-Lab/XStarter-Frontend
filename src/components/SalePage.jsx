@@ -10,7 +10,9 @@ function SalePage(props) {
     const [saleMutables, setSaleMutables] = useState(null);
     const address = useSelector(state => state.wallet.address);
     const isAdmin = useSelector(state => state.wallet.isAdmin);
+    const [chainName, setChainName] = useState('');
     const currentChainId = useSelector(state => state.wallet.chainId);
+    const rightChainId = useSelector(state => state.wallet.correntChainId);
     const isLoaded = useSelector(state => state.wallet.isLoaded)
     const [totalSupply, setTotalSupply] = useState(0);
     const [tokenName, setTokenName] = useState('-');
@@ -28,6 +30,9 @@ function SalePage(props) {
             setSale(props.sale);
         }
     }
+    useEffect(()=> {
+        rightChainId === '4' ?  setChainName('Rinkeby') : setChainName('Solana')
+    }, [currentChainId])
     useEffect(() => {
         if (!sale) {
             setParams()
@@ -118,28 +123,31 @@ function SalePage(props) {
 
     const saleAction = () => {
         if (saleMutables.status === "Current") {
-            return <div className="xs-trade-change xs-sale-trade">
-                <div className="xs-trade-change-top">
-                    <span>Buy tokens</span>
+            return <div className="xs-sale-block xs-sale-info-block">
+                <div className="xs-trade-change xs-sale-trade">
+                    <div className="xs-sale-table-header">
+                        <span>Buy tokens</span>
+                    </div>
+                    <div className="xs-trade-change-input  xs-trade-change-input-xs">
+                        <select defaultValue="ETH" >
+                            <option defaultValue value={"ETH"}>ETH</option>
+                        </select>
+                        <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inTokenAmount} />
+                    </div>
+                    <div className="xs-trade-change-input xs-trade-change-input-xs">
+                        <select defaultValue={sale.immutables.tokenSymbol}>
+                            <option defaultValue value={sale.immutables.tokenSymbol}>{sale.immutables.tokenSymbol}</option>
+                        </select>
+                        <input onChange={async (e) => { await changeInputPrice(e); }} type="tel" placeholder={0.0} value={outTokenAmount} />
+                    </div>
+                    <button className="btn xs-trade-change-btn" onClick={async () => { if (parseFloat(inTokenAmount) > 0) await sale.buyTokens(inTokenAmount) }}>Buy</button>
                 </div>
-                <div className="xs-trade-change-input  xs-trade-change-input-xs">
-                    <select defaultValue="ETH" >
-                        <option defaultValue value={"ETH"}>ETH</option>
-                    </select>
-                    <input onChange={async (e) => { await changeOutputPrice(e); }} type="tel" placeholder={0.0} value={inTokenAmount} />
-                </div>
-                <div className="xs-trade-change-input xs-trade-change-input-xs">
-                    <select defaultValue={sale.immutables.tokenSymbol}>
-                        <option defaultValue value={sale.immutables.tokenSymbol}>{sale.immutables.tokenSymbol}</option>
-                    </select>
-                    <input onChange={async (e) => { await changeInputPrice(e); }} type="tel" placeholder={0.0} value={outTokenAmount} />
-                </div>
-                <button className="btn xs-trade-change-btn" onClick={async () => { if (parseFloat(inTokenAmount) > 0) await sale.buyTokens(inTokenAmount) }}>Buy</button>
             </div>
         } else if (saleMutables.status === "Finished") {
             if (parseInt(saleMutables.totalTokensSold) >= parseInt(sale.immutables.softcap)) {
-                return <div className="xs-trade-change xs-sale-trade">
-                    <div>Sale ended!</div>
+                return <div className="xs-sale-block xs-sale-info-block">
+                <div className="xs-trade-change xs-sale-trade">
+                    <div className="xs-sale-table-header">Sale ended:</div>
                     <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawBoughtTokens() }}>Withdraw tokens</button>
                     {(() => {
                         if (sale.immutables.tokenCreator.toLowerCase() === address.toLowerCase()) {
@@ -147,9 +155,11 @@ function SalePage(props) {
                         }
                     })()}
                 </div>
+                </div>
             } else {
-                return <div className="xs-trade-change xs-sale-trade">
-                    <div>Sale failed!</div>
+                return <div className="xs-sale-block xs-sale-info-block">
+                <div className="xs-trade-change xs-sale-trade">
+                    <div className="xs-sale-table-header">Sale failed:</div>
                     <button className="btn xs-trade-action-btn" onClick={async () => { await sale.withdrawFunds() }}>Withdraw funds</button>
                     {(() => {
                         if (sale.immutables.tokenCreator.toLowerCase() === address.toLowerCase()) {
@@ -157,19 +167,24 @@ function SalePage(props) {
                         }
                     })()}
                 </div>
+                </div>
             }
         } else if (saleMutables.status === "Upcoming") {
             if (sale.immutables.tokenCreator.toLowerCase() === address.toLowerCase()) {
-                return <div className="xs-trade-change xs-sale-trade">
+                return <div className="xs-sale-block xs-sale-info-block">
+                <div className="xs-trade-change xs-sale-trade">
                     <div className="xs-sale-start-text">Sale will start soon...</div>
 
                     <AddTokens></AddTokens>
                     {saleChangeStatusButtons()}
                 </div>
-            } else {
-                return <div className="xs-trade-change xs-sale-trade">
+                </div>
+            } else if(isAdmin){
+                return <div className="xs-sale-block xs-sale-info-block">
+                <div className="xs-trade-change xs-sale-trade">
                     <div className="xs-sale-start-text">Sale will start soon...</div>
                     {saleChangeStatusButtons()}
+                </div>
                 </div>
             }
         }
@@ -196,14 +211,12 @@ function SalePage(props) {
 
     }
     const getWebsite = () => {
-        if (sale && sale.immutables.description.socials.website) {
+        if (sale && sale.immutables.description.socials && sale.immutables.description.socials.website) {
             let website = sale.immutables.description.socials.website
             if(!/^(http|https):\/\//i.test(sale.immutables.description.socials.website)){
                 website = 'https://' + website
             }
-            console.log(website)
             if(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(website)){
-                console.log('yes')
                 return website
             } 
         }
@@ -276,7 +289,7 @@ function SalePage(props) {
                             {socialLinks()}
                         </div>
                         <div className="xs-sale-status-block">
-                            <div className="xs-sale-network-name">RINKEBY</div>
+                            <div className="xs-sale-network-name"><span className="xs-sale-chain-name">{chainName}</span></div>
                             <div className="xs-sale-status">{saleStatus()}</div>
                         </div>
                     </div>
@@ -341,6 +354,7 @@ function SalePage(props) {
                                 </div>
                             </div>
                         </div>
+                        {saleAction()}
                         <div className="xs-sale-block xs-sale-info-block">
                             <div className="xs-sale-table-header">PROJECT INFORMATION</div>
                             <table>
@@ -351,7 +365,7 @@ function SalePage(props) {
                                     </tr>
                                     <tr>
                                         <td>CHAIN</td>
-                                        <td>RINKEBY</td>
+                                        <td><span className="xs-sale-chain-name">{chainName}</span></td>
                                     </tr>
                                     <tr>
                                         <td>WEBSITE</td>
@@ -395,6 +409,7 @@ function SalePage(props) {
                                 </tbody>
                             </table>
                         </div>
+                        
                     </div>
                 </div>
             </div>

@@ -1090,6 +1090,9 @@ select::-ms-expand {
     flex-direction: row;
     justify-content: space-between;
 }
+.xs-sale-chain-name {
+    text-transform: uppercase;
+}
 .xs-sale-descr-text {
     color: #FF824B;
 

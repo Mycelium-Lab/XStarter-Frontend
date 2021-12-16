@@ -186,11 +186,184 @@ function SalePage(props) {
         }
         
     }
+    const socialLinks = () => {
+        if (sale) {
+            let socialLinks = [];
+            if(sale.immutables.description.socials){
+                socialLinks = Object.keys(sale.immutables.description.socials).map((key) => {
+                    if(key === 'website'){
+                        if(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(sale.immutables.description.socials[key])){
+                            return <a key={key} href={sale.immutables.description.socials[key]}>Website</a>    
+                        }else{
+                            return <a key={key} href={'https://' + sale.immutables.description.socials[key]}>Website</a>
+                        }
+                    } else if (key === 'medium'){
+                        return <a key={key} href={'https://medium.com/@' + sale.immutables.description.socials[key]}>Medium</a>
+                    } else if (key === 'twitter'){
+                        return <a key={key} href={'https://twitter.com/' + sale.immutables.description.socials[key]}>Twitter</a>
+                    } else if (key === 'telegram'){
+                        return <a key={key} href={'https://t.me/' + sale.immutables.description.socials[key]}>Telegram</a>
+                    }
+                })
+            }
+            return <span className="xs-top-block-name-links">
+                {socialLinks}
+            </span>
+        }
+    }
+    const saleStatus = () => {
+        if(saleMutables){
+            if(saleMutables.approved){
+                return 'APPROVED'
+            } else if (saleMutables.declined){
+                return 'DECLINED'
+            } else {
+                return 'PENDING'
+            }
+        }
+    }
+    const saleDescription = () => {
+        if (sale && sale.immutables.description.text) {
+            return <div>{sale.immutables.description.text}</div>
+        }
+    }
     if (saleMutables && sale) {
         return (
             <div className="xs-body-sale">
                 
                 <div className="xs-sale">
+                <div className="xs-sale-go-back" onClick={()=> {handleChange("projects")}}>GO BACK TO IDOs LIST</div>
+                <div className="xs-sale-block xs-sale-block-top">
+                        <div className="xs-block-top-img"> 
+                            <img src={sale.immutables.description.logo} alt="" />
+                        </div>
+                        <div className="xs-block-top-content">
+                            <span onClick={() => {}} className="xs-top-block-name">{sale.immutables.tokenName}</span>
+                            {socialLinks()}
+                        </div>
+                        <div className="xs-sale-status-block">
+                            <div className="xs-sale-network-name">SOLANA</div>
+                            <div className="xs-sale-status">{saleStatus()}</div>
+                        </div>
+                </div>
+                <div className="xs-sale-block">
+                    <div className="xs-sale-xblo">
+                        <div className="xs-sale-block-header">ATTENTION: POOL USES BSC (BINANCE SMART CHAIN) FOR CONVENIENCE</div>
+                        <div className="xs-sale-block-content">
+                        This project will launch and list on the SOLANA network, but purchases will be made on BSC (Binance Smart Chain) using BNB. This is done to make things easier for our holders. 
+                        <br></br>
+                        After the TGE (token generation event), your tokens will be automatically dropped to the address where you hold your LIGHT or your configured alternate address.
+                        </div>
+                    </div>
+                </div>
+                <div className="xs-sale-info-blocks">
+                    <div className="xs-sale-block xs-sale-info-block">
+                        <div className="xs-sale-xblo">
+                        <div className="xs-sale-block-header">PROJECT DESCRIPTION</div>
+                        <div className="xs-sale-block-content">{sale.immutables.description.text || '-'}</div>
+                        </div>
+                        <div className="xs-sale-proj-descr-site-address ">
+                        <div className="xs-sale-xblo">
+                            <div className="xs-sale-block-header">WEBSITE</div>
+                            <a className="xs-sale-block-content-orange" href="">GO TO WEBSITE</a>
+                            </div>
+                            <div className="xs-sale-xblo">
+                            <div className="xs-sale-block-header">TOKEN ADDRESS</div>
+                            <div className="xs-sale-block-content-orange">{`${sale.immutables.tokenAddress.slice(0,6)}...${sale.immutables.tokenAddress.slice(-4)}`}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="xs-sale-block xs-sale-info-block">
+                        <div className="xs-sale-info-row">
+                            <div className="xs-sale-xblo">
+                                <div className="xs-sale-block-header">TOTAL RAISE / HARD CAP</div>
+                                <div className="xs-sale-block-content-orange">{saleMutables.hardcap} {sale.immutables.tokenSymbol}</div>
+                            </div>
+                            <div className="xs-sale-xblo">
+                                <div className="xs-sale-block-header">SWAP RATE</div>
+                                <div className="xs-sale-block-content-orange">TBA</div>
+                            </div>
+                        </div>
+                        <div className="xs-sale-xblo">
+                            <div className="xs-sale-block-header">ROUND 1 OPENS</div>
+                            <div className="xs-sale-block-content-orange">{timeConverter(sale.immutables.startTimestamp)}</div>
+                        </div>
+                        <div className="xs-sale-info-row">
+                            <div className="xs-sale-xblo">
+                                <div className="xs-sale-block-header">PARTICIPANTS</div>
+                                <div className="xs-sale-block-content-orange">{saleMutables.numberOfParticipants}</div>
+                            </div>
+                            <div className="xs-sale-xblo">
+                                <div className="xs-sale-block-header">YOU PARTICIPATED WITH</div>
+                                <div className="xs-sale-block-content-orange">TODO</div>
+                            </div>
+                        </div>
+                        <div className="xs-sale-xblo">
+                            <div className="xs-sale-block-header">IDO PROGRESS: <span>{saleMutables.hardcapCompletionPercent}%</span></div>
+                            <div className="progress-wrap progress">
+                                    <div className="progress-bar progress"
+                                        style={{ width: saleMutables.hardcapCompletionPercent + '%' }}>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div className="xs-sale-block xs-sale-info-block">
+                        <div className="xs-sale-table-header">PROJECT INFORMATION</div>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>NAME</td>
+                                    <td>{sale.immutables.tokenName}</td>
+                                </tr>
+                                <tr>
+                                    <td>CHAIN</td>
+                                    <td>SOLANA</td>
+                                </tr>
+                                <tr>
+                                    <td>WEBSITE</td>
+                                    <td>{"-"}</td>
+                                </tr>
+                                <tr>
+                                    <td>SOCIALS</td>
+                                    <td>{socialLinks()}</td>
+                                </tr>
+                                <tr>
+                                    <td>WHITE PAPER</td>
+                                    <td>White Paper</td>
+                                </tr>
+                                <tr>
+                                    <td>SECURITY AUDIT REPORT</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="xs-sale-block xs-sale-info-block">
+                        <div className="xs-sale-table-header">TOKEN INFORMATION</div>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>NAME</td>
+                                    <td>{sale.immutables.tokenName}</td>
+                                </tr>
+                                <tr>
+                                    <td>SYMBOL</td>
+                                    <td>{sale.immutables.tokenSymbol}</td>
+                                </tr>
+                                <tr>
+                                    <td>DECIMALS</td>
+                                    <td>{sale.immutables.decimals}</td>
+                                </tr>
+                                <tr>
+                                    <td>TOTAL SUPPLY</td>
+                                    <td>TODO</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </div>
+                {/* <div className="xs-sale">
                 <div className="xs-sale-info">
                     <div className="ido-status-stats">
                                 <div>Token name - {sale.immutables.tokenName}</div>
@@ -204,7 +377,7 @@ function SalePage(props) {
                 </div>
                 <div className="xs-sale-separator"></div>
                     {saleAction()}
-                </div>
+                </div> */}
             </div>
         )
     } else {

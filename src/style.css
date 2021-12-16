@@ -1027,15 +1027,113 @@ select::-ms-expand {
 }
 .xs-sale {
     display: flex;
+    flex-direction: column;
+    width: 80%;
+}
+.xs-sale-block{
+    display: flex;
     padding: 30px;
     flex-direction: row;
-    width: 610px;
     background: rgba(37, 40, 51, 0.8);
     border: 1px solid #494949;
     box-sizing: border-box;
     box-shadow: 1px -1px 4px rgba(242, 242, 242, 0.25);
     border-radius: 8px;
     position: relative;
+    text-align: left;
+    margin-bottom: 20px;    
+}
+.xs-sale-go-back{
+    cursor: pointer;
+    color: #7A7A7A;
+    font-weight: bold;
+    margin-bottom: 15px;
+    align-self: flex-start;
+    margin-left: 30px;
+}
+.xs-sale-xblo{
+    margin-bottom: 25px;
+}
+.xs-sale-block-top {
+    border: 2px solid #FF824B;
+    box-sizing: border-box;
+    border-radius: 8px 8px 0px 0px;
+    align-items: center;
+}
+.xs-sale-status-block{
+    display: flex;
+    margin-left: auto;
+    align-items: center;
+    flex-direction: row;
+}
+.xs-sale-info-block{
+    margin-right: 2%;
+    width: 49%;
+    display: flex;
+    flex-direction: column;
+}
+ .xs-sale-info-block:nth-child(2n+2){
+    margin-right: 0px
+} 
+.xs-sale-proj-descr-site-address {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.xs-sale-info-blocks {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.xs-sale-info-row{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.xs-sale-descr-text {
+    color: #FF824B;
+
+}
+.xs-sale-network-name {
+    /* width: 100px; */
+    padding: 5px 15px 5px 15px;
+    color: #ffffff;
+    font-weight: bold;
+    border: 2px solid #1e2029;
+    border-radius: 8px 8px 8px 8px;
+}
+.xs-sale-block-content{
+
+}
+.xs-sale-block-content-orange{
+    color: #FF824B;
+    font-size: 14px;
+}
+.xs-sale-block tbody tr td {
+    text-align: left;
+    font-size: 14px;
+}
+.xs-sale-block tbody tr td:first-child{
+    font-weight: bold;
+}
+.xs-sale-block-header{
+    font-size: 14px;
+    color: #7A7A7A;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.xs-sale-table-header{
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+.xs-sale-status {
+    padding: 5px 15px 5px 15px;
+    margin-left: 10px;
+    color: #ffffff;
+    background-color: #1e2029;
+    border: 2px solid #1e2029;
+    border-radius: 8px 8px 8px 8px;
 }
 .xs-sale-separator {
     opacity: 0.3;
@@ -1091,6 +1189,8 @@ select::-ms-expand {
     justify-content: center;
     align-items: center;
     margin-bottom: 300px;
+    font-size: 15px;
+    color:#FFFFFF;
 }
 .xs-body-create-sale {
     display: flex;

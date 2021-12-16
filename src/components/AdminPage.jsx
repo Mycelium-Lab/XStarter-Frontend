@@ -14,6 +14,9 @@ function AdminPage(props) {
     const [addButtonActive, setAddButtonActive] = useState(false)
     const [removeButtonActive, setRemoveButtonActive] = useState(false)
     const [transactionCompleted, setTransactionCompleted] = useState(true)
+    const [currentAPR, setCurrentAPR] = useState('')
+    const [aprInput, setAPRInput] = useState('')
+    const methods = useSelector(state => state.wallet.methods);
     const provider = useSelector(state => state.wallet.provider)
     const isLoaded = useSelector(state => state.wallet.isLoaded)
     const address = useSelector(state => state.wallet.address)
@@ -32,6 +35,9 @@ function AdminPage(props) {
         if (saleFactory && isAdmin) {
             saleFactory.setAccountAddress(address)
         }
+        if(!!address && !!methods) {
+            methods.setWallet(address);
+        }
     }, [address])
     useEffect(() => {
         onInputAddressChange()
@@ -39,6 +45,12 @@ function AdminPage(props) {
     const setParams = async () => {
         const sf = await SaleFactory.create(provider, address)
         setSaleFactory(sf)
+        if(!!address && !!methods)
+        {
+            methods.setWallet(address);
+            const currentAPR = await methods.getCurrentAPR()
+            setCurrentAPR(currentAPR)
+        }
     }
     const setSaleCreator = async (value) => {
         if(inputAddress!=='' && Web3.utils.isAddress(inputAddress.toLowerCase()) && saleFactory != null){
@@ -83,17 +95,35 @@ function AdminPage(props) {
     const onChangeInput = async (onChangeEvent) => {
         setInputAddress(onChangeEvent.target.value)
     }
+    const onChangeInputAPR = (onChangeEvent) => {
+        if (onChangeEvent.target.value === '') {
+            setAPRInput('')
+        } else if (/^[0-9]$|^[1-9][0-9]$|^(100)$/.test(onChangeEvent.target.value)) {
+            setAPRInput(onChangeEvent.target.value)
+        }
+    }
+    const onClickChangeAPR = async () => {
+        if(aprInput!==''){
+            await methods.changeAPR(aprInput)
+            const currentAPR = await methods.getCurrentAPR()
+            setCurrentAPR(currentAPR)
+        }
+    }
     return <div className="xs-body-admin">
         <div className="xs-block">
         <div className="xs-admin-text">Team address</div>
             <input className="xs-admin-input" value={inputAddress} onChange={async (onChangeEvent) => {await onChangeInput(onChangeEvent)}}></input>
             { status }
-            <div className="xs-admin-block">
+            <div className="xs-admin-block mb30">
                 <button className="btn xs-admin-btn" disabled={!addButtonActive} onClick={async ()=>{ await setSaleCreator(true)}}>Grant permission to create sales</button>
                 <button className="btn xs-admin-btn" disabled={!removeButtonActive} onClick={async ()=>{ await setSaleCreator(false)}}>Revoke permission to create sales</button>
             </div>
-        
+            <div className="xs-admin-text">Current APR: {currentAPR}%</div>
+            <div className="xs-admin-text">Change APR (0-100):</div>
+            <input className="xs-admin-input" value={aprInput} onChange={ (onChangeEvent) => {onChangeInputAPR(onChangeEvent)}}></input>
+            <button className="btn xs-admin-btn" disabled={aprInput===''} onClick={onClickChangeAPR}>Change APR</button>
         </div>
+        
         </div>
 }
 export default AdminPage;

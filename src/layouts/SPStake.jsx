@@ -2,7 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import {useDispatch, useSelector} from 'react-redux'
 import {setTransactionInfo} from '../redux/transaction-info/actions';
-
+import logo from '../img/xstarter-logo.png';
 function SPStake(props) {
 
   const [amount, setAmount] = useState('');
@@ -11,10 +11,13 @@ function SPStake(props) {
   const [userTier, setUserTier] = useState('');
   const [currentStakes, setCurrentStakes] = useState([]);
   const [isApproved, setIsApproved] = useState(false);
+  const [totalRewardAmount, setTotalRewardAmount] = useState('');
   const [isModal, setIsModal] = useState(false);
   const [isInsufficientBalance, setIsInsufficientBalance] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [chainName, setChainName] = useState('');
+  const [currentAPR, setCurrentAPR] = useState('');
+  const [tvl, setTVL] = useState('');
   const methods = useSelector(state => state.wallet.methods);
   const wallet = useSelector(state => state.wallet.address);
   const currentChainId = useSelector(state => state.wallet.chainId);
@@ -39,7 +42,13 @@ function SPStake(props) {
       const tier = await methods.getUserTier();
       const currentStakes = await methods.getCurrentStakes();
       const isInsufficientBalance = parseFloat(balance) >= parseFloat(amount) ? false : true;
-  
+      const currentAPR = await methods.getCurrentAPR();
+      const tvl = await methods.getTVL();
+      const totalRewardAmount = calculateTotalRewardAmount(currentStakes)
+
+      setTotalRewardAmount(totalRewardAmount);
+      setTVL(tvl);
+      setCurrentAPR(currentAPR);
       setIsInsufficientBalance(isInsufficientBalance);
       setCurrentStakes(currentStakes)
       setUserBalance(balance);
@@ -47,6 +56,14 @@ function SPStake(props) {
       setUserTier(tier);
       setIsLoaded(true);  
     }
+  }
+  const calculateTotalRewardAmount = (currentStakes) => {
+    let totalReward = 0;
+    currentStakes.forEach((item)=>{
+      const { reward } = item
+      totalReward += reward;
+    })
+    return totalReward
   }
   async function setMaxAmount() {
     setIsInsufficientBalance(false);
@@ -208,35 +225,44 @@ function SPStake(props) {
     let button
     if((!wallet || !provider) && isInitialized)
     {
-      button = <button className="btn xs-stake-btn-loading">Connect wallet</button>
+      button = <button className="btn xs-stake-btn-loading xs-staking-active-button">Connect wallet</button>
     }
     else if(currentChainId !== rightChainId && !!wallet && isInitialized)
     {
-      button = <button className="btn xs-stake-btn-loading" onClick={switchNetwork}>Switch to {chainName}</button>
+      button = <button className="btn xs-stake-btn-loading xs-staking-active-button" onClick={switchNetwork}>Switch to {chainName}</button>
     }
     else if(!isLoaded)
     {
-      button = <button className="btn xs-stake-btn-loading">Loading....</button>
+      button = <button className="btn xs-stake-btn-loading xs-staking-active-button">Loading....</button>
     }
     else if (amount == 0)
     {
-      button = <button className="btn xs-stake-btn">Enter an amount</button>
+      button = <button className="btn xs-stake-btn xs-staking-active-button">Enter an amount</button>
     }
     else if(isInsufficientBalance)
     {
-      button = <button className="btn xs-stake-btn-insufficient-balance">Insufficient balance</button>
+      button = <button className="btn xs-stake-btn-insufficient-balance xs-staking-active-button">Insufficient balance</button>
     }
     else if(isApproved)
     {
-      button = <button onClick = {stakeXST} className="btn xs-stake-btn">Stake</button>
+      button = <button onClick = {stakeXST} className="btn xs-stake-btn xs-staking-active-button">Stake</button>
     }
     else
     {
-      button = <button onClick = {approve} className="btn xs-stake-btn">Approve</button>
+      button = <button onClick = {approve} className="btn xs-stake-btn xs-staking-active-button">Approve</button>
     }
     return (
       button
     );
+  }
+  function round(value, precision) {
+    if (Number.isInteger(precision)) {
+      let shift = Math.pow(10, precision);
+      // Limited preventing decimal issue
+      return (Math.round( value * shift + 0.00000000000001 ) / shift);
+    } else {
+      return Math.round(value);
+    }
   }
   function UnstakeButton(props)
   {
@@ -244,35 +270,92 @@ function SPStake(props) {
     
     if(userStakedAmount == 0 || !isLoaded ||currentChainId !== rightChainId && !!wallet && isInitialized)
     {
-      stakeButton = <div></div>
+      stakeButton = <button className="btn xs-staking-button">UNSTAKE</button>
     }
     else
     {
-      stakeButton = <button onClick={openModal} className="btn btn-wo-bg">Unstake</button>
+      stakeButton = <button onClick={openModal} className="btn xs-staking-button">UNSTAKE</button>
     }
     return stakeButton
   }
   return (
-    <div className="staking-tier mb80">
-      <StakesTable data={currentStakes}></StakesTable>
-      <span className="staking-tier-text mb40">
-        We are proud to see you as part of XStarter community. Your current tier is: {userTier}
-      </span>
-      <div className="xs-block">
-        <div className="staking-tier-stats">
-          <div><span>Balance:</span> <span>{userBalance} XS</span></div>
-          <div><span>Staked:</span> <span>{userStakedAmount} XS</span></div>
+    <>
+    <StakesTable data={currentStakes}></StakesTable>
+    <div className="xs-staking-info-header mb30">
+      STAKE YOUR XS TO GET YOUR ALLOCATION TIER 
+      <br></br>
+      AND EARN COMMUNITY STAKING REWARD
+    </div>
+    <div className="xs-staking-info-blocks">
+      <div className="xs-staking-block xs-staking-block-green xs-staking-info-block">
+        <div className="xs-staking-info-block-header">
+          {currentAPR||'0'} %
         </div>
-        <div className="staking-tier-stats-input">
+        <div className="xs-staking-info-block-content">
+          CURRENT APR
+        </div>
+      </div>
+      <div className="xs-staking-block xs-staking-info-block">
+        <div className="xs-staking-info-block-header">
+          {tvl||'0'}XS
+        </div>
+        <div className="xs-staking-info-block-content">
+          TVL IN STAKING POOL
+        </div>
+      </div>
+      <div className="xs-staking-block xs-staking-info-block">
+        <div className="xs-staking-info-block-header">
+          {round((userStakedAmount * parseInt(currentAPR))/365, 5) || '0'}XS
+        </div>
+        <div className="xs-staking-info-block-content">
+          YOUR AVERAGE REWARDS PER DAY
+        </div>
+      </div>
+      <div className="xs-staking-block xs-staking-stake-block">
+      <div className="xs-staking-stake-buttons mb30">
+      <StakeButton></StakeButton>
+      <UnstakeButton></UnstakeButton>
+      </div>
+      <div>
+      <div className="xs-staking-input-label">STAKE LIGHT</div>
+      <div className="staking-tier-stats-input">
           <input onChange={async (e) => {changeInput(e)}} type="tel" placeholder={0.0} value={amount}/>
           <button className="btn btn-max" onClick={setMaxAmount}>MAX</button>
         </div>
-        <div className="staking-tier-stats-btns">
-          <StakeButton></StakeButton>
-          <UnstakeButton></UnstakeButton>
+    </div>
+    
+    </div>
+    <div className="xs-staking-block xs-staking-reward-block">
+      <div className="xs-staking-input-label">YOUR REWARDS</div>
+      <div className="xs-staking-reward mb10">
+        <img src={logo}></img>
+        <div className="xs-staking-reward-text-block">
+          <div className="xs-staking-reward-value">{totalRewardAmount}</div>
+          <div className="xs-staking-reward-tokenname">XS</div>
+        </div>
+      </div>
+      <button onClick={openModal}className="btn btn-wo-bg xs-staking-claim-rewards-button">CLAIM REWARDS</button>
+      <div className="xs-staking-input-label">STAKED</div>
+      <div className="xs-staking-reward mb30">
+        <img src={logo}></img>
+        <div className="xs-staking-reward-text-block">
+          <div className="xs-staking-reward-value">{userStakedAmount}</div>
+          <div className="xs-staking-reward-tokenname">XS</div>
+        </div>
+      </div>
+      <div className="xs-staking-input-label">UNSTAKED</div>
+      <div className="xs-staking-reward">
+        <img src={logo}></img>
+        <div className="xs-staking-reward-text-block">
+          <div className="xs-staking-reward-value">{userBalance - userStakedAmount}</div>
+          <div className="xs-staking-reward-tokenname">XS</div>
         </div>
       </div>
     </div>
+    </div>
+
+   
+    </>
   );
     
     

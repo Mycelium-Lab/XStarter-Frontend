@@ -121,358 +121,425 @@ const abiProxy = [
 ];
 
 const abiStake = [
-  {
-     "inputs":[
-        {
-           "internalType":"address",
-           "name":"_xstarterToken",
-           "type":"address"
-        },
-        {
-           "internalType":"address",
-           "name":"_admin",
-           "type":"address"
-        },
-        {
-           "internalType":"uint256[]",
-           "name":"_tierValues",
-           "type":"uint256[]"
-        }
-     ],
-     "stateMutability":"nonpayable",
-     "type":"constructor"
-  },
-  {
-     "anonymous":false,
-     "inputs":[
-        {
-           "indexed":false,
-           "internalType":"uint256",
-           "name":"idx",
-           "type":"uint256"
-        },
-        {
-           "indexed":false,
-           "internalType":"address",
-           "name":"user",
-           "type":"address"
-        },
-        {
-           "indexed":false,
-           "internalType":"uint256",
-           "name":"stakeAmount",
-           "type":"uint256"
-        }
-     ],
-     "name":"CreateStake",
-     "type":"event"
-  },
-  {
-     "anonymous":false,
-     "inputs":[
-        {
-           "indexed":false,
-           "internalType":"uint256",
-           "name":"idx",
-           "type":"uint256"
-        },
-        {
-           "indexed":false,
-           "internalType":"address",
-           "name":"user",
-           "type":"address"
-        },
-        {
-           "indexed":false,
-           "internalType":"uint256",
-           "name":"rewardAmount",
-           "type":"uint256"
-        }
-     ],
-     "name":"ReceiveStakeReward",
-     "type":"event"
-  },
-  {
-     "anonymous":false,
-     "inputs":[
-        {
-           "indexed":false,
-           "internalType":"uint256",
-           "name":"idx",
-           "type":"uint256"
-        },
-        {
-           "indexed":false,
-           "internalType":"address",
-           "name":"user",
-           "type":"address"
-        },
-        {
-           "indexed":false,
-           "internalType":"uint256",
-           "name":"rewardAmount",
-           "type":"uint256"
-        }
-     ],
-     "name":"WithdrawReward",
-     "type":"event"
-  },
-  {
-     "anonymous":false,
-     "inputs":[
-        {
-           "indexed":false,
-           "internalType":"uint256",
-           "name":"idx",
-           "type":"uint256"
-        },
-        {
-           "indexed":false,
-           "internalType":"address",
-           "name":"user",
-           "type":"address"
-        },
-        {
-           "indexed":false,
-           "internalType":"uint256",
-           "name":"rewardAmount",
-           "type":"uint256"
-        }
-     ],
-     "name":"WithdrawStake",
-     "type":"event"
-  },
-  {
-     "inputs":[
-        
-     ],
-     "name":"amountOfTiers",
-     "outputs":[
-        {
-           "internalType":"uint256",
-           "name":"",
-           "type":"uint256"
-        }
-     ],
-     "stateMutability":"view",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        {
-           "internalType":"uint256",
-           "name":"stakeIdx",
-           "type":"uint256"
-        }
-     ],
-     "name":"calculateInterestAmount",
-     "outputs":[
-        {
-           "internalType":"uint256",
-           "name":"",
-           "type":"uint256"
-        }
-     ],
-     "stateMutability":"view",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        
-     ],
-     "name":"mintedXStarterTokens",
-     "outputs":[
-        {
-           "internalType":"uint256",
-           "name":"",
-           "type":"uint256"
-        }
-     ],
-     "stateMutability":"view",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        {
-           "internalType":"uint256",
-           "name":"stakeAmount",
-           "type":"uint256"
-        }
-     ],
-     "name":"stake",
-     "outputs":[
-        {
-           "internalType":"uint256",
-           "name":"stakeIdx",
-           "type":"uint256"
-        }
-     ],
-     "stateMutability":"nonpayable",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        {
-           "internalType":"uint256",
-           "name":"",
-           "type":"uint256"
-        }
-     ],
-     "name":"stakeList",
-     "outputs":[
-        {
-           "internalType":"address",
-           "name":"staker",
-           "type":"address"
-        },
-        {
-           "internalType":"uint256",
-           "name":"stakeAmount",
-           "type":"uint256"
-        },
-        {
-           "internalType":"uint256",
-           "name":"withdrawnInterestAmount",
-           "type":"uint256"
-        },
-        {
-           "internalType":"uint256",
-           "name":"stakeTimestamp",
-           "type":"uint256"
-        },
-        {
-           "internalType":"bool",
-           "name":"active",
-           "type":"bool"
-        }
-     ],
-     "stateMutability":"view",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        {
-           "internalType":"uint256",
-           "name":"",
-           "type":"uint256"
-        }
-     ],
-     "name":"tierValues",
-     "outputs":[
-        {
-           "internalType":"uint256",
-           "name":"",
-           "type":"uint256"
-        }
-     ],
-     "stateMutability":"view",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        {
-           "internalType":"uint256",
-           "name":"tierValue",
-           "type":"uint256"
-        },
-        {
-           "internalType":"uint256",
-           "name":"tierIndex",
-           "type":"uint256"
-        }
-     ],
-     "name":"updateSpecificTierValue",
-     "outputs":[
-        
-     ],
-     "stateMutability":"nonpayable",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        {
-           "internalType":"uint256[]",
-           "name":"_tierValues",
-           "type":"uint256[]"
-        }
-     ],
-     "name":"updateTierValues",
-     "outputs":[
-        
-     ],
-     "stateMutability":"nonpayable",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        {
-           "internalType":"address",
-           "name":"",
-           "type":"address"
-        }
-     ],
-     "name":"userStakeAmount",
-     "outputs":[
-        {
-           "internalType":"uint256",
-           "name":"",
-           "type":"uint256"
-        }
-     ],
-     "stateMutability":"view",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        {
-           "internalType":"address",
-           "name":"",
-           "type":"address"
-        }
-     ],
-     "name":"userTiers",
-     "outputs":[
-        {
-           "internalType":"uint256",
-           "name":"",
-           "type":"uint256"
-        }
-     ],
-     "stateMutability":"view",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        {
-           "internalType":"uint256",
-           "name":"stakeIdx",
-           "type":"uint256"
-        }
-     ],
-     "name":"withdraw",
-     "outputs":[
-        
-     ],
-     "stateMutability":"nonpayable",
-     "type":"function"
-  },
-  {
-     "inputs":[
-        
-     ],
-     "name":"xstarterToken",
-     "outputs":[
-        {
-           "internalType":"contract XStarterToken",
-           "name":"",
-           "type":"address"
-        }
-     ],
-     "stateMutability":"view",
-     "type":"function"
-  }
+   {
+      "inputs": [
+         {
+            "internalType": "address",
+            "name": "_xstarterToken",
+            "type": "address"
+         },
+         {
+            "internalType": "address",
+            "name": "_admin",
+            "type": "address"
+         },
+         {
+            "internalType": "uint256[]",
+            "name": "_tierValues",
+            "type": "uint256[]"
+         },
+         {
+            "internalType": "uint256",
+            "name": "initialAPR",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "idx",
+            "type": "uint256"
+         },
+         {
+            "indexed": false,
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+         },
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "stakeAmount",
+            "type": "uint256"
+         }
+      ],
+      "name": "CreateStake",
+      "type": "event"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "idx",
+            "type": "uint256"
+         },
+         {
+            "indexed": false,
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+         },
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "rewardAmount",
+            "type": "uint256"
+         }
+      ],
+      "name": "ReceiveStakeReward",
+      "type": "event"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "idx",
+            "type": "uint256"
+         },
+         {
+            "indexed": false,
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+         },
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "rewardAmount",
+            "type": "uint256"
+         }
+      ],
+      "name": "WithdrawReward",
+      "type": "event"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "idx",
+            "type": "uint256"
+         },
+         {
+            "indexed": false,
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+         },
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "rewardAmount",
+            "type": "uint256"
+         }
+      ],
+      "name": "WithdrawStake",
+      "type": "event"
+   },
+   {
+      "inputs": [],
+      "name": "amountOfTiers",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "name": "aprPeriods",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "startTimestamp",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "endTimestamp",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "aprRate",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "aprPeriodsLength",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256",
+            "name": "stakeIdx",
+            "type": "uint256"
+         }
+      ],
+      "name": "calculateInterestAmount",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256",
+            "name": "newAPR",
+            "type": "uint256"
+         }
+      ],
+      "name": "changeAPR",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "mintedXStarterTokens",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256",
+            "name": "stakeAmount",
+            "type": "uint256"
+         }
+      ],
+      "name": "stake",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "stakeIdx",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "name": "stakeList",
+      "outputs": [
+         {
+            "internalType": "address",
+            "name": "staker",
+            "type": "address"
+         },
+         {
+            "internalType": "uint256",
+            "name": "stakeAmount",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "withdrawnInterestAmount",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "stakeTimestamp",
+            "type": "uint256"
+         },
+         {
+            "internalType": "bool",
+            "name": "active",
+            "type": "bool"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "name": "tierValues",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "totalStakedTokens",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "updateSenderTier",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256",
+            "name": "tierValue",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "tierIndex",
+            "type": "uint256"
+         }
+      ],
+      "name": "updateSpecificTierValue",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256[]",
+            "name": "_tierValues",
+            "type": "uint256[]"
+         }
+      ],
+      "name": "updateTierValues",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+         }
+      ],
+      "name": "userStakeAmount",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+         }
+      ],
+      "name": "userTiers",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256",
+            "name": "stakeIdx",
+            "type": "uint256"
+         }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "xstarterToken",
+      "outputs": [
+         {
+            "internalType": "contract XStarterToken",
+            "name": "",
+            "type": "address"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   }
 ]
-
 const abiRank = [
 	{
       "inputs": [

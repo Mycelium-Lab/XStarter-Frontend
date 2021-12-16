@@ -396,6 +396,9 @@ nav ul li button:focus::after {
     color: #FFFFFF;
     text-align: left;
 }
+.mb10{
+    margin-bottom: 10px;
+}
 .mb30 {
     margin-bottom: 30px;
 }
@@ -688,6 +691,7 @@ footer {
     align-items: center;
     color: #fff;
     font-weight: bold;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     line-height: 17px;
     padding: 6px 0 7px;
@@ -1391,5 +1395,138 @@ select::-ms-expand {
         width: 100%;
         width: -webkit-fill-available;
         width: fill-available;
+    }
+}
+.xs-staking-info-header{
+    text-align: left;
+    color: #FFFFFF;
+    font-size: 24px;
+    margin-left: 30px;
+}
+.xs-staking-info-blocks{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+.xs-staking-block{
+    background: rgba(37, 40, 51, 0.8);
+    border: 1px solid #494949;
+    box-sizing: border-box;
+    box-shadow: 1px -1px 4px rgba(242, 242, 242, 0.25);
+    border-radius: 8px;
+    padding: 30px;
+    position: relative;
+    color: #FFFFFF;
+    margin-bottom: 20px;
+}
+.xs-staking-block-green{
+    background: #00B682;
+    box-shadow: none;
+    border: none;
+}
+.xs-staking-info-block{
+    text-align: left;
+    color: #FFFFFF;
+    width: 32%;
+    height: 110px;
+    margin-bottom: 20px;
+}
+.xs-staking-info-block-header{
+    color: #FF824B;
+    font-size: 24px;
+}
+.xs-staking-stake-buttons{
+    background-color: #414141;
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    width: 100%;
+    border-radius: 8px;
+    font-size: 18px;
+}
+.xs-staking-active-button{
+    background-color: #FF824B;
+    border-radius: 8px;
+    padding: 8px 0 8px 0;
+    width: 50%;
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: normal;
+    -webkit-transition: none;
+}
+.xs-staking-active-button:hover{
+    background-color: #FF824B;
+    color:white;
+    border-color: #FF824B;
+    box-shadow: none;
+}
+.xs-staking-button{
+    background-color: #414141;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 0 8px 0;
+    width: 50%;
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: normal;
+    -webkit-transition: none;
+}
+.xs-staking-button:hover{
+    background-color: #414141;
+    color:white;
+    border: none;
+    box-shadow: none;
+
+}
+.xs-body-staking{
+    display: flex;
+    margin: 0 auto;
+    max-width: 1192px;
+    flex-direction: column;
+}
+.xs-staking-stake-block{
+    width: 66%;
+}
+.xs-staking-reward-block{
+    width: 32%;
+}
+.xs-staking-input-label{
+    text-align: left;
+    color: #7A7A7A;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+.xs-staking-claim-rewards-button{
+    border-radius: 8px;
+    padding: 8px 0 8px 0;
+    font-weight: normal;
+    border: 1px solid #FF824B;
+    margin-bottom: 30px;
+    font-size:14px;
+    width: 100%;
+}
+.xs-staking-reward{
+    display: flex;
+    flex-direction: row;
+}
+.xs-staking-reward-text-block{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-left: 10px;
+}
+.xs-staking-reward-tokenname{
+    color: #FF824B;
+}
+.xs-staking-info-block-content{
+    font-weight: bold;
+    font-size: 14px;
+}
+@media (max-width: 768px) {
+    .xs-staking-block{
+        width: 100%;
     }
 }

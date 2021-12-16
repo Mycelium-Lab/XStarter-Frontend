@@ -8,7 +8,7 @@ function StakingPage(props) {
     return (
         <div className="xs-body-staking">
           <SPStake />
-          
+{/*           
         <div className="staking-tables-wrapper">
           <span className="staking-tier-text mb40">
             To be eligible for any of the tiers you are required to stake the following:
@@ -20,7 +20,7 @@ function StakingPage(props) {
             
           </div>
         </div>
-        <button onClick={()=>handleChange('trade')} className="btn btn-go">GO to BUY XS tokens</button>
+        <button onClick={()=>handleChange('trade')} className="btn btn-go">GO to BUY XS tokens</button> */}
       </div>
     );
 }

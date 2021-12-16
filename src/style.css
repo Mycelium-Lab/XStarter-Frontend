@@ -1127,6 +1127,25 @@ select::-ms-expand {
     margin-bottom: 20px;
     font-weight: bold;
 }
+@media (max-width: 768px) {
+    .xs-sale-block-top{
+        flex-direction: column;
+    }
+    .xs-sale-status-block{
+        margin-left: 0px;
+        margin-top: 30px;
+    }
+    .xs-sale-info-block{
+        width: 100%;
+        margin-right: 0px;
+    }
+    .xs-sale-block table{
+        width: auto;
+    }
+    .xs-body-sale .xs-block-top-content {
+        text-align: center;
+    }
+}
 .xs-sale-status {
     padding: 5px 15px 5px 15px;
     margin-left: 10px;
@@ -1261,7 +1280,23 @@ select::-ms-expand {
     justify-content: space-between;
 }
 
-
+.xs-sale-social-links a {
+    color:#ffffff;
+    position: relative;
+    margin-right: 7px;
+}
+.xs-sale-social-links a:last-child {
+    margin-right: 0;
+}
+.xs-sale-social-links a::after {
+    content: '|';
+    position: absolute;
+    right: -6px;
+    top: 0px;
+}
+.xs-sale-social-links a:last-child::after {
+    display: none;
+}
 .xs-create-sale-block {
     display: flex;
     flex-flow: column;

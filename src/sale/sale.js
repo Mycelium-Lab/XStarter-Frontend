@@ -233,6 +233,18 @@ export class Sale {
         return currentBlock.timestamp
     }
 
+    async getTotalSupply() {
+        const erc20Contract = new this.web3.eth.Contract(erc20Abi, this.immutables.tokenAddress)
+        const totalSupply = await erc20Contract.methods.totalSupply().call();
+        return this.noDecimals(totalSupply, this.immutables.decimals);
+    }
+    async getTokenName() {
+        const erc20Contract = new this.web3.eth.Contract(erc20Abi, this.immutables.tokenAddress)
+        return erc20Contract.methods.name().call();
+    }
+    async getTokenBalance(){
+        return this.saleContract.methods.tokenBalances(this.account).call()
+    }
     async getMutables() {
         const [
             status,

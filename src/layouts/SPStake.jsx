@@ -105,6 +105,8 @@ function SPStake(props) {
           type: 'stakeXS'
         }));
       const receipt = await methods.waitTransaction(tx);
+      const isApproved = await methods.isEnoughAllowance(amount);
+      setIsApproved(isApproved)
       if(!!receipt)
       {
         setUserInfo();
@@ -305,7 +307,7 @@ function SPStake(props) {
       </div>
       <div className="xs-staking-block xs-staking-info-block">
         <div className="xs-staking-info-block-header">
-          {round((userStakedAmount * parseInt(currentAPR))/365, 5) || '0'}XS
+          {round((userStakedAmount * parseInt(currentAPR))/36500, 7) || '0'}XS
         </div>
         <div className="xs-staking-info-block-content">
           YOUR AVERAGE REWARDS PER DAY
@@ -335,6 +337,7 @@ function SPStake(props) {
         </div>
       </div>
       <button onClick={openModal}className="btn btn-wo-bg xs-staking-claim-rewards-button">CLAIM REWARDS</button>
+      <div className="xs-staking-input-label">YOUR TIER: {userTier}</div>
       <div className="xs-staking-input-label">STAKED</div>
       <div className="xs-staking-reward mb30">
         <img src={logo}></img>
@@ -343,14 +346,17 @@ function SPStake(props) {
           <div className="xs-staking-reward-tokenname">XS</div>
         </div>
       </div>
+      
+      
       <div className="xs-staking-input-label">UNSTAKED</div>
       <div className="xs-staking-reward">
         <img src={logo}></img>
         <div className="xs-staking-reward-text-block">
-          <div className="xs-staking-reward-value">{userBalance - userStakedAmount}</div>
+          <div className="xs-staking-reward-value">{userBalance}</div>
           <div className="xs-staking-reward-tokenname">XS</div>
         </div>
       </div>
+      
     </div>
     </div>
 

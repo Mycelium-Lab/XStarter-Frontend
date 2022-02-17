@@ -16,3 +16,4 @@
 
 ### `npm run build`
 
+## Контракты находятся в репозтории https://github.com/Mycelium-Lab/XStarter-Contracts
